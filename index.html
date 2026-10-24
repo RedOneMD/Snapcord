@@ -1,0 +1,844 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#000000">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Klick">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Klick</title>
+<style>
+:root{
+  --accent:#5865f2;--danger:#ff4d5e;--text:#fff;--muted:#a3a3ad;
+  --panel:rgba(22,22,28,.94);--line:rgba(255,255,255,.14);
+  --safe-t:env(safe-area-inset-top,0px);--safe-b:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+html,body{height:100%;background:#000;color:var(--text);overflow:hidden;overscroll-behavior:none;
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+button,label{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+.vh{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden}
+.screen{position:fixed;inset:0;display:none;background:#000}
+.screen.active{display:block}
+
+/* Kamera */
+#video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#0b0b0f}
+#video.mirror{transform:scaleX(-1)}
+.tint,.fx{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.touch{position:absolute;inset:0;touch-action:none}
+.topbar{position:absolute;left:0;right:0;top:0;z-index:5;display:flex;justify-content:space-between;align-items:center;
+  padding:calc(var(--safe-t) + 12px) 16px 18px;background:linear-gradient(rgba(0,0,0,.45),transparent)}
+.brand{font-weight:800;font-size:18px;letter-spacing:.02em;text-shadow:0 1px 6px rgba(0,0,0,.5)}
+.icon-btn{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:rgba(0,0,0,.35);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.icon-btn svg{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.icon-btn.txt{font-weight:800;font-size:16px}
+.icon-btn.ghost{visibility:hidden}
+.tools{display:flex;gap:10px}
+.bottombar{position:absolute;left:0;right:0;bottom:0;z-index:5;padding-bottom:calc(var(--safe-b) + 18px);
+  background:linear-gradient(transparent,rgba(0,0,0,.55));transition:opacity .15s}
+.filters{display:flex;gap:12px;overflow-x:auto;padding:14px 16px;scrollbar-width:none}
+.filters::-webkit-scrollbar{display:none}
+.chip{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12px;color:var(--muted);font-weight:600}
+.sw{position:relative;width:54px;height:54px;border-radius:50%;overflow:hidden;border:2px solid rgba(255,255,255,.35)}
+.sw-img,.sw-tint{position:absolute;inset:0}
+.sw-img{background:radial-gradient(circle at 32% 30%,#ffd166 0 17%,transparent 18%),linear-gradient(160deg,#4cc9f0,#f72585 55%,#7209b7)}
+.chip.on{color:#fff}
+.chip.on .sw{border-color:#fff;box-shadow:0 0 0 3px var(--accent)}
+.shutter-row{display:flex;align-items:center;justify-content:space-around;padding:4px 24px 0}
+.shutter{width:80px;height:80px;border-radius:50%;border:5px solid #fff;background:rgba(255,255,255,.15);transition:transform .1s}
+.shutter:active{transform:scale(.9)}
+.flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:6}
+.flash.go{animation:flash .35s ease-out}
+@keyframes flash{from{opacity:.85}to{opacity:0}}
+.filter-name{position:absolute;left:0;right:0;top:40%;z-index:4;text-align:center;font-size:30px;font-weight:800;
+  text-shadow:0 2px 12px rgba(0,0,0,.6);opacity:0;transition:opacity .3s;pointer-events:none}
+.filter-name.show{opacity:1}
+.cam-msg{position:absolute;inset:0;z-index:3;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:16px;padding:32px;text-align:center;line-height:1.5;color:var(--muted);background:#0b0b0f}
+
+/* Bearbeiten */
+.stage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.frame{position:relative;overflow:hidden;border-radius:12px;background:#111}
+.frame canvas{display:block;width:100%;height:100%}
+.layer{position:absolute;inset:0;touch-action:none}
+.caption{position:absolute;left:0;right:0;display:flex;align-items:center;justify-content:center;padding:0 4%;
+  background:rgba(0,0,0,.55);font-weight:600}
+.caption input{all:unset;width:100%;text-align:center;color:#fff;font:inherit;pointer-events:none;user-select:text;-webkit-user-select:text}
+.caption.editing input{pointer-events:auto}
+.sticker{position:absolute;transform:translate(-50%,-50%);line-height:1;white-space:nowrap;
+  font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif}
+.send-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:4px 16px 0}
+.tap-hint{font-size:13px;color:rgba(255,255,255,.75);text-shadow:0 1px 4px rgba(0,0,0,.6)}
+.send-btn{display:flex;align-items:center;gap:8px;padding:14px 20px;border-radius:999px;background:var(--accent);
+  font-weight:700;font-size:16px;box-shadow:0 6px 20px rgba(88,101,242,.45)}
+.send-btn svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linejoin:round;stroke-linecap:round}
+.trash{position:absolute;left:50%;bottom:calc(var(--safe-b) + 40px);z-index:7;width:60px;height:60px;border-radius:50%;
+  display:grid;place-items:center;background:rgba(0,0,0,.5);opacity:0;pointer-events:none;
+  transform:translateX(-50%) scale(.8);transition:.15s}
+.trash svg{width:26px;height:26px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#edit.dragging .trash{opacity:1}
+#edit.dragging .bottombar{opacity:0;pointer-events:none}
+.trash.hot{background:var(--danger);transform:translateX(-50%) scale(1.1)}
+
+/* Sheets */
+.backdrop{position:fixed;inset:0;z-index:19;background:rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:opacity .2s}
+.backdrop.open{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:20;max-height:85dvh;overflow:auto;
+  padding:20px 16px calc(var(--safe-b) + 20px);border-radius:20px 20px 0 0;background:var(--panel);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);transform:translateY(105%);transition:transform .25s}
+.sheet.open{transform:none}
+.sheet .grab{width:40px;height:5px;border-radius:3px;background:rgba(255,255,255,.25);margin:-8px auto 14px}
+.sheet h2{font-size:20px;margin-bottom:14px}
+.sheet h3{font-size:12px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin:22px 0 8px}
+.field{display:block;margin-bottom:12px;font-size:13px;color:var(--muted)}
+.input{display:block;width:100%;margin-top:6px;padding:13px 14px;border-radius:12px;border:1px solid var(--line);
+  background:rgba(255,255,255,.06);color:#fff;font:inherit;font-size:16px;user-select:text;-webkit-user-select:text}
+.input:focus{outline:2px solid var(--accent);outline-offset:-1px}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px 18px;border-radius:999px;
+  background:rgba(255,255,255,.12);font-weight:700}
+.btn.primary{background:var(--accent)}
+.btn.inline{display:inline-flex;width:auto}
+.btn:disabled{opacity:.5}
+.chan-pick{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.chan-pick button{padding:10px 14px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.06);font-weight:600}
+.chan-pick button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent)}
+.chan-row{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
+.chan-row .n{flex:1;font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.chan-row small{display:block;color:var(--muted);font-weight:400}
+.chan-row button{color:var(--danger);font-weight:600;padding:8px}
+.hint{margin-top:10px;font-size:13px;line-height:1.45;color:var(--muted)}
+.hint.warn{color:#ffb4a8}
+.empty{color:var(--muted);padding:6px 0 4px}
+.sticker-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:4px}
+.sticker-grid button{font-size:34px;padding:8px 0;border-radius:12px;
+  font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif}
+.sticker-grid button:active{background:rgba(255,255,255,.1)}
+.toast{position:fixed;left:50%;top:calc(var(--safe-t) + 70px);z-index:50;max-width:calc(100% - 32px);padding:12px 18px;
+  border-radius:999px;background:rgba(22,22,28,.96);font-weight:600;font-size:14px;text-align:center;
+  opacity:0;transform:translate(-50%,-20px);transition:.25s;pointer-events:none}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.toast.err{background:var(--danger)}
+</style>
+</head>
+<body>
+
+<input type="file" id="galleryInput" class="vh" accept="image/*">
+
+<section id="cam" class="screen active">
+  <video id="video" playsinline muted autoplay></video>
+  <div id="camTint" class="tint"></div>
+  <canvas id="camFx" class="fx"></canvas>
+  <div id="camTouch" class="touch"></div>
+  <div id="filterName" class="filter-name"></div>
+  <div id="camMsg" class="cam-msg" hidden>
+    <p></p>
+    <label for="galleryInput" class="btn inline primary">Bild aus Galerie wählen</label>
+  </div>
+  <header class="topbar">
+    <button class="icon-btn" id="btnSettings" aria-label="Einstellungen"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+    <div class="brand">Klick</div>
+    <button class="icon-btn" id="btnFlip" aria-label="Kamera wechseln"><svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></button>
+  </header>
+  <footer class="bottombar">
+    <div class="filters" id="camFilters"></div>
+    <div class="shutter-row">
+      <label class="icon-btn" for="galleryInput" aria-label="Bild aus Galerie"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></label>
+      <button class="shutter" id="btnShutter" aria-label="Foto aufnehmen"></button>
+      <span class="icon-btn ghost"></span>
+    </div>
+  </footer>
+  <div id="flash" class="flash"></div>
+</section>
+
+<section id="edit" class="screen">
+  <div class="stage">
+    <div class="frame" id="frame">
+      <canvas id="editCanvas"></canvas>
+      <div class="layer" id="overlay">
+        <div id="stickerLayer"></div>
+        <div class="caption" id="caption" hidden><input id="capInput" maxlength="80" enterkeyhint="done" autocomplete="off" spellcheck="false"></div>
+      </div>
+    </div>
+  </div>
+  <header class="topbar">
+    <button class="icon-btn" id="btnDiscard" aria-label="Verwerfen"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    <div class="tools">
+      <button class="icon-btn txt" id="btnText" aria-label="Text">Aa</button>
+      <button class="icon-btn" id="btnSticker" aria-label="Sticker"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg></button>
+      <button class="icon-btn" id="btnSave" aria-label="Speichern"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+    </div>
+  </header>
+  <footer class="bottombar">
+    <div class="filters" id="editFilters"></div>
+    <div class="send-row">
+      <span class="tap-hint">Tippe aufs Bild für Text</span>
+      <button class="send-btn" id="btnSend">An Discord <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+    </div>
+  </footer>
+  <div class="trash" id="trash"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m3 0V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/></svg></div>
+</section>
+
+<div class="backdrop" id="backdrop"></div>
+
+<div class="sheet" id="sendSheet">
+  <div class="grab"></div>
+  <h2>An Discord senden</h2>
+  <div id="sendEmpty" hidden>
+    <p class="empty">Noch kein Kanal eingerichtet.</p>
+    <button class="btn primary" id="sendToSettings" style="margin-top:14px">Kanal einrichten</button>
+  </div>
+  <div id="sendForm">
+    <div class="chan-pick" id="sendChans"></div>
+    <label class="field">Nachricht (optional)<input class="input" id="sendMsg" maxlength="1900" placeholder="Was gibt’s zu sehen?"></label>
+    <button class="btn primary" id="sendGo">Senden</button>
+  </div>
+</div>
+
+<div class="sheet" id="stickerSheet">
+  <div class="grab"></div>
+  <h2>Sticker</h2>
+  <div class="sticker-grid" id="stickerGrid"></div>
+  <p class="hint">Ziehen zum Verschieben, mit zwei Fingern größer/kleiner machen, zum Löschen auf den Mülleimer ziehen.</p>
+</div>
+
+<div class="sheet" id="settingsSheet">
+  <div class="grab"></div>
+  <h2>Einstellungen</h2>
+  <label class="field">Dein Name in Discord<input class="input" id="setName" maxlength="80" placeholder="z. B. Alex"></label>
+  <h3>Kanäle</h3>
+  <div id="chanList"></div>
+  <h3>Kanal hinzufügen</h3>
+  <label class="field">Name<input class="input" id="newName" maxlength="40" placeholder="z. B. snaps"></label>
+  <label class="field">Webhook-URL<input class="input" id="newUrl" inputmode="url" autocomplete="off" placeholder="https://discord.com/api/webhooks/…"></label>
+  <button class="btn primary" id="addChan">Hinzufügen</button>
+  <p class="hint">Webhook-URL bekommen: In Discord den Kanal bearbeiten → Integrationen → Webhooks → Neuer Webhook → „Webhook-URL kopieren“.</p>
+  <h3>Community</h3>
+  <button class="btn" id="shareSetup">Einrichtungslink teilen</button>
+  <p class="hint">Der Link richtet alle deine Kanäle mit einem Tipp in der App ein.</p>
+  <p class="hint warn">Achtung: Wer eine Webhook-URL kennt, kann in diesen Kanal posten. Teile sie und den Einrichtungslink nur in privaten Kanälen.</p>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+const $ = s => document.querySelector(s);
+const EMOJI_FONT = '"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';
+const CAP_FS = .048, CAP_H = 1.9, MAX_SIDE = 1600;
+const WEBHOOK_RE = /^https:\/\/(?:(?:canary|ptb)\.)?discord(?:app)?\.com\/api\/webhooks\/\d+\/[\w-]+\/?$/;
+const STICKERS = ['🎬','🍿','📺','🎥','🎧','🎵','🎸','🎤','🤖','🧠','💻','🎮','👾','🚀','🔥','✨','⭐','🌙','😂','😎','🤯','👀','💯','❤️'];
+
+// css = Filter fürs Bild, tint = Farbverlauf mit Mischmodus, fx = Effekte darüber
+const FILTERS = [
+  {name:'Normal', css:'none'},
+  {name:'Kino', css:'contrast(1.12) saturate(1.15) brightness(.98)', tint:{stops:['#008a9e','#ff8a3d'], dir:'v', blend:'soft-light', alpha:.45}, fx:['letterbox','vignette']},
+  {name:'Noir', css:'grayscale(1) contrast(1.4) brightness(.95)', fx:['vignette2','grain']},
+  {name:'Vintage', css:'sepia(.5) saturate(1.3) contrast(1.05) brightness(1.05)', tint:{stops:['#ffb36b','#ff6b9a'], dir:'d', blend:'soft-light', alpha:.35}, fx:['vignette','grain']},
+  {name:'VHS', css:'saturate(1.5) contrast(1.15) hue-rotate(-8deg) brightness(1.05)', fx:['scanlines','vhs']},
+  {name:'Neon', css:'saturate(1.8) contrast(1.25)', tint:{stops:['#ff00c8','#00e5ff'], dir:'d', blend:'overlay', alpha:.45}, fx:['vignette']},
+  {name:'KI', css:'grayscale(1) contrast(1.3) brightness(.9)', tint:{stops:['#33ff77','#33ff77'], dir:'v', blend:'multiply', alpha:1}, fx:['matrix','scanlines','vignette']},
+  {name:'Synthwave', css:'contrast(1.1) saturate(1.4)', tint:{stops:['#7b2ff7','#ff6b3d'], dir:'v', blend:'soft-light', alpha:.6}, fx:['vignette']},
+  {name:'Eis', css:'saturate(.85) brightness(1.08) contrast(1.05)', tint:{stops:['#5ab8ff','#bfe8ff'], dir:'v', blend:'soft-light', alpha:.5}},
+  {name:'Pop', css:'saturate(2.1) contrast(1.3) brightness(1.03)'},
+  {name:'Traum', css:'brightness(1.12) contrast(.9) saturate(1.2)', tint:{stops:['#ffd1f0','#c9d6ff'], dir:'d', blend:'screen', alpha:.25}, fx:['vignette']},
+];
+
+const store = {
+  get(k, d) { try { const v = localStorage.getItem('klick.' + k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+  set(k, v) { try { localStorage.setItem('klick.' + k, JSON.stringify(v)); } catch {} },
+};
+
+const state = {
+  f: store.get('filter', 0) % FILTERS.length,
+  base: null,
+  caption: {on:false, text:'', y:.72},
+  stickers: [],
+};
+let fw = 0, fh = 0, active = null, nextId = 1;
+
+/* ---------- Filter-Rendering ---------- */
+
+// Ältere Browser (z. B. iOS < 18) kennen ctx.filter nicht – dann rechnen wir die Pixel selbst
+const CANVAS_FILTER = (() => {
+  try {
+    const c = document.createElement('canvas'); c.width = c.height = 1;
+    const x = c.getContext('2d', {willReadFrequently:true});
+    x.filter = 'grayscale(1)'; x.fillStyle = '#f00'; x.fillRect(0, 0, 1, 1);
+    const d = x.getImageData(0, 0, 1, 1).data;
+    return d[0] === d[1];
+  } catch { return false; }
+})();
+
+function filterMatrix(css) {
+  let M = [1,0,0, 0,1,0, 0,0,1], o = [0,0,0];
+  const apply = (N, p = [0,0,0]) => {
+    const R = [];
+    for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) R[i*3+j] = N[i*3]*M[j] + N[i*3+1]*M[3+j] + N[i*3+2]*M[6+j];
+    o = [0,1,2].map(i => N[i*3]*o[0] + N[i*3+1]*o[1] + N[i*3+2]*o[2] + p[i]);
+    M = R;
+  };
+  const sat = s => [.213+.787*s, .715-.715*s, .072-.072*s, .213-.213*s, .715+.285*s, .072-.072*s, .213-.213*s, .715-.715*s, .072+.928*s];
+  css.replace(/([a-z-]+)\(([^)]+)\)/g, (_, n, raw) => {
+    const v = parseFloat(raw) / (raw.trim().endsWith('%') ? 100 : 1);
+    if (n === 'brightness') apply([v,0,0, 0,v,0, 0,0,v]);
+    else if (n === 'contrast') { const b = 128 * (1 - v); apply([v,0,0, 0,v,0, 0,0,v], [b,b,b]); }
+    else if (n === 'saturate') apply(sat(v));
+    else if (n === 'grayscale') apply(sat(1 - Math.min(1, v)));
+    else if (n === 'sepia') { const a = 1 - Math.min(1, v); apply([.393+.607*a, .769-.769*a, .189-.189*a, .349-.349*a, .686+.314*a, .168-.168*a, .272-.272*a, .534-.534*a, .131+.869*a]); }
+    else if (n === 'hue-rotate') {
+      const r = v * Math.PI / 180, c = Math.cos(r), s = Math.sin(r);
+      apply([.213+c*.787-s*.213, .715-c*.715-s*.715, .072-c*.072+s*.928,
+             .213-c*.213+s*.143, .715+c*.285+s*.140, .072-c*.072-s*.283,
+             .213-c*.213-s*.787, .715-c*.715+s*.715, .072+c*.928+s*.072]);
+    }
+  });
+  return {M, o};
+}
+
+function pixelFilter(x, w, h, css) {
+  const {M, o} = filterMatrix(css);
+  const img = x.getImageData(0, 0, w, h), d = img.data;
+  for (let i = 0; i < d.length; i += 4) {
+    const r = d[i], g = d[i+1], b = d[i+2];
+    d[i]   = M[0]*r + M[1]*g + M[2]*b + o[0];
+    d[i+1] = M[3]*r + M[4]*g + M[5]*b + o[1];
+    d[i+2] = M[6]*r + M[7]*g + M[8]*b + o[2];
+  }
+  x.putImageData(img, 0, 0);
+}
+
+let grainTile = null;
+function grain() {
+  if (grainTile) return grainTile;
+  const c = document.createElement('canvas'); c.width = c.height = 160;
+  const x = c.getContext('2d'), im = x.createImageData(160, 160);
+  for (let i = 0; i < im.data.length; i += 4) { const v = Math.random() * 255 | 0; im.data[i] = im.data[i+1] = im.data[i+2] = v; im.data[i+3] = 255; }
+  x.putImageData(im, 0, 0);
+  return grainTile = c;
+}
+
+function rng(seed) {
+  return () => { seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+}
+
+function vhsDate() {
+  const d = new Date(), m = ['JAN.','FEB.','MÄR.','APR.','MAI','JUN.','JUL.','AUG.','SEP.','OKT.','NOV.','DEZ.'][d.getMonth()];
+  const p = n => String(n).padStart(2, '0');
+  return `${m} ${p(d.getDate())} ${d.getFullYear()}  ${p(d.getHours())}:${p(d.getMinutes())}`;
+}
+
+function drawFx(x, w, h, fx = []) {
+  for (const f of fx) {
+    x.save();
+    if (f === 'vignette' || f === 'vignette2') {
+      const m = Math.max(w, h), g = x.createRadialGradient(w/2, h/2, m * .25, w/2, h/2, m * .75);
+      g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, `rgba(0,0,0,${f === 'vignette2' ? .75 : .5})`);
+      x.fillStyle = g; x.fillRect(0, 0, w, h);
+    } else if (f === 'grain') {
+      const s = Math.max(1, w / 600);
+      x.globalAlpha = .09; x.scale(s, s); x.fillStyle = x.createPattern(grain(), 'repeat'); x.fillRect(0, 0, w / s, h / s);
+    } else if (f === 'scanlines') {
+      const k = Math.max(2, Math.round(h / 300));
+      x.fillStyle = 'rgba(0,0,0,.2)';
+      for (let y = 0; y < h; y += k * 2) x.fillRect(0, y, w, k);
+    } else if (f === 'letterbox') {
+      const b = h * .07; x.fillStyle = '#000'; x.fillRect(0, 0, w, b); x.fillRect(0, h - b, w, b);
+    } else if (f === 'vhs') {
+      const fs = Math.round(w * .055), p = w * .06;
+      x.font = `700 ${fs}px ui-monospace,"Courier New",monospace`; x.fillStyle = '#fff';
+      x.shadowColor = 'rgba(0,0,0,.7)'; x.shadowBlur = fs * .2; x.shadowOffsetX = fs * .08;
+      x.textBaseline = 'top'; x.fillText('▶ PLAY', p, h * .1);
+      x.textBaseline = 'bottom'; x.fillText(vhsDate(), p, h * .78);
+    } else if (f === 'matrix') {
+      const r = rng(7), fs = w * .034, step = fs * 1.15, cols = Math.floor(w / step);
+      x.font = `${fs}px ui-monospace,monospace`; x.textAlign = 'center'; x.fillStyle = '#39ff88';
+      for (let i = 0; i < cols; i++) {
+        if (r() < .45) continue;
+        const len = 4 + r() * 14 | 0, start = r() * h * 1.1 - h * .1;
+        for (let j = 0; j < len; j++) { x.globalAlpha = .08 + .35 * j / len; x.fillText(r() < .5 ? '0' : '1', (i + .5) * w / cols, start + j * step); }
+      }
+    }
+    x.restore();
+  }
+}
+
+function drawFiltered(x, src, w, h, f) {
+  x.save();
+  if (f.css === 'none') x.drawImage(src, 0, 0, w, h);
+  else if (CANVAS_FILTER) { x.filter = f.css; x.drawImage(src, 0, 0, w, h); x.filter = 'none'; }
+  else { x.drawImage(src, 0, 0, w, h); pixelFilter(x, w, h, f.css); }
+  if (f.tint) {
+    const t = f.tint, g = t.dir === 'd' ? x.createLinearGradient(0, 0, w, h) : x.createLinearGradient(0, 0, 0, h);
+    g.addColorStop(0, t.stops[0]); g.addColorStop(1, t.stops[1]);
+    x.globalCompositeOperation = t.blend; x.globalAlpha = t.alpha; x.fillStyle = g; x.fillRect(0, 0, w, h);
+  }
+  x.restore();
+  drawFx(x, w, h, f.fx);
+}
+
+function setTint(el, f) {
+  if (!f.tint) { el.style.display = 'none'; return; }
+  const t = f.tint;
+  el.style.display = 'block';
+  el.style.background = `linear-gradient(${t.dir === 'd' ? '135deg' : '180deg'},${t.stops[0]},${t.stops[1]})`;
+  el.style.mixBlendMode = t.blend;
+  el.style.opacity = t.alpha;
+}
+
+/* ---------- Filterleiste ---------- */
+
+function buildChips(el) {
+  FILTERS.forEach((f, i) => {
+    const b = document.createElement('button');
+    b.className = 'chip'; b.dataset.i = i;
+    b.innerHTML = `<span class="sw"><span class="sw-img"></span><span class="sw-tint"></span></span><span></span>`;
+    b.lastChild.textContent = f.name;
+    if (f.css !== 'none') b.querySelector('.sw-img').style.filter = f.css;
+    setTint(b.querySelector('.sw-tint'), f);
+    b.onclick = () => setFilter(i);
+    el.appendChild(b);
+  });
+}
+
+let nameTimer;
+function setFilter(i) {
+  state.f = i; store.set('filter', i);
+  for (const c of document.querySelectorAll('.chip')) {
+    const on = +c.dataset.i === i;
+    c.classList.toggle('on', on);
+    if (on && c.offsetParent) c.scrollIntoView({inline:'center', block:'nearest', behavior:'smooth'});
+  }
+  if ($('#cam').classList.contains('active')) {
+    applyLiveFilter();
+    const n = $('#filterName'); n.textContent = FILTERS[i].name; n.classList.add('show');
+    clearTimeout(nameTimer); nameTimer = setTimeout(() => n.classList.remove('show'), 700);
+  } else renderEdit();
+}
+
+/* ---------- Kamera ---------- */
+
+const video = $('#video');
+let stream = null, facing = store.get('facing', 'user'), camToken = 0;
+
+function showCamMsg(text) { const m = $('#camMsg'); m.querySelector('p').textContent = text; m.hidden = false; }
+
+async function startCamera() {
+  stopCamera();
+  const token = ++camToken;
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    showCamMsg(window.isSecureContext ? 'Dein Browser unterstützt keine Kamera.' : 'Die Kamera funktioniert nur über HTTPS.');
+    return;
+  }
+  try {
+    const s = await navigator.mediaDevices.getUserMedia({video:{facingMode:facing, width:{ideal:1920}, height:{ideal:1080}}, audio:false});
+    if (token !== camToken) { s.getTracks().forEach(t => t.stop()); return; }
+    stream = s; video.srcObject = s;
+    video.classList.toggle('mirror', facing === 'user');
+    await video.play().catch(() => {});
+    $('#camMsg').hidden = true;
+  } catch (e) {
+    showCamMsg(e.name === 'NotAllowedError'
+      ? 'Kamerazugriff wurde verweigert. Erlaube ihn in den Browser-Einstellungen und lade die Seite neu.'
+      : 'Keine Kamera gefunden.');
+  }
+}
+
+function stopCamera() {
+  camToken++;
+  if (stream) stream.getTracks().forEach(t => t.stop());
+  stream = null; video.srcObject = null;
+}
+
+function flip() { facing = facing === 'user' ? 'environment' : 'user'; store.set('facing', facing); startCamera(); }
+
+function applyLiveFilter() {
+  const f = FILTERS[state.f];
+  video.style.filter = f.css === 'none' ? '' : f.css;
+  setTint($('#camTint'), f);
+  const c = $('#camFx'), dpr = Math.min(2, devicePixelRatio || 1);
+  c.width = innerWidth * dpr | 0; c.height = innerHeight * dpr | 0;
+  drawFx(c.getContext('2d'), c.width, c.height, f.fx);
+}
+
+function capture() {
+  const vw = video.videoWidth, vh = video.videoHeight;
+  if (!vw || !stream) return;
+  // Genau den sichtbaren Ausschnitt nehmen (object-fit: cover)
+  const ar = innerWidth / innerHeight;
+  let cw = vw, ch = vw / ar;
+  if (ch > vh) { ch = vh; cw = vh * ar; }
+  const s = Math.min(1, MAX_SIDE / Math.max(cw, ch));
+  const c = document.createElement('canvas');
+  c.width = Math.round(cw * s); c.height = Math.round(ch * s);
+  const x = c.getContext('2d');
+  if (facing === 'user') { x.translate(c.width, 0); x.scale(-1, 1); }
+  x.drawImage(video, (vw - cw) / 2, (vh - ch) / 2, cw, ch, 0, 0, c.width, c.height);
+  const fl = $('#flash'); fl.classList.remove('go'); void fl.offsetWidth; fl.classList.add('go');
+  openEditor(c);
+}
+
+let tp = null, lastTap = 0;
+$('#camTouch').addEventListener('pointerdown', e => { tp = {x:e.clientX, y:e.clientY}; });
+$('#camTouch').addEventListener('pointerup', e => {
+  if (!tp) return;
+  const dx = e.clientX - tp.x, dy = e.clientY - tp.y; tp = null;
+  if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) { setFilter((state.f + (dx < 0 ? 1 : -1) + FILTERS.length) % FILTERS.length); return; }
+  if (Math.hypot(dx, dy) < 10) {
+    const now = Date.now();
+    if (now - lastTap < 300) { flip(); lastTap = 0; } else lastTap = now;
+  }
+});
+
+$('#galleryInput').addEventListener('change', e => {
+  const file = e.target.files[0]; e.target.value = '';
+  if (!file) return;
+  const url = URL.createObjectURL(file), img = new Image();
+  img.onload = () => {
+    const s = Math.min(1, MAX_SIDE / Math.max(img.naturalWidth, img.naturalHeight));
+    const c = document.createElement('canvas');
+    c.width = Math.round(img.naturalWidth * s); c.height = Math.round(img.naturalHeight * s);
+    c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+    URL.revokeObjectURL(url);
+    openEditor(c);
+  };
+  img.onerror = () => { URL.revokeObjectURL(url); toast('Bild konnte nicht geladen werden', true); };
+  img.src = url;
+});
+
+/* ---------- Bearbeiten ---------- */
+
+function show(id) { for (const s of document.querySelectorAll('.screen')) s.classList.toggle('active', s.id === id); }
+
+function openEditor(canvas) {
+  state.base = canvas;
+  state.caption = {on:false, text:'', y:.72};
+  state.stickers = []; active = null;
+  $('#capInput').value = '';
+  stopCamera();
+  show('edit');
+  layoutEdit(); renderEdit(); renderStickers();
+  setFilter(state.f);
+}
+
+function closeEditor() { closeSheets(); state.base = null; show('cam'); setFilter(state.f); startCamera(); }
+
+function renderEdit() {
+  const b = state.base; if (!b) return;
+  const c = $('#editCanvas'); c.width = b.width; c.height = b.height;
+  drawFiltered(c.getContext('2d'), b, b.width, b.height, FILTERS[state.f]);
+}
+
+function layoutEdit() {
+  const b = state.base; if (!b) return;
+  const s = Math.min(innerWidth / b.width, innerHeight / b.height);
+  fw = b.width * s; fh = b.height * s;
+  const fr = $('#frame'); fr.style.width = fw + 'px'; fr.style.height = fh + 'px';
+  placeCaption(); placeStickers();
+}
+
+const cap = $('#caption'), capInput = $('#capInput');
+function placeCaption() {
+  if (!state.caption.on) { cap.hidden = true; return; }
+  cap.hidden = false;
+  const fs = fw * CAP_FS, bh = fs * CAP_H;
+  cap.style.fontSize = fs + 'px'; cap.style.height = bh + 'px';
+  cap.style.top = (state.caption.y * fh - bh / 2) + 'px';
+}
+function editCaption(y) {
+  state.caption.on = true;
+  if (y != null) state.caption.y = Math.min(.92, Math.max(.08, y));
+  placeCaption(); cap.classList.add('editing'); capInput.focus();
+}
+capInput.addEventListener('input', () => { state.caption.text = capInput.value; });
+capInput.addEventListener('keydown', e => { if (e.key === 'Enter') capInput.blur(); });
+capInput.addEventListener('blur', () => {
+  cap.classList.remove('editing');
+  if (!state.caption.text.trim()) { state.caption.on = false; placeCaption(); }
+});
+
+function renderStickers() {
+  const L = $('#stickerLayer'); L.innerHTML = '';
+  for (const s of state.stickers) {
+    const el = document.createElement('div');
+    el.className = 'sticker'; el.dataset.id = s.id; el.textContent = s.e;
+    L.appendChild(el);
+  }
+  placeStickers();
+}
+function placeStickers() {
+  for (const el of document.querySelectorAll('.sticker')) {
+    const s = state.stickers.find(t => t.id === +el.dataset.id); if (!s) continue;
+    el.style.left = s.x * fw + 'px'; el.style.top = s.y * fh + 'px'; el.style.fontSize = s.s * fw + 'px';
+  }
+}
+
+// Gesten: Sticker ziehen/pinchen, Textbalken verschieben, Tippen = Text
+const overlay = $('#overlay'), pointers = new Map();
+let gesture = null;
+const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+function overTrash(e) { const r = $('#trash').getBoundingClientRect(); return Math.hypot(e.clientX - (r.left + r.width / 2), e.clientY - (r.top + r.height / 2)) < 55; }
+
+overlay.addEventListener('pointerdown', e => {
+  if (e.target === capInput) return;
+  pointers.set(e.pointerId, {x:e.clientX, y:e.clientY});
+  overlay.setPointerCapture(e.pointerId);
+  if (pointers.size === 1) {
+    const st = e.target.closest('.sticker'), isCap = !!e.target.closest('.caption');
+    gesture = {type: st ? 'sticker' : isCap ? 'caption' : 'empty', x0:e.clientX, y0:e.clientY, moved:false, wasEditing: document.activeElement === capInput};
+    if (st) { active = state.stickers.find(t => t.id === +st.dataset.id); gesture.orig = {x:active.x, y:active.y}; }
+    if (isCap) gesture.orig = {y:state.caption.y};
+  } else if (pointers.size === 2 && active) {
+    const [a, b] = [...pointers.values()];
+    gesture = {type:'pinch', d0:dist(a, b), s0:active.s};
+    $('#edit').classList.remove('dragging');
+  }
+});
+overlay.addEventListener('pointermove', e => {
+  if (!pointers.has(e.pointerId) || !gesture) return;
+  pointers.set(e.pointerId, {x:e.clientX, y:e.clientY});
+  if (gesture.type === 'pinch') {
+    if (pointers.size < 2) return;
+    const [a, b] = [...pointers.values()];
+    active.s = Math.min(.9, Math.max(.05, gesture.s0 * dist(a, b) / gesture.d0));
+    placeStickers(); return;
+  }
+  const dx = e.clientX - gesture.x0, dy = e.clientY - gesture.y0;
+  if (!gesture.moved && Math.hypot(dx, dy) < 6) return;
+  gesture.moved = true;
+  if (gesture.type === 'sticker') {
+    active.x = gesture.orig.x + dx / fw; active.y = gesture.orig.y + dy / fh;
+    $('#edit').classList.add('dragging');
+    $('#trash').classList.toggle('hot', overTrash(e));
+    placeStickers();
+  } else if (gesture.type === 'caption') {
+    state.caption.y = Math.min(.95, Math.max(.05, gesture.orig.y + dy / fh));
+    placeCaption();
+  }
+});
+function endPointer(e) {
+  if (!pointers.delete(e.pointerId) || !gesture) return;
+  const g = gesture;
+  if (g.type === 'pinch') { if (!pointers.size) gesture = null; return; }
+  gesture = null;
+  if (g.type === 'sticker') {
+    if (g.moved && overTrash(e)) { state.stickers = state.stickers.filter(t => t !== active); active = null; renderStickers(); }
+    $('#edit').classList.remove('dragging'); $('#trash').classList.remove('hot');
+  } else if (!g.moved && e.type === 'pointerup') {
+    if (g.type === 'caption') editCaption();
+    else if (g.wasEditing) capInput.blur();
+    else if (!state.caption.on) editCaption((e.clientY - overlay.getBoundingClientRect().top) / fh);
+  }
+}
+overlay.addEventListener('pointerup', endPointer);
+overlay.addEventListener('pointercancel', endPointer);
+
+/* ---------- Export ---------- */
+
+const capFont = fs => `600 ${fs}px system-ui,-apple-system,"Segoe UI",Roboto,sans-serif`;
+function exportCanvas() {
+  const b = state.base, w = b.width, h = b.height;
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  const x = c.getContext('2d');
+  drawFiltered(x, b, w, h, FILTERS[state.f]);
+  const t = state.caption.text.trim();
+  if (state.caption.on && t) {
+    const bh = w * CAP_FS * CAP_H, cy = state.caption.y * h;
+    let fs = w * CAP_FS; x.font = capFont(fs);
+    const tw = x.measureText(t).width, max = w * .92;
+    if (tw > max) { fs *= max / tw; x.font = capFont(fs); }
+    x.fillStyle = 'rgba(0,0,0,.55)'; x.fillRect(0, cy - bh / 2, w, bh);
+    x.fillStyle = '#fff'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(t, w / 2, cy);
+  }
+  x.textAlign = 'center'; x.textBaseline = 'middle';
+  for (const s of state.stickers) { x.font = `${s.s * w}px ${EMOJI_FONT}`; x.fillText(s.e, s.x * w, s.y * h); }
+  return c;
+}
+const exportBlob = () => new Promise((res, rej) => exportCanvas().toBlob(b => b ? res(b) : rej(new Error('Export fehlgeschlagen')), 'image/jpeg', .9));
+
+async function saveImage() {
+  const blob = await exportBlob();
+  const file = new File([blob], `klick-${Date.now()}.jpg`, {type:'image/jpeg'});
+  if (navigator.canShare && navigator.canShare({files:[file]})) {
+    try { await navigator.share({files:[file]}); } catch {}
+    return;
+  }
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = file.name; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+}
+
+/* ---------- Discord ---------- */
+
+const channels = () => store.get('channels', []);
+let sendSel = store.get('last', 0), sending = false;
+
+function openSend() {
+  const chans = channels(), box = $('#sendChans');
+  $('#sendEmpty').hidden = chans.length > 0;
+  $('#sendForm').hidden = chans.length === 0;
+  if (sendSel >= chans.length) sendSel = 0;
+  box.innerHTML = '';
+  chans.forEach((c, i) => {
+    const b = document.createElement('button');
+    b.textContent = '#' + c.name;
+    b.setAttribute('aria-pressed', i === sendSel);
+    b.onclick = () => { sendSel = i; for (const x of box.children) x.setAttribute('aria-pressed', x === b); };
+    box.appendChild(b);
+  });
+  openSheet('#sendSheet');
+}
+
+async function send() {
+  if (sending) return;
+  const ch = channels()[sendSel]; if (!ch) return;
+  const btn = $('#sendGo');
+  sending = true; btn.disabled = true; btn.textContent = 'Wird gesendet …';
+  try {
+    const blob = await exportBlob();
+    const payload = {attachments:[{id:0, filename:'klick.jpg'}]};
+    const msg = $('#sendMsg').value.trim(), name = store.get('name', '').trim();
+    if (msg) payload.content = msg;
+    if (name) payload.username = name;
+    const fd = new FormData();
+    fd.append('payload_json', JSON.stringify(payload));
+    fd.append('files[0]', blob, 'klick.jpg');
+    let res;
+    try { res = await fetch(ch.url.replace(/\/$/, '') + '?wait=true', {method:'POST', body:fd}); }
+    catch { throw new Error('Keine Verbindung zu Discord. Bist du online?'); }
+    if (!res.ok) {
+      let detail = ''; try { detail = (await res.json()).message || ''; } catch {}
+      if (res.status === 401 || res.status === 404) throw new Error('Webhook ungültig oder gelöscht – bitte in den Einstellungen prüfen.');
+      if (res.status === 413) throw new Error('Bild ist zu groß für Discord.');
+      if (res.status === 429) throw new Error('Zu viele Posts – warte kurz.');
+      throw new Error(`Discord-Fehler ${res.status}${detail ? ': ' + detail : ''}`);
+    }
+    store.set('last', sendSel);
+    $('#sendMsg').value = '';
+    toast(`Gepostet in #${ch.name} ✓`);
+    closeEditor();
+  } catch (e) {
+    toast(e.message, true);
+  } finally {
+    sending = false; btn.disabled = false; btn.textContent = 'Senden';
+  }
+}
+
+/* ---------- Einstellungen ---------- */
+
+function renderChanList() {
+  const L = $('#chanList'), chans = channels();
+  L.innerHTML = '';
+  if (!chans.length) { L.innerHTML = '<p class="empty">Noch keine Kanäle.</p>'; return; }
+  chans.forEach((c, i) => {
+    const row = document.createElement('div'); row.className = 'chan-row';
+    const n = document.createElement('div'); n.className = 'n'; n.textContent = '#' + c.name;
+    const sm = document.createElement('small'); sm.textContent = 'Webhook …' + c.url.split('/').slice(-2, -1)[0].slice(-4);
+    n.appendChild(sm);
+    const del = document.createElement('button'); del.textContent = 'Entfernen';
+    del.onclick = () => {
+      if (!confirm(`#${c.name} entfernen?`)) return;
+      const next = channels(); next.splice(i, 1); store.set('channels', next); renderChanList();
+    };
+    row.append(n, del); L.appendChild(row);
+  });
+}
+
+function addChannel() {
+  const name = $('#newName').value.trim().replace(/^#/, ''), url = $('#newUrl').value.trim();
+  if (!name) return toast('Gib dem Kanal einen Namen', true);
+  if (!WEBHOOK_RE.test(url)) return toast('Das ist keine gültige Discord-Webhook-URL', true);
+  const chans = channels();
+  if (chans.some(c => c.url === url)) return toast('Diesen Webhook gibt es schon', true);
+  chans.push({name, url}); store.set('channels', chans);
+  $('#newName').value = ''; $('#newUrl').value = '';
+  renderChanList(); toast(`#${name} hinzugefügt ✓`);
+}
+
+const b64enc = s => btoa(unescape(encodeURIComponent(s))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+const b64dec = s => { s = s.replace(/-/g, '+').replace(/_/g, '/'); while (s.length % 4) s += '='; return decodeURIComponent(escape(atob(s))); };
+
+async function shareSetup() {
+  const chans = channels();
+  if (!chans.length) return toast('Füge zuerst einen Kanal hinzu', true);
+  const link = location.href.split('#')[0] + '#setup=' + b64enc(JSON.stringify({c: chans.map(c => [c.name, c.url])}));
+  if (navigator.share) { try { await navigator.share({title:'Klick einrichten', url:link}); } catch {} return; }
+  try { await navigator.clipboard.writeText(link); toast('Link kopiert ✓'); }
+  catch { prompt('Link kopieren:', link); }
+}
+
+function importFromHash() {
+  const m = location.hash.match(/^#setup=([\w-]+)$/);
+  if (!m) return;
+  history.replaceState(null, '', location.pathname + location.search);
+  try {
+    const data = JSON.parse(b64dec(m[1]));
+    const add = (data.c || []).map(([n, u]) => ({name:String(n).slice(0, 40), url:String(u)})).filter(c => c.name && WEBHOOK_RE.test(c.url));
+    if (!add.length) throw 0;
+    const chans = channels(), fresh = add.filter(a => !chans.some(c => c.url === a.url));
+    if (!fresh.length) return toast('Kanäle sind schon eingerichtet');
+    if (confirm(`Diese Kanäle zu Klick hinzufügen?\n\n${fresh.map(c => '#' + c.name).join('\n')}`)) {
+      store.set('channels', chans.concat(fresh)); toast('Kanäle hinzugefügt ✓');
+    }
+  } catch { toast('Einrichtungslink ist ungültig', true); }
+}
+
+/* ---------- UI-Helfer ---------- */
+
+function openSheet(sel) { closeSheets(); $(sel).classList.add('open'); $('#backdrop').classList.add('open'); }
+function closeSheets() { for (const s of document.querySelectorAll('.sheet.open')) s.classList.remove('open'); $('#backdrop').classList.remove('open'); }
+
+let toastTimer;
+function toast(text, err) {
+  const t = $('#toast'); t.textContent = text; t.classList.toggle('err', !!err); t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), err ? 4000 : 2200);
+}
+
+/* ---------- Start ---------- */
+
+buildChips($('#camFilters')); buildChips($('#editFilters'));
+const grid = $('#stickerGrid');
+for (const e of STICKERS) {
+  const b = document.createElement('button'); b.textContent = e;
+  b.onclick = () => {
+    active = {id:nextId++, e, x:.5, y:.45, s:.2};
+    state.stickers.push(active); renderStickers(); closeSheets();
+  };
+  grid.appendChild(b);
+}
+
+$('#btnShutter').onclick = capture;
+$('#btnFlip').onclick = flip;
+$('#btnSettings').onclick = () => { $('#setName').value = store.get('name', ''); renderChanList(); openSheet('#settingsSheet'); };
+$('#setName').oninput = e => store.set('name', e.target.value);
+$('#addChan').onclick = addChannel;
+$('#shareSetup').onclick = shareSetup;
+$('#btnDiscard').onclick = closeEditor;
+$('#btnText').onclick = () => state.caption.on && document.activeElement === capInput ? capInput.blur() : editCaption();
+$('#btnSticker').onclick = () => openSheet('#stickerSheet');
+$('#btnSave').onclick = saveImage;
+$('#btnSend').onclick = () => { capInput.blur(); openSend(); };
+$('#sendGo').onclick = send;
+$('#sendToSettings').onclick = () => $('#btnSettings').onclick();
+$('#backdrop').onclick = closeSheets;
+
+addEventListener('resize', () => { if (state.base) layoutEdit(); else applyLiveFilter(); });
+addEventListener('keydown', e => { if (e.code === 'Space' && !state.base && document.activeElement === document.body) { e.preventDefault(); capture(); } });
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) stopCamera();
+  else if (!state.base) startCamera();
+});
+
+setFilter(state.f);
+importFromHash();
+startCamera();
+if ('serviceWorker' in navigator && window.isSecureContext) navigator.serviceWorker.register('sw.js').catch(() => {});
+</script>
+</body>
+</html>
