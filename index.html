@@ -184,6 +184,34 @@ button,label{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .reward ul{list-style:none;text-align:left;margin-bottom:16px}
 .reward li{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line);font-size:14px}
 .reward .event{margin:0 0 10px;padding:10px 12px;border-radius:12px;background:rgba(255,200,61,.14);font-weight:700;font-size:14px}
+
+/* Webhook-Modus: Profilbild, Post-Stil, Meine Posts, Aufgaben, Feier-Animation */
+.avatar-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.avatar-grid button{aspect-ratio:1;border-radius:50%;overflow:hidden;padding:0;border:3px solid transparent;transition:transform .15s}
+.avatar-grid button img{display:block;width:100%;height:100%}
+.avatar-grid button[aria-pressed="true"]{border-color:#fff;box-shadow:0 0 0 3px var(--accent);transform:scale(1.05)}
+.avatar-grid .none{display:grid;place-items:center;background:rgba(255,255,255,.08);font-size:12px;font-weight:700;color:var(--muted)}
+.post-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+.post-row img{width:48px;height:64px;object-fit:cover;border-radius:8px;flex:none;background:#222}
+.post-row .i{flex:1;min-width:0;font-size:14px;font-weight:600}
+.post-row .i small{display:block;color:var(--muted);font-weight:500;margin-top:2px}
+.post-row button{color:var(--danger);font-weight:700;padding:8px}
+.toast{width:max-content}
+.toast.action{pointer-events:auto;display:flex;align-items:center;gap:12px;padding:8px 8px 8px 18px}
+.toast button{padding:7px 14px;border-radius:999px;background:#fff;color:#000;font-weight:800;font-size:13px}
+.task-opt{display:flex;align-items:center;gap:14px;width:100%;margin-bottom:8px;padding:14px;border-radius:16px;text-align:left;
+  border:2px solid transparent;background:rgba(255,255,255,.06);font-size:15px;font-weight:700;line-height:1.3}
+.task-opt .em{font-size:30px;flex:none}
+.task-opt small{display:block;margin-top:3px;color:var(--muted);font-size:12px;font-weight:500}
+.task-opt[aria-pressed="true"]{border-color:var(--fire);background:rgba(255,140,26,.16)}
+.task-opt.done{opacity:.55}
+.theme-pill.task{background:linear-gradient(90deg,rgba(255,140,26,.85),rgba(193,61,255,.85));max-width:calc(100vw - 32px);overflow:hidden;text-overflow:ellipsis}
+#confetti{position:fixed;inset:0;z-index:61;width:100%;height:100%;pointer-events:none}
+.reward-icon{font-size:72px;line-height:1;margin-bottom:6px;animation:pop .7s cubic-bezier(.2,1.6,.4,1) both}
+.reward-title{font-size:26px;font-weight:900;line-height:1.15;background:linear-gradient(90deg,var(--gold),var(--fire));
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+.reward-sub{margin:8px 0 16px;color:var(--muted);font-weight:600;font-size:15px}
+@keyframes pop{from{transform:scale(0) rotate(-25deg);opacity:0}}
 </style>
 </head>
 <body>
@@ -306,6 +334,15 @@ button,label{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   <div class="grab"></div>
   <h2>Einstellungen</h2>
   <label class="field">Dein Name in Discord<input class="input" id="setName" maxlength="80" placeholder="z. B. Alex"></label>
+  <h3>Profilbild</h3>
+  <div class="avatar-grid" id="avatarGrid"></div>
+  <h3>Post-Stil</h3>
+  <div class="tabs" id="styleTabs">
+    <button data-k="card" aria-pressed="true">✨ Karte</button>
+    <button data-k="image" aria-pressed="false">🖼️ Nur Bild</button>
+  </div>
+  <p class="hint" style="margin-top:4px">Karte: Foto mit Farbleiste, Aufgabe, Filter, Streak und Uhrzeit. Nur Bild: wie früher.</p>
+  <button class="btn" id="btnMyPosts" style="margin-top:16px">🗂️ Meine Posts</button>
   <h3>Kanäle</h3>
   <div id="chanList"></div>
   <h3>Kanal hinzufügen</h3>
@@ -319,7 +356,22 @@ button,label{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   <p class="hint warn">Achtung: Wer eine Webhook-URL kennt, kann in diesen Kanal posten. Teile sie und den Einrichtungslink nur in privaten Kanälen.</p>
 </div>
 
+<div class="sheet" id="tasksSheet">
+  <div class="grab"></div>
+  <h2>🎯 Aufgaben des Tages</h2>
+  <div id="taskList"></div>
+  <p class="hint">Jeden Tag gibt es drei neue Aufgaben – für alle in der Community dieselben. Wähle eine aus, mach das Foto und reiche es beim Senden ein.</p>
+</div>
+
+<div class="sheet" id="postsSheet">
+  <div class="grab"></div>
+  <h2>🗂️ Meine Posts</h2>
+  <div id="postList"></div>
+  <p class="hint">Hier siehst du deine letzten Posts von diesem Handy. „Löschen“ entfernt den Post auch aus Discord.</p>
+</div>
+
 <div class="reward" id="reward"><div class="reward-card" id="rewardCard"></div></div>
+<canvas id="confetti" hidden></canvas>
 
 <div class="toast" id="toast"></div>
 
@@ -1005,6 +1057,7 @@ function renderMe() {
       : '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>';
     btn.setAttribute('aria-label', BOT_MODE ? 'Profil' : 'Einstellungen');
     pill.hidden = true; tp.hidden = true;
+    if (!BOT_MODE) renderLocal();
   }
   updateLocks();
 }
@@ -1128,11 +1181,150 @@ function showReward(a, s) {
 const channels = () => store.get('channels', []);
 let hookSel = store.get('last', 0);
 
+// Aufgaben des Tages: jeden Tag 3 aus dieser Liste – per Datum ausgewählt, damit alle dieselben haben
+const TASKS = [
+  ['🐶', 'Fotografiere einen Hund (nicht deinen eigenen)'],
+  ['🏎️', 'Finde ein richtig sexy Auto'],
+  ['👀', 'Etwas, das wie ein Gesicht aussieht'],
+  ['☕', 'Die hässlichste Tasse, die du finden kannst'],
+  ['🍿', 'Dein Lieblingssnack in dramatischer Pose – mit Kino-Filter'],
+  ['🪧', 'Ein Schild mit einem witzigen Text'],
+  ['🐈', 'Eine Katze, die dich komplett ignoriert'],
+  ['🖥️', 'Dein Schreibtisch – ehrlich, ohne vorher aufzuräumen'],
+  ['🔌', 'Der schlimmste Kabelsalat in deiner Wohnung'],
+  ['📼', 'Ein Film oder eine Serie aus deinem Regal'],
+  ['📺', 'Was gerade bei dir im TV oder Stream läuft'],
+  ['🧊', 'Dein Kühlschrank-Inhalt im HDR-Filter'],
+  ['😎', 'Ein Selfie mit Sonnenbrille – egal bei welchem Wetter'],
+  ['☁️', 'Eine Wolke, die wie etwas aussieht'],
+  ['📟', 'Das älteste Gerät, das du noch benutzt'],
+  ['🛒', 'Etwas im Supermarkt, das du niemals kaufen würdest'],
+  ['🐦', 'Ein Tier in freier Wildbahn (Tauben zählen!)'],
+  ['👟', 'Deine Schuhe von heute aus einer coolen Perspektive'],
+  ['🌇', 'Ein Sonnenuntergang oder -aufgang'],
+  ['💿', 'Ein Foto, das wie ein Albumcover aussieht'],
+  ['🤝', 'Zwei Dinge, die überhaupt nicht zusammenpassen'],
+  ['🚲', 'Ein Fahrrad mit ganz viel Charakter'],
+  ['🔍', 'Etwas Winziges ganz groß – so nah ran wie möglich'],
+  ['🪞', 'Eine Spiegelung in einer Pfütze, einem Fenster oder Löffel'],
+  ['🪴', 'Eine Pflanze, die dringend mehr Liebe braucht'],
+  ['🎨', 'Graffiti oder Street-Art'],
+  ['🍰', 'Ein Essen, das zu schön zum Essen ist'],
+  ['🤖', 'Etwas, das eine KI niemals verstehen würde'],
+  ['🪟', 'Dein Blick aus dem Fenster – genau jetzt'],
+  ['✨', 'Etwas, das glitzert oder funkelt'],
+  ['🎥', 'Etwas, das dich an eine Filmszene erinnert'],
+  ['🌑', 'Ein Schatten mit einer coolen Form'],
+  ['🎛️', 'Alle deine Fernbedienungen auf einem Haufen'],
+  ['🕵️', 'Ein Krimi-Foto im Noir-Filter'],
+  ['🎧', 'Deine Kopfhörer oder dein Instrument in Szene gesetzt'],
+  ['🛍️', 'Ein Schaufenster mit seltsamer Deko'],
+  ['📚', 'Das chaotischste Regal, das du findest'],
+  ['🦆', 'Etwas Gelbes, das dich zum Lachen bringt'],
+  ['🎮', 'Dein Controller oder dein Gaming-Platz'],
+  ['🧦', 'Deine verrücktesten Socken'],
+  ['🍕', 'Das beste Essen, das du diese Woche hattest'],
+  ['🚗', 'Ein Auto, das schon bessere Tage gesehen hat'],
+  ['🌳', 'Ein Baum, der aussieht, als hätte er eine Geschichte'],
+  ['🔦', 'Ein Foto nur mit Taschenlampen-Licht'],
+  ['🎭', 'Dein bester Filmbösewicht-Blick (Selfie)'],
+  ['🍔', 'Fast Food im Stil eines Werbeplakats'],
+  ['💡', 'Die coolste Lampe in deiner Nähe'],
+  ['🏠', 'Ein Haus, in dem ein Filmheld wohnen könnte'],
+  ['🌈', 'So viele Farben wie möglich in einem Foto'],
+  ['🐌', 'Etwas Langsames'],
+];
+const pad2 = n => String(n).padStart(2, '0');
+const localDay = (d = new Date()) => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+const dayBefore = day => { const d = new Date(day + 'T12:00:00'); d.setDate(d.getDate() - 1); return localDay(d); };
+
+function todaysTasks(day = localDay()) {
+  const r = rng(Math.round(Date.parse(day + 'T00:00:00Z') / 864e5) * 7919);
+  const idx = [...TASKS.keys()];
+  for (let i = idx.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [idx[i], idx[j]] = [idx[j], idx[i]]; }
+  return idx.slice(0, 3).map(i => ({ id: i, emoji: TASKS[i][0], text: TASKS[i][1] }));
+}
+const doneTasks = () => store.get('done', []);              // ["2026-10-24:12", …]
+const isDone = (t, day = localDay()) => doneTasks().includes(`${day}:${t.id}`);
+function selectedTask() {
+  const sel = store.get('task', null);
+  return sel && sel.day === localDay() ? todaysTasks().find(t => t.id === sel.id) || null : null;
+}
+
+// Persönliche Streak – nur auf diesem Handy gespeichert
+function streakInfo() {
+  const days = new Set(store.get('days', [])), today = localDay();
+  let d = days.has(today) ? today : dayBefore(today), n = 0;
+  while (days.has(d)) { n++; d = dayBefore(d); }
+  return { streak: n, postedToday: days.has(today), best: Math.max(store.get('best', 0), n), tasks: doneTasks().length };
+}
+
+const avatarUrl = name => name ? new URL(`avatars/${name}.png`, location.href).href : null;
+const AVATARS = ['kino','popcorn','tv','musik','gitarre','gamer','alien','roboter','rakete','fuchs','katze','hund','panda','einhorn','geist','cool'];
+
+function renderLocal() {
+  const s = streakInfo(), pill = $('#streakPill'), tp = $('#themePill'), task = selectedTask(), btn = $('#btnProfile');
+  const av = store.get('avatar', null);
+  if (av) { const i = new Image(); i.src = `avatars/${av}.png`; i.alt = ''; btn.replaceChildren(i); }
+  pill.hidden = false;
+  pill.textContent = `🔥 ${s.streak}` + (s.streak && !s.postedToday ? ' · heute noch posten!' : '');
+  pill.classList.toggle('risk', s.streak > 0 && !s.postedToday);
+  tp.hidden = false;
+  tp.classList.add('task');
+  tp.textContent = task
+    ? (isDone(task) ? `✅ ${task.emoji} Aufgabe erfüllt – noch eine?` : `🎯 ${task.emoji} ${task.text}`)
+    : '🎯 Aufgabe des Tages – tippe zum Auswählen';
+}
+
+function openTasks() {
+  const sel = selectedTask();
+  $('#taskList').replaceChildren(...todaysTasks().map(t => {
+    const b = document.createElement('button');
+    const done = isDone(t);
+    b.className = 'task-opt' + (done ? ' done' : '');
+    b.setAttribute('aria-pressed', sel?.id === t.id);
+    b.innerHTML = '<span class="em"></span><span><span class="tx"></span><small></small></span>';
+    b.querySelector('.em').textContent = done ? '✅' : t.emoji;
+    b.querySelector('.tx').textContent = t.text;
+    b.querySelector('small').textContent = done ? 'Schon erfüllt' : sel?.id === t.id ? 'Ausgewählt – mach dein Foto!' : 'Tippen zum Auswählen';
+    b.onclick = () => {
+      store.set('task', sel?.id === t.id ? null : { day: localDay(), id: t.id });
+      renderLocal(); closeSheets();
+      if (sel?.id !== t.id) toast(`🎯 Los geht’s: ${t.text}`);
+    };
+    return b;
+  }));
+  openSheet('#tasksSheet');
+}
+
+function renderAvatars() {
+  const cur = store.get('avatar', null);
+  const none = document.createElement('button');
+  none.className = 'none'; none.textContent = 'Keins';
+  none.setAttribute('aria-pressed', !cur);
+  none.onclick = () => { store.set('avatar', null); renderAvatars(); renderMe(); };
+  $('#avatarGrid').replaceChildren(none, ...AVATARS.map(a => {
+    const b = document.createElement('button');
+    const i = new Image(); i.src = `avatars/${a}.png`; i.alt = a; b.appendChild(i);
+    b.setAttribute('aria-pressed', cur === a);
+    b.onclick = () => { store.set('avatar', a); renderAvatars(); renderMe(); };
+    return b;
+  }));
+  const style = store.get('postStyle', 'card');
+  for (const x of $('#styleTabs').children) x.setAttribute('aria-pressed', x.dataset.k === style);
+}
+
 function openSendWebhook() {
   const chans = channels(), box = $('#sendChans');
   $('#sendLogin').hidden = true;
   $('#sendHint').hidden = true;
-  $('#themeRow').hidden = true;
+  const task = selectedTask();
+  $('#themeRow').hidden = !task || isDone(task);
+  if (task) {
+    $('#themeLabel').textContent = `Für Aufgabe einreichen: ${task.emoji} ${task.text}`;
+    $('#themeRow').querySelector('small').textContent = 'Zählt für deine erfüllten Aufgaben';
+  }
+  $('#sendTheme').checked = !!task;
   $('#sendEmpty').hidden = chans.length > 0;
   $('#sendForm').hidden = chans.length === 0;
   if (hookSel >= chans.length) hookSel = 0;
@@ -1153,11 +1345,37 @@ async function sendWebhook() {
   const btn = $('#sendGo');
   sending = true; btn.disabled = true; btn.textContent = 'Wird gesendet …';
   try {
-    const blob = await exportBlob();
+    const canvas = exportCanvas();
+    const blob = await new Promise((res, rej) => canvas.toBlob(b => b ? res(b) : rej(new Error('Export fehlgeschlagen')), 'image/jpeg', .9));
+    const msg = $('#sendMsg').value.trim(), name = store.get('name', '').trim(), av = store.get('avatar', null);
+    const task = !$('#themeRow').hidden && $('#sendTheme').checked ? selectedTask() : null;
+    const before = streakInfo();
+    const streakAfter = before.postedToday ? before.streak : before.streak + 1;
+    const filterName = FILTERS[state.f].name;
+
     const payload = {attachments:[{id:0, filename:'snapcord.jpg'}]};
-    const msg = $('#sendMsg').value.trim(), name = store.get('name', '').trim();
-    if (msg) payload.content = msg;
     if (name) payload.username = name;
+    if (av) payload.avatar_url = avatarUrl(av);
+    if (store.get('postStyle', 'card') === 'card') {
+      // Schöne Post-Karte als Discord-Embed
+      const footer = ['📸 Snapcord'];
+      if (filterName !== 'Normal') footer.push(`🎨 ${filterName}`);
+      footer.push(`🔥 ${streakAfter} ${streakAfter === 1 ? 'Tag' : 'Tage'}`);
+      const embed = {
+        color: task ? 0xff8c1a : 0x5865f2,
+        image: { url: 'attachment://snapcord.jpg' },
+        footer: { text: footer.join('  ·  '), icon_url: new URL('icon-192.png', location.href).href },
+        timestamp: new Date().toISOString(),
+      };
+      if (task) embed.title = `🎯 Aufgabe des Tages: ${task.text}`;
+      if (msg) embed.description = msg;
+      payload.embeds = [embed];
+    } else {
+      const lines = [];
+      if (task) lines.push(`🎯 **Aufgabe des Tages:** ${task.text}`);
+      if (msg) lines.push(msg);
+      if (lines.length) payload.content = lines.join('\n');
+    }
     const fd = new FormData();
     fd.append('payload_json', JSON.stringify(payload));
     fd.append('files[0]', blob, 'snapcord.jpg');
@@ -1171,10 +1389,30 @@ async function sendWebhook() {
       if (res.status === 429) throw new Error('Zu viele Posts – warte kurz.');
       throw new Error(`Discord-Fehler ${res.status}${detail ? ': ' + detail : ''}`);
     }
+    const message = await res.json().catch(() => ({}));
     store.set('last', hookSel);
     $('#sendMsg').value = '';
-    toast(`Gepostet in #${ch.name} ✓`);
+
+    // Lokal merken: Streak-Tag, erfüllte Aufgabe, Post für „Meine Posts“
+    const day = localDay();
+    store.set('days', [...new Set([...store.get('days', []), day])].sort().slice(-400));
+    if (task) store.set('done', [...new Set([...doneTasks(), `${day}:${task.id}`])]);
+    const after = streakInfo();
+    store.set('best', after.best);
+    const thumb = document.createElement('canvas');
+    thumb.width = 96; thumb.height = Math.round(96 * canvas.height / canvas.width);
+    thumb.getContext('2d').drawImage(canvas, 0, 0, thumb.width, thumb.height);
+    const post = { id: message.id, hook: ch.url, ch: ch.name, ts: Date.now(), day, task: task ? task.id : null, thumb: thumb.toDataURL('image/jpeg', .6) };
+    if (message.id) store.set('posts', [post, ...store.get('posts', [])].slice(0, 40));
+
     closeEditor();
+    renderMe();
+    if (task) celebrate({ icon: '🎯', title: 'Aufgabe erfüllt!', sub: task.text,
+      lines: [!before.postedToday && `🔥 ${after.streak} ${after.streak === 1 ? 'Tag' : 'Tage'} Streak`, `🏅 ${after.tasks} ${after.tasks === 1 ? 'Aufgabe' : 'Aufgaben'} erfüllt`] });
+    else if (!before.postedToday) celebrate({ icon: '🔥', title: `${after.streak} ${after.streak === 1 ? 'Tag' : 'Tage'} Streak!`,
+      sub: after.streak === 1 ? 'Deine Streak startet – komm morgen wieder!' : 'Weiter so – morgen wieder posten!',
+      lines: [after.best > after.streak ? `🏆 Rekord: ${after.best} Tage` : after.streak > 1 ? '🏆 Neuer Rekord!' : null] });
+    toast(`Gepostet in #${ch.name} ✓`, false, message.id ? { label: 'Rückgängig', fn: () => deletePost(post) } : null);
   } catch (e) {
     toast(e.message, true);
   } finally {
@@ -1182,7 +1420,79 @@ async function sendWebhook() {
   }
 }
 
-function openSettings() { $('#setName').value = store.get('name', ''); renderChanList(); openSheet('#settingsSheet'); }
+// Post aus Discord löschen und Streak/Aufgabe wieder zurücknehmen
+async function deletePost(post) {
+  try {
+    const res = await fetch(`${post.hook.replace(/\/$/, '')}/messages/${post.id}`, { method: 'DELETE' });
+    if (!res.ok && res.status !== 404) throw new Error(res.status === 401 ? 'Webhook ungültig.' : `Discord-Fehler ${res.status}`);
+  } catch (e) { toast(e instanceof TypeError ? 'Keine Verbindung zu Discord.' : e.message, true); return; }
+  const rest = store.get('posts', []).filter(p => p.id !== post.id);
+  store.set('posts', rest);
+  // Nur zurücknehmen, wenn es an dem Tag keinen anderen Post (mit dieser Aufgabe) gibt
+  if (!rest.some(p => p.day === post.day)) store.set('days', store.get('days', []).filter(d => d !== post.day));
+  if (post.task != null && !rest.some(p => p.day === post.day && p.task === post.task)) {
+    store.set('done', doneTasks().filter(x => x !== `${post.day}:${post.task}`));
+  }
+  renderMe();
+  if ($('#postsSheet').classList.contains('open')) renderPosts();
+  toast('Post gelöscht 🗑️');
+}
+
+function renderPosts() {
+  const posts = store.get('posts', []);
+  if (!posts.length) { $('#postList').innerHTML = '<p class="empty">Noch keine Posts von diesem Handy.</p>'; return; }
+  const fmt = new Intl.DateTimeFormat('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+  $('#postList').replaceChildren(...posts.map(p => {
+    const row = document.createElement('div'); row.className = 'post-row';
+    const img = new Image(); img.src = p.thumb; img.alt = '';
+    const info = document.createElement('div'); info.className = 'i';
+    info.textContent = '#' + p.ch;
+    const sm = document.createElement('small');
+    const t = p.task != null && TASKS[p.task];
+    sm.textContent = fmt.format(p.ts) + (t ? ` · 🎯 ${t[0]} Aufgabe` : '');
+    info.appendChild(sm);
+    const del = document.createElement('button'); del.textContent = 'Löschen';
+    del.onclick = () => { if (confirm('Diesen Post wirklich aus Discord löschen?')) deletePost(p); };
+    row.append(img, info, del);
+    return row;
+  }));
+}
+
+// Feier-Animation mit Konfetti
+function celebrate({ icon, title, sub, lines = [] }) {
+  const esc = t => String(t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  $('#rewardCard').innerHTML = `<div class="reward-icon">${icon}</div><div class="reward-title">${esc(title)}</div>
+    <div class="reward-sub">${esc(sub)}</div>${lines.filter(Boolean).map(l => `<p class="event">${esc(l)}</p>`).join('')}
+    <button class="btn primary" id="rewardOk">Weiter</button>`;
+  $('#reward').classList.add('show');
+  $('#rewardOk').onclick = () => $('#reward').classList.remove('show');
+  confetti();
+}
+
+function confetti() {
+  const c = $('#confetti'), x = c.getContext('2d'), dpr = Math.min(2, devicePixelRatio || 1);
+  c.hidden = false; c.width = innerWidth * dpr; c.height = innerHeight * dpr;
+  const colors = ['#ff8c1a', '#ffc83d', '#5865f2', '#c13dff', '#3ddc84', '#ff4d5e', '#00d2ff'];
+  const parts = Array.from({ length: 160 }, () => ({
+    x: c.width / 2 + (Math.random() - .5) * c.width * .3, y: c.height * .45,
+    vx: (Math.random() - .5) * 26 * dpr, vy: (-Math.random() * 22 - 8) * dpr,
+    s: (6 + Math.random() * 7) * dpr, r: Math.random() * 6, vr: (Math.random() - .5) * .4,
+    col: colors[Math.random() * colors.length | 0],
+  }));
+  const t0 = performance.now();
+  (function frame(t) {
+    const age = t - t0;
+    x.clearRect(0, 0, c.width, c.height);
+    for (const p of parts) {
+      p.vy += .55 * dpr; p.vx *= .99; p.x += p.vx; p.y += p.vy; p.r += p.vr;
+      x.save(); x.translate(p.x, p.y); x.rotate(p.r); x.globalAlpha = Math.max(0, 1 - age / 2800);
+      x.fillStyle = p.col; x.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2); x.restore();
+    }
+    if (age < 2800) requestAnimationFrame(frame); else c.hidden = true;
+  })(t0);
+}
+
+function openSettings() { $('#setName').value = store.get('name', ''); renderChanList(); renderAvatars(); openSheet('#settingsSheet'); }
 
 function renderChanList() {
   const L = $('#chanList'), chans = channels();
@@ -1247,9 +1557,17 @@ function openSheet(sel) { closeSheets(); $(sel).classList.add('open'); $('#backd
 function closeSheets() { for (const s of document.querySelectorAll('.sheet.open')) s.classList.remove('open'); $('#backdrop').classList.remove('open'); }
 
 let toastTimer;
-function toast(text, err) {
-  const t = $('#toast'); t.textContent = text; t.classList.toggle('err', !!err); t.classList.add('show');
-  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), err ? 4000 : 2200);
+// action = { label, fn } zeigt einen Knopf im Hinweis (z. B. „Rückgängig“)
+function toast(text, err, action) {
+  const t = $('#toast');
+  t.textContent = text;
+  if (action) {
+    const b = document.createElement('button'); b.textContent = action.label;
+    b.onclick = () => { t.classList.remove('show'); action.fn(); };
+    t.appendChild(b);
+  }
+  t.classList.toggle('err', !!err); t.classList.toggle('action', !!action); t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), action ? 7000 : err ? 4000 : 2200);
 }
 
 /* ---------- Start ---------- */
@@ -1268,12 +1586,21 @@ for (const e of STICKERS) {
 $('#btnShutter').onclick = capture;
 $('#btnFlip').onclick = flip;
 $('#btnProfile').onclick = () => BOT_MODE ? openProfile() : openSettings();
-$('#streakPill').onclick = openProfile;
+$('#streakPill').onclick = () => {
+  if (BOT_MODE) return openProfile();
+  const s = streakInfo();
+  toast(`🔥 ${s.streak} ${s.streak === 1 ? 'Tag' : 'Tage'} · 🏆 Rekord ${s.best} · 🏅 ${s.tasks} Aufgaben`);
+};
+$('#btnMyPosts').onclick = () => { renderPosts(); openSheet('#postsSheet'); };
+$('#styleTabs').onclick = e => {
+  const b = e.target.closest('button'); if (!b) return;
+  store.set('postStyle', b.dataset.k); renderAvatars();
+};
 $('#setName').oninput = e => store.set('name', e.target.value);
 $('#addChan').onclick = addChannel;
 $('#shareSetup').onclick = shareSetup;
 $('#sendToSettings').onclick = openSettings;
-$('#themePill').onclick = () => toast('🎯 Passt dein Foto zum Thema, gibt es +5 Bonuspunkte');
+$('#themePill').onclick = () => BOT_MODE ? toast('🎯 Passt dein Foto zum Thema, gibt es +5 Bonuspunkte') : openTasks();
 for (const b of document.querySelectorAll('.login-btn')) b.onclick = login;
 $('#btnLogout').onclick = async () => {
   try { await api('/api/logout', {method:'POST'}); } catch {}
