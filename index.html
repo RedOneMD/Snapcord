@@ -28,6 +28,11 @@ button,label{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .screen.active{display:block}
 
 /* Kamera */
+/* Sucher im Fotoformat 3:4 zwischen oberer und unterer Leiste – zeigt genau, was aufs Bild kommt */
+:root{--bar-top:64px;--bar-cam:205px;--bar-edit:175px}
+.viewfinder{position:absolute;left:50%;top:calc(var(--safe-t) + var(--bar-top));transform:translateX(-50%);
+  width:min(100vw, calc((100dvh - var(--safe-t) - var(--safe-b) - var(--bar-top) - var(--bar-cam)) * .75));
+  aspect-ratio:3/4;overflow:hidden;border-radius:16px;background:#0b0b0f;pointer-events:none}
 #video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#0b0b0f}
 #video.mirror{transform:scaleX(-1)}
 .tint,.fx{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
@@ -64,7 +69,8 @@ button,label{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   gap:16px;padding:32px;text-align:center;line-height:1.5;color:var(--muted);background:#0b0b0f}
 
 /* Bearbeiten */
-.stage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.stage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  padding:calc(var(--safe-t) + var(--bar-top)) 0 calc(var(--safe-b) + var(--bar-edit))}
 .frame{position:relative;overflow:hidden;border-radius:12px;background:#111}
 .frame canvas{display:block;width:100%;height:100%}
 .layer{position:absolute;inset:0;touch-action:none}
@@ -125,6 +131,59 @@ button,label{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   opacity:0;transform:translate(-50%,-20px);transition:.25s;pointer-events:none}
 .toast.show{opacity:1;transform:translate(-50%,0)}
 .toast.err{background:var(--danger)}
+
+/* Belohnungen & Profil */
+:root{--fire:#ff8c1a;--gold:#ffc83d}
+.brand-wrap{display:flex;flex-direction:column;align-items:center;gap:4px}
+.streak-pill{padding:3px 10px;border-radius:999px;background:rgba(0,0,0,.45);font-weight:800;font-size:13px;
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.streak-pill.risk{background:var(--fire);animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{50%{transform:scale(1.08)}}
+.icon-btn img,.icon-btn .ph{width:100%;height:100%;border-radius:50%;object-fit:cover;background:var(--accent)}
+.ph{display:grid;place-items:center;font-weight:800;color:#fff}
+.theme-pill{position:absolute;left:50%;top:calc(var(--safe-t) + 82px);z-index:5;transform:translateX(-50%);
+  padding:7px 14px;border-radius:999px;background:rgba(0,0,0,.45);font-size:13px;font-weight:600;white-space:nowrap;
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.chip.locked .sw::after{content:"🔒";position:absolute;inset:0;display:grid;place-items:center;font-size:20px;background:rgba(0,0,0,.55)}
+.chip.locked{opacity:.75}
+.check{display:flex;align-items:center;gap:12px;padding:12px 14px;margin-bottom:12px;border-radius:12px;
+  border:1px solid var(--line);background:rgba(255,255,255,.06);font-size:15px;cursor:pointer}
+.check input{width:22px;height:22px;accent-color:var(--accent)}
+.check small{display:block;color:var(--muted);font-size:12px;margin-top:2px}
+.send-hint{margin:-4px 0 14px;font-size:13px;color:var(--muted)}
+.me{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.me img,.me .ph{width:56px;height:56px;border-radius:50%;background:var(--accent);object-fit:cover;flex:none}
+.me b{display:block;font-size:18px}
+.me span{color:var(--muted);font-size:14px}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.stat{padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.06)}
+.stat b{display:block;font-size:24px}
+.stat span{font-size:12px;color:var(--muted)}
+.progress{height:8px;border-radius:4px;background:rgba(255,255,255,.1);overflow:hidden;margin:8px 0 4px}
+.progress i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#c13dff)}
+.lb{list-style:none}
+.lb li{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)}
+.lb li:last-child{border-bottom:0}
+.lb .r{width:26px;text-align:center;font-weight:800}
+.lb img,.lb .ph{width:30px;height:30px;border-radius:50%;background:var(--accent);object-fit:cover;flex:none}
+.lb .n{flex:1;font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lb .v{font-weight:700;color:var(--muted)}
+.lb li.you .n{color:var(--gold)}
+.tabs{display:flex;gap:6px;margin-bottom:8px}
+.tabs button{flex:1;padding:8px;border-radius:999px;background:rgba(255,255,255,.06);font-weight:600;font-size:13px}
+.tabs button[aria-pressed="true"]{background:var(--accent)}
+.reward{position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:24px;background:rgba(0,0,0,.6);
+  opacity:0;pointer-events:none;transition:opacity .25s}
+.reward.show{opacity:1;pointer-events:auto}
+.reward-card{width:100%;max-width:340px;padding:28px 22px 22px;border-radius:24px;text-align:center;
+  background:linear-gradient(160deg,#2a2070,#16161c 70%);border:1px solid rgba(255,255,255,.12);transform:scale(.85);transition:transform .3s cubic-bezier(.2,1.6,.4,1)}
+.reward.show .reward-card{transform:none}
+.reward-points{font-size:56px;font-weight:900;line-height:1;background:linear-gradient(90deg,var(--gold),var(--fire));
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+.reward-streak{font-size:22px;font-weight:800;margin:10px 0 14px}
+.reward ul{list-style:none;text-align:left;margin-bottom:16px}
+.reward li{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line);font-size:14px}
+.reward .event{margin:0 0 10px;padding:10px 12px;border-radius:12px;background:rgba(255,200,61,.14);font-weight:700;font-size:14px}
 </style>
 </head>
 <body>
@@ -132,20 +191,24 @@ button,label{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 <input type="file" id="galleryInput" class="vh" accept="image/*">
 
 <section id="cam" class="screen active">
-  <video id="video" playsinline muted autoplay></video>
-  <div id="camTint" class="tint"></div>
-  <canvas id="camFx" class="fx"></canvas>
   <div id="camTouch" class="touch"></div>
+  <div class="viewfinder" id="viewfinder">
+    <video id="video" playsinline muted autoplay></video>
+    <div id="camTint" class="tint"></div>
+    <canvas id="camFx" class="fx"></canvas>
+    <div id="flash" class="flash"></div>
+  </div>
   <div id="filterName" class="filter-name"></div>
   <div id="camMsg" class="cam-msg" hidden>
     <p></p>
     <label for="galleryInput" class="btn inline primary">Bild aus Galerie wählen</label>
   </div>
   <header class="topbar">
-    <button class="icon-btn" id="btnSettings" aria-label="Einstellungen"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
-    <div class="brand">Snapcord</div>
+    <button class="icon-btn" id="btnProfile" aria-label="Profil"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></button>
+    <div class="brand-wrap"><div class="brand">Snapcord</div><button class="streak-pill" id="streakPill" hidden></button></div>
     <button class="icon-btn" id="btnFlip" aria-label="Kamera wechseln"><svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></button>
   </header>
+  <button class="theme-pill" id="themePill" hidden></button>
   <footer class="bottombar">
     <div class="filters" id="camFilters"></div>
     <div class="shutter-row">
@@ -154,7 +217,6 @@ button,label{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
       <span class="icon-btn ghost"></span>
     </div>
   </footer>
-  <div id="flash" class="flash"></div>
 </section>
 
 <section id="edit" class="screen">
@@ -194,9 +256,15 @@ button,label{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
     <p class="empty">Noch kein Kanal eingerichtet.</p>
     <button class="btn primary" id="sendToSettings" style="margin-top:14px">Kanal einrichten</button>
   </div>
+  <div id="sendLogin" hidden>
+    <p class="empty">Melde dich mit Discord an, um zu posten und Punkte zu sammeln.</p>
+    <button class="btn primary login-btn" style="margin-top:14px">Mit Discord anmelden</button>
+  </div>
   <div id="sendForm">
+    <p class="send-hint" id="sendHint"></p>
     <div class="chan-pick" id="sendChans"></div>
-    <label class="field">Nachricht (optional)<input class="input" id="sendMsg" maxlength="1900" placeholder="Was gibt’s zu sehen?"></label>
+    <label class="check" id="themeRow" hidden><input type="checkbox" id="sendTheme"><span><span id="themeLabel"></span><small>+5 Bonuspunkte, wenn dein Foto dazu passt</small></span></label>
+    <label class="field">Nachricht (optional)<input class="input" id="sendMsg" maxlength="1800" placeholder="Was gibt’s zu sehen?"></label>
     <button class="btn primary" id="sendGo">Senden</button>
   </div>
 </div>
@@ -208,6 +276,32 @@ button,label{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   <p class="hint">Ziehen zum Verschieben, mit zwei Fingern größer/kleiner machen, zum Löschen auf den Mülleimer ziehen.</p>
 </div>
 
+<div class="sheet" id="profileSheet">
+  <div class="grab"></div>
+  <div id="profileOut">
+    <h2>Willkommen bei Snapcord</h2>
+    <p class="empty">Melde dich mit deinem Discord-Konto an. Jeden Tag ein Foto hält deine 🔥 Streak am Leben – dafür gibt es Punkte, Rollen auf dem Server und exklusive Filter.</p>
+    <button class="btn primary login-btn" style="margin-top:16px">Mit Discord anmelden</button>
+  </div>
+  <div id="profileIn" hidden>
+    <div class="me" id="meHead"></div>
+    <div class="stats" id="meStats"></div>
+    <h3>Level</h3>
+    <div id="meLevel"></div>
+    <h3>Rangliste</h3>
+    <div class="tabs" id="lbTabs">
+      <button data-k="week" aria-pressed="true">Diese Woche</button>
+      <button data-k="streaks" aria-pressed="false">Streaks</button>
+      <button data-k="allTime" aria-pressed="false">Gesamt</button>
+    </div>
+    <ul class="lb" id="lbList"><li class="empty">Lädt …</li></ul>
+    <h3>So gibt es Punkte</h3>
+    <p class="hint" style="margin-top:0">📸 Erstes Foto des Tages: +10 · 🎯 Passt zum Tagesthema: +5 · ❤️ Jede Reaktion eines anderen Mitglieds: +1<br>🛟 Einmal pro Woche rettet der Streak-Retter einen verpassten Tag.</p>
+    <button class="btn" id="btnLogout" style="margin-top:20px">Abmelden</button>
+  </div>
+</div>
+
+<!-- Nur im Webhook-Modus (solange kein Bot eingerichtet ist) -->
 <div class="sheet" id="settingsSheet">
   <div class="grab"></div>
   <h2>Einstellungen</h2>
@@ -225,6 +319,8 @@ button,label{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   <p class="hint warn">Achtung: Wer eine Webhook-URL kennt, kann in diesen Kanal posten. Teile sie und den Einrichtungslink nur in privaten Kanälen.</p>
 </div>
 
+<div class="reward" id="reward"><div class="reward-card" id="rewardCard"></div></div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -232,7 +328,8 @@ button,label{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 const $ = s => document.querySelector(s);
 const EMOJI_FONT = '"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';
 const CAP_FS = .048, CAP_H = 1.9, MAX_SIDE = 1600;
-const WEBHOOK_RE = /^https:\/\/(?:(?:canary|ptb)\.)?discord(?:app)?\.com\/api\/webhooks\/\d+\/[\w-]+\/?$/;
+// Adresse des Snapcord-Bots auf Railway (ohne / am Ende)
+const BOT_URL = 'https://DEIN-BOT.up.railway.app';
 const STICKERS = ['🎬','🍿','📺','🎥','🎧','🎵','🎸','🎤','🤖','🧠','💻','🎮','👾','🚀','🔥','✨','⭐','🌙','😂','😎','🤯','👀','💯','❤️'];
 
 // css = Filter fürs Bild, live = Ersatz für die Kameravorschau, hdr = lokaler Kontrast + Schatten aufhellen,
@@ -259,6 +356,10 @@ const FILTERS = [
   {name:'Eis', css:'saturate(.85) brightness(1.08) contrast(1.05)', tint:{stops:['#5ab8ff','#bfe8ff'], dir:'v', blend:'soft-light', alpha:.5}},
   {name:'Pop', css:'saturate(2.1) contrast(1.3) brightness(1.03)'},
   {name:'Traum', css:'brightness(1.12) contrast(.9) saturate(1.2)', tint:{stops:['#ffd1f0','#c9d6ff'], dir:'d', blend:'screen', alpha:.25}, fx:['vignette']},
+  // Exklusiv: werden über Streaks/Punkte freigeschaltet (Regeln im Bot, config.js → UNLOCKS)
+  {name:'Gold', unlock:'gold', css:'sepia(.35) saturate(1.6) brightness(1.08) contrast(1.05)', tint:{stops:['#ffe08a','#b8860b'], dir:'d', blend:'soft-light', alpha:.55}, fx:['vignette','goldframe']},
+  {name:'Award', unlock:'oscar', css:'grayscale(1) contrast(1.3) brightness(1.02)', tint:{stops:['#ffd36b','#8a5a00'], dir:'v', blend:'soft-light', alpha:.5}, fx:['vignette2','award']},
+  {name:"Director's Cut", unlock:'regie', css:'contrast(1.18) saturate(1.2) brightness(.98)', tint:{stops:['#00737f','#ff7a2e'], dir:'v', blend:'soft-light', alpha:.5}, fx:['letterbox','directorscut']},
 ];
 
 // Schlüssel bleibt 'klick.', damit bereits eingetragene Webhooks erhalten bleiben
@@ -342,7 +443,7 @@ function rng(seed) {
 
 const pad = n => String(n).padStart(2, '0');
 const MONTHS = ['JAN.','FEB.','MÄR.','APR.','MAI','JUN.','JUL.','AUG.','SEP.','OKT.','NOV.','DEZ.'];
-const TIME_FX = ['clock','weekday','stamp','live','vhs'];
+const TIME_FX = ['clock','weekday','stamp','live','vhs','directorscut'];
 const clockText = d => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
 function vhsDate() {
   const d = new Date();
@@ -450,6 +551,37 @@ function drawFx(x, w, h, fx = []) {
       x.fillText(d.toLocaleDateString('de-DE', {weekday:'long'}).toUpperCase(), u * 5, y + u * 4.5);
       x.fillStyle = '#111'; x.font = `700 ${u * 4}px system-ui,-apple-system,"Segoe UI",Roboto,sans-serif`;
       x.fillText(`${d.getDate()}. ${d.toLocaleDateString('de-DE', {month:'long'})} ${d.getFullYear()} · ${clockText(d)} Uhr`, u * 5, y + u * 12.5);
+    } else if (f === 'goldframe') {
+      // Goldener Rahmen mit Glanz
+      const u = w / 100, b = u * 3;
+      const g = x.createLinearGradient(0, 0, w, h);
+      ['#7a5200', '#ffe9a0', '#c8901a', '#fff4c8', '#8a5c00'].forEach((c, i, a) => g.addColorStop(i / (a.length - 1), c));
+      x.fillStyle = g;
+      x.beginPath(); x.rect(0, 0, w, h); x.rect(b, b, w - 2 * b, h - 2 * b); x.fill('evenodd');
+      x.strokeStyle = 'rgba(60,35,0,.6)'; x.lineWidth = u * .4; x.strokeRect(b, b, w - 2 * b, h - 2 * b);
+    } else if (f === 'award') {
+      // „Snapcord Award“ mit Sternen und Jahr
+      const u = w / 100, y = h * .7;
+      x.textAlign = 'center'; x.textBaseline = 'middle';
+      x.shadowColor = 'rgba(0,0,0,.6)'; x.shadowBlur = u * 2;
+      const g = x.createLinearGradient(0, y - u * 6, 0, y + u * 6);
+      g.addColorStop(0, '#fff2b0'); g.addColorStop(.5, '#ffc83d'); g.addColorStop(1, '#b07a10');
+      x.fillStyle = g;
+      x.font = `800 ${u * 4}px system-ui,-apple-system,"Segoe UI",Roboto,sans-serif`;
+      x.fillText('★ ★ ★ ★ ★', w / 2, y - u * 8);
+      fitFont(x, 'SNAPCORD AWARD', s => `900 ${s}px Georgia,"Times New Roman",serif`, u * 9, w * .86);
+      x.fillText('SNAPCORD AWARD', w / 2, y);
+      x.font = `600 ${u * 4}px Georgia,"Times New Roman",serif`;
+      x.fillText(`— ${new Date().getFullYear()} —`, w / 2, y + u * 8);
+    } else if (f === 'directorscut') {
+      // Filmklappe-Infos auf den Kinobalken
+      const d = new Date(), u = w / 100, b = h * .07;
+      x.fillStyle = '#fff'; x.textBaseline = 'middle';
+      x.font = `800 ${u * 3.6}px ui-monospace,"Courier New",monospace`;
+      x.textAlign = 'left'; x.fillText("DIRECTOR'S CUT", u * 5, b / 2);
+      x.textAlign = 'right'; x.fillText(`SZENE ${pad(d.getDate())} · TAKE ${d.getHours() + 1}`, w - u * 5, b / 2);
+      x.textAlign = 'left'; x.fillStyle = '#ff3b3b'; x.fillText('● REC', u * 5, h - b / 2);
+      x.textAlign = 'right'; x.fillStyle = '#fff'; x.fillText(`${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()}  ${clockText(d)}`, w - u * 5, h - b / 2);
     } else if (f === 'matrix') {
       const r = rng(7), fs = w * .034, step = fs * 1.15, cols = Math.floor(w / step);
       x.font = `${fs}px ui-monospace,monospace`; x.textAlign = 'center'; x.fillStyle = '#39ff88';
@@ -498,12 +630,25 @@ function buildChips(el) {
     if (f.css !== 'none') b.querySelector('.sw-img').style.filter = f.live || f.css;
     setTint(b.querySelector('.sw-tint'), f);
     b.onclick = () => setFilter(i);
+    if (f.unlock && !BOT_MODE) b.hidden = true; // Exklusive Filter gibt es nur mit Bot
     el.appendChild(b);
   });
 }
 
+const isLocked = f => !!f.unlock && !(me?.stats.unlocks || []).includes(f.unlock);
+function updateLocks() {
+  for (const c of document.querySelectorAll('.chip')) c.classList.toggle('locked', isLocked(FILTERS[+c.dataset.i]));
+  if (isLocked(FILTERS[state.f])) setFilter(0);
+}
+
 let nameTimer;
 function setFilter(i) {
+  const f = FILTERS[i];
+  if (isLocked(f)) {
+    const rule = me?.unlockRules?.find(r => r.id === f.unlock);
+    toast(`🔒 ${f.name}: ${rule ? rule.hint : 'Melde dich an und sammle Streaks'}, um ihn freizuschalten`);
+    return;
+  }
   state.f = i; store.set('filter', i);
   for (const c of document.querySelectorAll('.chip')) {
     const on = +c.dataset.i === i;
@@ -557,16 +702,34 @@ function applyLiveFilter() {
   const f = FILTERS[state.f], css = f.live || f.css;
   video.style.filter = css === 'none' ? '' : css;
   setTint($('#camTint'), f);
-  const c = $('#camFx'), dpr = Math.min(2, devicePixelRatio || 1);
-  c.width = innerWidth * dpr | 0; c.height = innerHeight * dpr | 0;
+  const c = $('#camFx'), r = $('#viewfinder').getBoundingClientRect(), dpr = Math.min(2, devicePixelRatio || 1);
+  c.width = r.width * dpr | 0; c.height = r.height * dpr | 0;
   drawFx(c.getContext('2d'), c.width, c.height, f.fx);
+}
+
+// Fotos immer im normalen Fotoformat: hochkant 3:4, quer 4:3
+const PHOTO_AR = 3 / 4;
+function cropToPhoto(src, sw, sh, mirror) {
+  const ar = sw / sh;
+  const target = ar > 1 ? 1 / PHOTO_AR : PHOTO_AR;
+  // Nur zuschneiden, wenn das Bild schmaler bzw. breiter ist als das Fotoformat
+  const want = ar < 1 ? Math.max(ar, target) : ar > 1 ? Math.min(ar, target) : 1;
+  let cw = sw, ch = sw / want;
+  if (ch > sh) { ch = sh; cw = sh * want; }
+  const s = Math.min(1, MAX_SIDE / Math.max(cw, ch));
+  const c = document.createElement('canvas');
+  c.width = Math.round(cw * s); c.height = Math.round(ch * s);
+  const x = c.getContext('2d');
+  if (mirror) { x.translate(c.width, 0); x.scale(-1, 1); }
+  x.drawImage(src, (sw - cw) / 2, (sh - ch) / 2, cw, ch, 0, 0, c.width, c.height);
+  return c;
 }
 
 function capture() {
   const vw = video.videoWidth, vh = video.videoHeight;
   if (!vw || !stream) return;
-  // Genau den sichtbaren Ausschnitt nehmen (object-fit: cover)
-  const ar = innerWidth / innerHeight;
+  // Genau den Sucher-Ausschnitt nehmen (3:4, object-fit: cover)
+  const ar = PHOTO_AR;
   let cw = vw, ch = vw / ar;
   if (ch > vh) { ch = vh; cw = vh * ar; }
   const s = Math.min(1, MAX_SIDE / Math.max(cw, ch));
@@ -584,7 +747,12 @@ $('#camTouch').addEventListener('pointerdown', e => { tp = {x:e.clientX, y:e.cli
 $('#camTouch').addEventListener('pointerup', e => {
   if (!tp) return;
   const dx = e.clientX - tp.x, dy = e.clientY - tp.y; tp = null;
-  if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) { setFilter((state.f + (dx < 0 ? 1 : -1) + FILTERS.length) % FILTERS.length); return; }
+  if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+    // Zum nächsten freigeschalteten Filter wischen
+    let i = state.f;
+    do i = (i + (dx < 0 ? 1 : -1) + FILTERS.length) % FILTERS.length; while (isLocked(FILTERS[i]));
+    setFilter(i); return;
+  }
   if (Math.hypot(dx, dy) < 10) {
     const now = Date.now();
     if (now - lastTap < 300) { flip(); lastTap = 0; } else lastTap = now;
@@ -596,10 +764,7 @@ $('#galleryInput').addEventListener('change', e => {
   if (!file) return;
   const url = URL.createObjectURL(file), img = new Image();
   img.onload = () => {
-    const s = Math.min(1, MAX_SIDE / Math.max(img.naturalWidth, img.naturalHeight));
-    const c = document.createElement('canvas');
-    c.width = Math.round(img.naturalWidth * s); c.height = Math.round(img.naturalHeight * s);
-    c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+    const c = cropToPhoto(img, img.naturalWidth, img.naturalHeight, false);
     URL.revokeObjectURL(url);
     openEditor(c);
   };
@@ -632,7 +797,10 @@ function renderEdit() {
 
 function layoutEdit() {
   const b = state.base; if (!b) return;
-  const s = Math.min(innerWidth / b.width, innerHeight / b.height);
+  // Platz zwischen oberer und unterer Leiste
+  const st = $('#edit .stage'), cs = getComputedStyle(st);
+  const aw = st.clientWidth - 24, ah = st.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+  const s = Math.min(aw / b.width, ah / b.height);
   fw = b.width * s; fh = b.height * s;
   const fr = $('#frame'); fr.style.width = fw + 'px'; fr.style.height = fh + 'px';
   placeCaption(); placeStickers();
@@ -771,28 +939,217 @@ async function saveImage() {
 
 /* ---------- Discord ---------- */
 
-const channels = () => store.get('channels', []);
-let sendSel = store.get('last', 0), sending = false;
+// Für lokale Tests lässt sich die Bot-Adresse per localStorage überschreiben
+const API = store.get('api', BOT_URL).replace(/\/$/, '');
+// Ohne eingetragene Bot-Adresse läuft die App wie früher über Webhooks (ohne Login und Punkte)
+const BOT_MODE = !API.includes('DEIN-BOT');
+const WEBHOOK_RE = /^https:\/\/(?:(?:canary|ptb)\.)?discord(?:app)?\.com\/api\/webhooks\/\d+\/[\w-]+\/?$/;
+let me = null, sendSel = store.get('lastChannel', null), sending = false;
+const token = () => store.get('token', null);
+
+class ApiError extends Error {}
+async function api(path, opts = {}) {
+  let res;
+  try {
+    res = await fetch(API + path, {...opts, headers: {...(opts.headers || {}), Authorization: 'Bearer ' + token(), ...(opts.body ? {'Content-Type':'application/json'} : {})}});
+  } catch { throw new ApiError('Keine Verbindung zum Snapcord-Bot. Bist du online?'); }
+  const data = await res.json().catch(() => ({}));
+  if (res.status === 401) { store.set('token', null); me = null; renderMe(); throw new ApiError('Bitte melde dich erneut an.'); }
+  if (!res.ok) throw new ApiError(data.error || `Fehler ${res.status}`);
+  return data;
+}
+
+function login() {
+  if (API.includes('DEIN-BOT')) return toast('Der Snapcord-Bot ist noch nicht eingerichtet.', true);
+  location.href = API + '/auth/login';
+}
+
+// Rückkehr vom Discord-Login: #login=TOKEN oder #login_error=…
+function handleLoginHash() {
+  const p = new URLSearchParams(location.hash.slice(1));
+  if (!p.has('login') && !p.has('login_error')) return;
+  history.replaceState(null, '', location.pathname + location.search);
+  if (p.get('login')) { store.set('token', p.get('login')); toast('Angemeldet ✓'); return; }
+  toast({
+    not_member: 'Du bist nicht Mitglied auf unserem Discord-Server.',
+    cancelled: 'Anmeldung abgebrochen.',
+    expired: 'Anmeldung abgelaufen – bitte nochmal versuchen.',
+  }[p.get('login_error')] || 'Anmeldung fehlgeschlagen.', true);
+}
+
+async function refreshMe() {
+  if (!BOT_MODE || !token()) { me = null; renderMe(); return; }
+  try { me = await api('/api/me'); renderMe(); }
+  catch (e) { if (!me) renderMe(); }
+}
+
+const tage = n => `${n} ${n === 1 ? 'Tag' : 'Tage'}`;
+function avatarEl(url, name) {
+  if (!url) { const s = document.createElement('span'); s.className = 'ph'; s.textContent = (name || '?').trim().charAt(0).toUpperCase(); return s; }
+  const i = new Image(); i.src = url; i.alt = ''; i.referrerPolicy = 'no-referrer'; return i;
+}
+
+function renderMe() {
+  const btn = $('#btnProfile'), pill = $('#streakPill'), tp = $('#themePill');
+  if (me) {
+    btn.replaceChildren(avatarEl(me.user.avatar, me.user.name));
+    const s = me.stats;
+    pill.hidden = false;
+    pill.textContent = `🔥 ${s.streak}` + (s.streakAtRisk ? ' · heute noch posten!' : '');
+    pill.classList.toggle('risk', s.streakAtRisk);
+    tp.hidden = !s.theme;
+    if (s.theme) tp.textContent = `${s.theme.emoji} Thema heute: ${s.theme.title}`;
+  } else {
+    btn.innerHTML = BOT_MODE
+      ? '<svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>'
+      : '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>';
+    btn.setAttribute('aria-label', BOT_MODE ? 'Profil' : 'Einstellungen');
+    pill.hidden = true; tp.hidden = true;
+  }
+  updateLocks();
+}
+
+let lbData = null, lbTab = 'week';
+async function openProfile() {
+  $('#profileOut').hidden = !!me;
+  $('#profileIn').hidden = !me;
+  openSheet('#profileSheet');
+  if (!me) return;
+  const s = me.stats;
+  const head = $('#meHead');
+  const txt = document.createElement('div');
+  txt.innerHTML = '<b></b><span></span>';
+  txt.firstChild.textContent = me.user.name;
+  txt.lastChild.textContent = s.streakRole ? `${s.streakRole} · ${s.level.name}` : s.level.name;
+  head.replaceChildren(avatarEl(me.user.avatar, me.user.name), txt);
+
+  const stat = (v, l) => `<div class="stat"><b>${v}</b><span>${l}</span></div>`;
+  $('#meStats').innerHTML =
+    stat(`🔥 ${s.streak}`, s.nextStreakRole ? `Streak · noch ${tage(s.nextStreakRole.days - s.streak)} bis ${s.nextStreakRole.name}` : 'Streak · höchste Stufe!') +
+    stat(`🏆 ${s.bestStreak}`, 'Rekord-Streak') +
+    stat(`⭐ ${s.points}`, `Punkte · ${s.weekPoints} diese Woche`) +
+    stat(s.freezeAvailable ? '🛟 1' : '🛟 0', s.freezeAvailable ? 'Streak-Retter verfügbar' : 'Retter diese Woche benutzt');
+
+  const lv = s.level, pct = lv.next ? Math.round((s.points - lv.min) / (lv.next.points - lv.min) * 100) : 100;
+  $('#meLevel').innerHTML = `<div style="display:flex;justify-content:space-between;font-weight:700"><span>🎬 ${lv.name}</span><span style="color:var(--muted)">${lv.next ? `${s.points} / ${lv.next.points}` : 'Max'}</span></div>
+    <div class="progress"><i style="width:${pct}%"></i></div>
+    <p class="hint" style="margin:0">${lv.next ? `Noch ${lv.next.points - s.points} Punkte bis ${lv.next.name}` : 'Höchstes Level erreicht!'}</p>`;
+
+  try { lbData = await api('/api/leaderboard'); renderLb(); }
+  catch (e) { $('#lbList').innerHTML = `<li class="empty">${e.message}</li>`; }
+}
+
+function renderLb() {
+  const list = lbData?.[lbTab] || [], unit = lbTab === 'streaks' ? '🔥' : 'P';
+  const L = $('#lbList');
+  if (!list.length) { L.innerHTML = '<li class="empty">Noch niemand – sei die erste Person!</li>'; return; }
+  L.replaceChildren(...list.map((x, i) => {
+    const li = document.createElement('li');
+    if (x.id === me?.user.id) li.className = 'you';
+    const r = document.createElement('span'); r.className = 'r'; r.textContent = ['🥇','🥈','🥉'][i] || i + 1;
+    const n = document.createElement('span'); n.className = 'n'; n.textContent = x.name;
+    const v = document.createElement('span'); v.className = 'v'; v.textContent = `${x.value} ${unit}`;
+    li.append(r, avatarEl(x.avatar, x.name), n, v);
+    return li;
+  }));
+}
 
 function openSend() {
+  if (!BOT_MODE) return openSendWebhook();
+  $('#sendEmpty').hidden = true;
+  $('#sendHint').hidden = false;
+  const logged = !!me;
+  $('#sendLogin').hidden = logged;
+  $('#sendForm').hidden = !logged;
+  if (logged) {
+    const s = me.stats, box = $('#sendChans');
+    if (!me.channels.some(c => c.id === sendSel)) sendSel = me.channels[0]?.id;
+    box.replaceChildren(...me.channels.map(c => {
+      const b = document.createElement('button');
+      b.textContent = '#' + c.name;
+      b.setAttribute('aria-pressed', c.id === sendSel);
+      b.onclick = () => { sendSel = c.id; for (const x of box.children) x.setAttribute('aria-pressed', x === b); };
+      return b;
+    }));
+    $('#sendHint').textContent = s.postedToday
+      ? `🔥 ${tage(s.streak)} – heute schon gezählt. Reaktionen bringen trotzdem Punkte!`
+      : s.freezeNeeded ? `🛟 Gestern verpasst – der Streak-Retter rettet deine 🔥 ${s.streak}, wenn du jetzt postest!`
+      : `📸 Erstes Foto heute: +10 Punkte und 🔥 ${s.streak + (s.streakAtRisk ? 1 : 0) || 1}`;
+    $('#themeRow').hidden = !s.theme || s.postedToday;
+    if (s.theme) $('#themeLabel').textContent = `Passt zum Thema: ${s.theme.emoji} ${s.theme.title}`;
+    $('#sendTheme').checked = false;
+  }
+  openSheet('#sendSheet');
+}
+
+async function send() {
+  if (!BOT_MODE) return sendWebhook();
+  if (sending || !sendSel) return;
+  const btn = $('#sendGo');
+  sending = true; btn.disabled = true; btn.textContent = 'Wird gesendet …';
+  try {
+    const image = exportCanvas().toDataURL('image/jpeg', .88);
+    const r = await api('/api/snap', {method:'POST', body: JSON.stringify({
+      channelId: sendSel, image, message: $('#sendMsg').value.trim(), theme: $('#sendTheme').checked && !$('#themeRow').hidden,
+    })});
+    store.set('lastChannel', sendSel);
+    $('#sendMsg').value = '';
+    me.stats = r.stats; renderMe();
+    closeEditor();
+    showReward(r.awarded, r.stats);
+  } catch (e) {
+    toast(e.message, true);
+  } finally {
+    sending = false; btn.disabled = false; btn.textContent = 'Senden';
+  }
+}
+
+function showReward(a, s) {
+  const ch = me.channels.find(c => c.id === sendSel);
+  if (!a.counted) { toast(`Gepostet in #${ch ? ch.name : 'Discord'} ✓`); return; }
+  const card = $('#rewardCard');
+  const esc = t => t.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const ev = a.events.map(e =>
+    e.type === 'milestone' ? `🎉 ${e.days}-Tage-Streak! Neue Rolle: ${esc(e.role)}` :
+    e.type === 'level' ? `⬆️ Aufgestiegen: ${esc(e.name)}` :
+    e.type === 'unlock' ? `🔓 Neuer Filter freigeschaltet: ${esc(e.name)}` :
+    e.type === 'freeze' ? '🛟 Streak-Retter eingesetzt – Streak gerettet!' : '').filter(Boolean);
+  card.innerHTML = `<div class="reward-points">+${a.points}</div><div style="color:var(--muted);font-weight:600">Punkte</div>
+    <div class="reward-streak">🔥 ${tage(s.streak)} Streak</div>
+    ${ev.map(t => `<p class="event">${t}</p>`).join('')}
+    <ul>${a.reasons.map(r => `<li><span>${esc(r.label)}</span><b>+${r.points}</b></li>`).join('')}</ul>
+    <button class="btn primary" id="rewardOk">Weiter</button>`;
+  $('#reward').classList.add('show');
+  $('#rewardOk').onclick = () => $('#reward').classList.remove('show');
+}
+
+/* ---------- Webhook-Modus (solange kein Bot eingerichtet ist) ---------- */
+
+const channels = () => store.get('channels', []);
+let hookSel = store.get('last', 0);
+
+function openSendWebhook() {
   const chans = channels(), box = $('#sendChans');
+  $('#sendLogin').hidden = true;
+  $('#sendHint').hidden = true;
+  $('#themeRow').hidden = true;
   $('#sendEmpty').hidden = chans.length > 0;
   $('#sendForm').hidden = chans.length === 0;
-  if (sendSel >= chans.length) sendSel = 0;
+  if (hookSel >= chans.length) hookSel = 0;
   box.innerHTML = '';
   chans.forEach((c, i) => {
     const b = document.createElement('button');
     b.textContent = '#' + c.name;
-    b.setAttribute('aria-pressed', i === sendSel);
-    b.onclick = () => { sendSel = i; for (const x of box.children) x.setAttribute('aria-pressed', x === b); };
+    b.setAttribute('aria-pressed', i === hookSel);
+    b.onclick = () => { hookSel = i; for (const x of box.children) x.setAttribute('aria-pressed', x === b); };
     box.appendChild(b);
   });
   openSheet('#sendSheet');
 }
 
-async function send() {
+async function sendWebhook() {
   if (sending) return;
-  const ch = channels()[sendSel]; if (!ch) return;
+  const ch = channels()[hookSel]; if (!ch) return;
   const btn = $('#sendGo');
   sending = true; btn.disabled = true; btn.textContent = 'Wird gesendet …';
   try {
@@ -814,7 +1171,7 @@ async function send() {
       if (res.status === 429) throw new Error('Zu viele Posts – warte kurz.');
       throw new Error(`Discord-Fehler ${res.status}${detail ? ': ' + detail : ''}`);
     }
-    store.set('last', sendSel);
+    store.set('last', hookSel);
     $('#sendMsg').value = '';
     toast(`Gepostet in #${ch.name} ✓`);
     closeEditor();
@@ -825,7 +1182,7 @@ async function send() {
   }
 }
 
-/* ---------- Einstellungen ---------- */
+function openSettings() { $('#setName').value = store.get('name', ''); renderChanList(); openSheet('#settingsSheet'); }
 
 function renderChanList() {
   const L = $('#chanList'), chans = channels();
@@ -910,17 +1267,30 @@ for (const e of STICKERS) {
 
 $('#btnShutter').onclick = capture;
 $('#btnFlip').onclick = flip;
-$('#btnSettings').onclick = () => { $('#setName').value = store.get('name', ''); renderChanList(); openSheet('#settingsSheet'); };
+$('#btnProfile').onclick = () => BOT_MODE ? openProfile() : openSettings();
+$('#streakPill').onclick = openProfile;
 $('#setName').oninput = e => store.set('name', e.target.value);
 $('#addChan').onclick = addChannel;
 $('#shareSetup').onclick = shareSetup;
+$('#sendToSettings').onclick = openSettings;
+$('#themePill').onclick = () => toast('🎯 Passt dein Foto zum Thema, gibt es +5 Bonuspunkte');
+for (const b of document.querySelectorAll('.login-btn')) b.onclick = login;
+$('#btnLogout').onclick = async () => {
+  try { await api('/api/logout', {method:'POST'}); } catch {}
+  store.set('token', null); me = null; renderMe(); closeSheets(); toast('Abgemeldet');
+};
+$('#lbTabs').onclick = e => {
+  const b = e.target.closest('button'); if (!b) return;
+  lbTab = b.dataset.k;
+  for (const x of $('#lbTabs').children) x.setAttribute('aria-pressed', x === b);
+  renderLb();
+};
 $('#btnDiscard').onclick = closeEditor;
 $('#btnText').onclick = () => state.caption.on && document.activeElement === capInput ? capInput.blur() : editCaption();
 $('#btnSticker').onclick = () => openSheet('#stickerSheet');
 $('#btnSave').onclick = saveImage;
 $('#btnSend').onclick = () => { capInput.blur(); openSend(); };
 $('#sendGo').onclick = send;
-$('#sendToSettings').onclick = () => $('#btnSettings').onclick();
 $('#backdrop').onclick = closeSheets;
 
 addEventListener('resize', () => { if (state.base) layoutEdit(); else applyLiveFilter(); });
@@ -931,11 +1301,14 @@ setInterval(() => {
 }, 15000);
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) stopCamera();
-  else if (!state.base) startCamera();
+  else { if (!state.base) startCamera(); refreshMe(); }
 });
 
+if (BOT_MODE) handleLoginHash(); else importFromHash();
+if (FILTERS[state.f].unlock) state.f = 0;
 setFilter(state.f);
-importFromHash();
+renderMe();
+refreshMe();
 startCamera();
 if ('serviceWorker' in navigator && window.isSecureContext) navigator.serviceWorker.register('sw.js').catch(() => {});
 </script>
