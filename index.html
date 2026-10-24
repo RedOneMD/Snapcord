@@ -339,9 +339,10 @@ button,label{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   <h3>Post-Stil</h3>
   <div class="tabs" id="styleTabs">
     <button data-k="card" aria-pressed="true">✨ Karte</button>
+    <button data-k="classic" aria-pressed="false">📋 Klassisch</button>
     <button data-k="image" aria-pressed="false">🖼️ Nur Bild</button>
   </div>
-  <p class="hint" style="margin-top:4px">Karte: Foto mit Farbleiste, Aufgabe, Filter, Streak und Uhrzeit. Nur Bild: wie früher.</p>
+  <p class="hint" style="margin-top:4px">Karte: großes Foto mit Farbleiste, Aufgabe, Streak und Abzeichen. Klassisch: kompakte Karte mit kleinerem Foto. Nur Bild: wie früher.</p>
   <button class="btn" id="btnMyPosts" style="margin-top:16px">🗂️ Meine Posts</button>
   <h3>Kanäle</h3>
   <div id="chanList"></div>
@@ -1339,6 +1340,63 @@ function openSendWebhook() {
   openSheet('#sendSheet');
 }
 
+const STREAK_BADGES = { 3: '🔥 **3 Tage am Stück!**', 7: '🔥 **7 Tage – eine ganze Woche geschafft!**', 14: '🔥 **14 Tage – zwei Wochen am Stück!**',
+  30: '🌋 **30 Tage – ein ganzer Monat!**', 50: '💎 **50 Tage Streak!**', 100: '👑 **100 Tage – legendär!**', 365: '🏆 **Ein ganzes Jahr!**' };
+
+// Post-Stile: card = neues großes Layout (Components V2), classic = Embed-Karte, image = nur Bild
+function buildPayload(style, { task, msg, filterName, streakAfter, tasksAfter, newRecord, firstToday }, name, av) {
+  const p = { attachments: [{ id: 0, filename: 'snapcord.jpg' }], allowed_mentions: { parse: [] } };
+  if (name) p.username = name;
+  if (av) p.avatar_url = avatarUrl(av);
+  const tage = `${streakAfter} ${streakAfter === 1 ? 'Tag' : 'Tage'}`;
+
+  if (style === 'card') {
+    const parts = [];
+    if (task) parts.push({ type: 10, content: `-# 🎯 AUFGABE DES TAGES\n## ${task.emoji} ${task.text}` });
+    parts.push({ type: 12, items: [{ media: { url: 'attachment://snapcord.jpg' } }] });
+    if (msg) parts.push({ type: 10, content: msg });
+    parts.push({ type: 14, divider: true, spacing: 1 });
+    const stats = [`🔥 **${tage}**`];
+    if (filterName !== 'Normal') stats.push(`🎨 ${filterName}`);
+    if (tasksAfter) stats.push(`🏅 ${tasksAfter} ${tasksAfter === 1 ? 'Aufgabe' : 'Aufgaben'}`);
+    const badges = [];
+    if (firstToday && STREAK_BADGES[streakAfter]) badges.push(STREAK_BADGES[streakAfter]);
+    if (firstToday && newRecord && !STREAK_BADGES[streakAfter]) badges.push('🏆 **Neuer Streak-Rekord!**');
+    parts.push({ type: 10, content: [stats.join('  ·  '), ...badges, `-# 📸 Snapcord · <t:${Math.floor(Date.now() / 1000)}:R>`].join('\n') });
+    // Farbleiste: gold ab 30 Tagen, orange bei Aufgaben, sonst blau
+    const accent = streakAfter >= 30 ? 0xffc83d : task ? 0xff8c1a : 0x5865f2;
+    p.flags = 1 << 15; // IS_COMPONENTS_V2
+    p.components = [{ type: 17, accent_color: accent, components: parts }];
+  } else if (style === 'classic') {
+    const footer = ['📸 Snapcord'];
+    if (filterName !== 'Normal') footer.push(`🎨 ${filterName}`);
+    footer.push(`🔥 ${tage}`);
+    const embed = {
+      color: task ? 0xff8c1a : 0x5865f2,
+      image: { url: 'attachment://snapcord.jpg' },
+      footer: { text: footer.join('  ·  '), icon_url: new URL('icon-192.png', location.href).href },
+      timestamp: new Date().toISOString(),
+    };
+    if (task) embed.title = `🎯 Aufgabe des Tages: ${task.text}`;
+    if (msg) embed.description = msg;
+    p.embeds = [embed];
+  } else {
+    const lines = [];
+    if (task) lines.push(`🎯 **Aufgabe des Tages:** ${task.text}`);
+    if (msg) lines.push(msg);
+    if (lines.length) p.content = lines.join('\n');
+  }
+  return p;
+}
+
+async function postWebhook(url, payload, blob, components) {
+  const fd = new FormData();
+  fd.append('payload_json', JSON.stringify(payload));
+  fd.append('files[0]', blob, 'snapcord.jpg');
+  try { return await fetch(url.replace(/\/$/, '') + '?wait=true' + (components ? '&with_components=true' : ''), { method: 'POST', body: fd }); }
+  catch { throw new Error('Keine Verbindung zu Discord. Bist du online?'); }
+}
+
 async function sendWebhook() {
   if (sending) return;
   const ch = channels()[hookSel]; if (!ch) return;
@@ -1353,35 +1411,12 @@ async function sendWebhook() {
     const streakAfter = before.postedToday ? before.streak : before.streak + 1;
     const filterName = FILTERS[state.f].name;
 
-    const payload = {attachments:[{id:0, filename:'snapcord.jpg'}]};
-    if (name) payload.username = name;
-    if (av) payload.avatar_url = avatarUrl(av);
-    if (store.get('postStyle', 'card') === 'card') {
-      // Schöne Post-Karte als Discord-Embed
-      const footer = ['📸 Snapcord'];
-      if (filterName !== 'Normal') footer.push(`🎨 ${filterName}`);
-      footer.push(`🔥 ${streakAfter} ${streakAfter === 1 ? 'Tag' : 'Tage'}`);
-      const embed = {
-        color: task ? 0xff8c1a : 0x5865f2,
-        image: { url: 'attachment://snapcord.jpg' },
-        footer: { text: footer.join('  ·  '), icon_url: new URL('icon-192.png', location.href).href },
-        timestamp: new Date().toISOString(),
-      };
-      if (task) embed.title = `🎯 Aufgabe des Tages: ${task.text}`;
-      if (msg) embed.description = msg;
-      payload.embeds = [embed];
-    } else {
-      const lines = [];
-      if (task) lines.push(`🎯 **Aufgabe des Tages:** ${task.text}`);
-      if (msg) lines.push(msg);
-      if (lines.length) payload.content = lines.join('\n');
-    }
-    const fd = new FormData();
-    fd.append('payload_json', JSON.stringify(payload));
-    fd.append('files[0]', blob, 'snapcord.jpg');
-    let res;
-    try { res = await fetch(ch.url.replace(/\/$/, '') + '?wait=true', {method:'POST', body:fd}); }
-    catch { throw new Error('Keine Verbindung zu Discord. Bist du online?'); }
+    const info = { task, msg, filterName, streakAfter, tasksAfter: doneTasks().length + (task && !isDone(task) ? 1 : 0),
+      newRecord: streakAfter > 1 && streakAfter > before.best, firstToday: !before.postedToday };
+    const style = store.get('postStyle', 'card');
+    let res = await postWebhook(ch.url, buildPayload(style, info, name, av), blob, style === 'card');
+    // Falls Discord das neue Karten-Layout ablehnt: einmal als klassische Karte senden
+    if (res.status === 400 && style === 'card') res = await postWebhook(ch.url, buildPayload('classic', info, name, av), blob, false);
     if (!res.ok) {
       let detail = ''; try { detail = (await res.json()).message || ''; } catch {}
       if (res.status === 401 || res.status === 404) throw new Error('Webhook ungültig oder gelöscht – bitte in den Einstellungen prüfen.');
