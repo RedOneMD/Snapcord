@@ -1,7 +1,7 @@
 // Netzwerk zuerst (damit Updates sofort ankommen), Cache als Offline-Fallback.
 // Nur eigene GET-Anfragen – Posts an Discord laufen nie durch den Cache.
-const CACHE = 'klick-v1';
-const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon.svg', './icon-192.png', './icon-512.png'];
+const CACHE = 'snapcord-v3';
+const ASSETS = ['./', './index.html', './manifest.webmanifest', './favicon.png', './apple-touch-icon.png', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
