@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-25T09:53:59.050Z",
+  "updated": "2026-10-25T16:03:13.324Z",
   "news": [
     {
       "id": "n-willkommen",
@@ -20,5 +20,17 @@
       "date": "2026-10-25"
     }
   ],
-  "events": []
+  "events": [
+    {
+      "id": "e-mvo0obmt",
+      "emoji": "",
+      "title": "Test",
+      "text": "Test text",
+      "link": "https://www.youtube.com/watch?v=wiyi063sWaM",
+      "image": "content/events-mvo0o2e1.jpg",
+      "start": "2026-10-26T18:00",
+      "end": "2026-10-30T17:00",
+      "where": "Discord"
+    }
+  ]
 }
