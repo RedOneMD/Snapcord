@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-25T16:18:50.848Z",
+  "updated": "2026-10-25T16:54:28.628Z",
   "news": [
     {
       "id": "n-willkommen",
@@ -9,6 +9,15 @@
       "date": "2026-10-25",
       "image": null,
       "link": null
+    },
+    {
+      "id": "n-mvo2iajp",
+      "emoji": "",
+      "title": "Aniimo Season 1 | Part 2",
+      "text": "Der zweite Teil der ersten Season von Aniimo verspricht viele neue Aniimo und neue Landschaften und Cosmetics. Im Video sieht du das 10 Minuten lange Gameplay Showcase!",
+      "link": "https://www.youtube.com/watch?v=CexATcRVd1k",
+      "image": "content/news-mvo2hv03.jpg",
+      "date": "2026-10-29"
     }
   ],
   "events": []
