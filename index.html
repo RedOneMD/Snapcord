@@ -3163,11 +3163,12 @@ function buildDeco() {
   if (!s || !store.get('decoOn', true) || !$('#home').classList.contains('active')) return;
   const { width: W, height: H } = box.getBoundingClientRect();
   if (!W || !H) return;
-  const conf = SEASONS[s], n = Math.max(6, Math.round(W * H / 9000));
+  // Wenige Emojis, langsam und ruhig (auf dem Handy ca. 5 Stück, je 16–26 Sekunden pro Durchlauf)
+  const conf = SEASONS[s], n = Math.min(7, Math.max(4, Math.round(W * H / 22000)));
   for (let i = 0; i < n; i++) {
     const el = document.createElement('span');
     el.textContent = conf.deco[i % conf.deco.length];
-    const dur = 6 + Math.random() * 6;
+    const dur = 16 + Math.random() * 10;
     el.style.cssText = `font-size:${15 + Math.random() * 14}px;--o:${(.4 + Math.random() * .35).toFixed(2)};--dur:${dur.toFixed(1)}s;` +
       `--delay:${(-Math.random() * dur).toFixed(1)}s;--anim:deco-${conf.motion};--W:${W}px;--H:${H}px;` +
       `--x:${Math.round(Math.random() * (W - 20))}px;--y:${Math.round(20 + Math.random() * (H - 50))}px;` +
