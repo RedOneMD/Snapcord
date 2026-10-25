@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-25T16:03:13.324Z",
+  "updated": "2026-10-25T16:18:50.848Z",
   "news": [
     {
       "id": "n-willkommen",
@@ -9,28 +9,7 @@
       "date": "2026-10-25",
       "image": null,
       "link": null
-    },
-    {
-      "id": "n-mvnnhgu0",
-      "emoji": "",
-      "title": "Das ist ein Test",
-      "text": "Endlich funktionieren jetzt auch die News!\n\nPS: Schaut MANHUNT!",
-      "link": "https://www.youtube.com/watch?v=wiyi063sWaM",
-      "image": "content/news-mvnng75x.jpg",
-      "date": "2026-10-25"
     }
   ],
-  "events": [
-    {
-      "id": "e-mvo0obmt",
-      "emoji": "",
-      "title": "Test",
-      "text": "Test text",
-      "link": "https://www.youtube.com/watch?v=wiyi063sWaM",
-      "image": "content/events-mvo0o2e1.jpg",
-      "start": "2026-10-26T18:00",
-      "end": "2026-10-30T17:00",
-      "where": "Discord"
-    }
-  ]
+  "events": []
 }
