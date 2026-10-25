@@ -73,12 +73,25 @@
 /* Auf farbigen Flächen immer weiße Schrift – auch im hellen Style */
 .btn.primary,.when,.tabs button[aria-pressed="true"],.seg-chips button[aria-pressed="true"],.chan-pick button[aria-pressed="true"]{color:#fff}
 .reward,.toast,.busy{--text:#fff;--muted:#a3a3ad;color:#fff}
+:root[data-season="spring"]{--accent:#e85d9a;--glow1:rgba(255,143,171,.3);--glow2:rgba(116,198,157,.28);
+  --tile-snap:linear-gradient(135deg,#ff8fab,#e05780);--tile-news:linear-gradient(135deg,#52b788,#2d6a4f);
+  --tile-events:linear-gradient(135deg,#f6bd60,#e76f51);--tile-party:linear-gradient(135deg,#b388eb,#7b5cd6)}
+:root[data-season="autumn"]{--accent:#e07a2f;--glow1:rgba(217,72,15,.32);--glow2:rgba(176,137,104,.25);
+  --tile-snap:linear-gradient(135deg,#e85d04,#9d0208);--tile-news:linear-gradient(135deg,#a47148,#6f4518);
+  --tile-events:linear-gradient(135deg,#e9a23b,#b5651d);--tile-party:linear-gradient(135deg,#8d5524,#4a2c17)}
+:root[data-season="winter"]{--accent:#4dabf7;--glow1:rgba(77,171,247,.3);--glow2:rgba(177,151,252,.22);
+  --tile-snap:linear-gradient(135deg,#4dabf7,#1864ab);--tile-news:linear-gradient(135deg,#3bc9db,#0b7285);
+  --tile-events:linear-gradient(135deg,#748ffc,#364fc7);--tile-party:linear-gradient(135deg,#9775fa,#5f3dc4)}
+:root[data-season="birthday"]{--accent:#f72585;--glow1:rgba(247,37,133,.32);--glow2:rgba(76,201,240,.28);
+  --tile-snap:linear-gradient(135deg,#ff6b9d,#b5179e);--tile-news:linear-gradient(135deg,#ffd166,#ff8c1a);
+  --tile-events:linear-gradient(135deg,#4cc9f0,#4361ee);--tile-party:linear-gradient(135deg,#f72585,#7209b7)}
 /* Kamera und Bearbeiten bleiben immer dunkel */
 #cam,#edit{--text:#fff;--muted:#a3a3ad;--soft:rgba(255,255,255,.06);--soft2:rgba(255,255,255,.12);--line:rgba(255,255,255,.14)}
 
 /* Animierte Saison-Deko auf Startseite und Unterseiten */
 #deco{position:fixed;inset:0;z-index:15;overflow:hidden;pointer-events:none}
-body.cam-on #deco{display:none}
+#deco{display:none}
+body.home-on #deco{display:block}
 #deco span{position:absolute;top:0;left:0;line-height:1;opacity:var(--o);will-change:transform;
   font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;animation:var(--anim) var(--dur) linear var(--delay) infinite}
 @keyframes deco-fall{from{transform:translate3d(var(--x),-12vh,0) rotate(0)}to{transform:translate3d(calc(var(--x) + var(--dx)),112vh,0) rotate(var(--rot))}}
@@ -444,7 +457,7 @@ textarea.input{min-height:90px;resize:vertical;font-family:inherit}
 .poster-pick span{color:var(--muted);font-size:14px}
 </style>
 </head>
-<body>
+<body class="home-on">
 
 <input type="file" id="galleryInput" class="vh" accept="image/*">
 
@@ -694,7 +707,7 @@ textarea.input{min-height:90px;resize:vertical;font-family:inherit}
   <h3>Saison-Design</h3>
   <p class="send-hint" id="seasonNow"></p>
   <div class="seg-chips" id="seasonChips"></div>
-  <p class="hint">„Automatisch“ wechselt von selbst: Karneval, Valentinstag, Ostern, Sommer, Halloween, Weihnachten und Silvester – mit passenden Farben, Begrüßung und Deko-Animation.</p>
+  <p class="hint">„Automatisch“ wechselt von selbst: Frühling, Sommer, Herbst und Winter – und zu besonderen Anlässen Karneval (auch am 11.11.), Valentinstag, Ostern, Community-Geburtstag (27.08.), Halloween, Weihnachten und Silvester. Mit passenden Farben, Begrüßung und Deko-Animation auf der Startseite.</p>
 </div>
 
 <div class="sheet" id="channelsSheet">
@@ -1324,7 +1337,7 @@ $('#galleryInput').addEventListener('change', e => {
 
 function show(id) {
   for (const s of document.querySelectorAll('.screen')) s.classList.toggle('active', s.id === id);
-  document.body.classList.toggle('cam-on', id === 'cam' || id === 'edit');   // Saison-Deko nur außerhalb der Kamera
+  document.body.classList.toggle('home-on', id === 'home');   // Saison-Deko nur auf der Startseite
 }
 
 // opts: { booth, recap } – merkt sich, woher das Bild kommt (für Abzeichen)
@@ -2773,6 +2786,12 @@ function renderHome() {
   const season = activeSeason();
   const greet = !season ? 'Hey' : season === 'newyear' && new Date().getMonth() === 11 ? 'Guten Rutsch' : SEASONS[season].greet;
   $('#heroTitle').textContent = `${greet}, ${name || 'du'} ${season ? SEASONS[season].emoji : '👋'}`;
+  if (season === 'birthday') {
+    const b = birthdayInfo();
+    $('#heroTitle').textContent = b.days === 0 ? `🎂 Heute wird unsere Community ${b.years}!`
+      : b.days > 0 ? `🎉 In ${b.days} ${b.days === 1 ? 'Tag' : 'Tagen'} wird unsere Community ${b.years}!`
+      : `🥳 Unsere Community ist ${b.years} geworden!`;
+  }
   const s = BOT_MODE ? me?.stats : streakInfo();
   $('#heroText').textContent = !s ? 'Schön, dass du da bist!'
     : s.streak ? `🔥 ${s.streak} ${s.streak === 1 ? 'Tag' : 'Tage'} Streak` + (s.postedToday ? ' – heute schon gepostet ✓' : ' – heute noch posten, sonst ist sie weg!')
@@ -2870,6 +2889,7 @@ function pick({ title, hint = '', options, multi = false, max = 99, value, onCha
   let sel = multi ? [...value] : value;
   $('#pickTitle').textContent = title; $('#pickHint').textContent = hint;
   $('#pickDone').hidden = !multi;
+  $('#pickDone').onclick = closeSheets;
   const render = () => $('#pickList').replaceChildren(...options.map(o => {
     const b = document.createElement('button'); b.type = 'button'; b.textContent = o.label;
     b.setAttribute('aria-pressed', multi ? sel.includes(o.v) : sel === o.v);
@@ -2936,8 +2956,12 @@ $('#pPoster').addEventListener('change', e => {
   img.src = url;
 });
 
-// Folgen-Kürzel wie „S1E23“ (oder „S2“ / „E5“)
-const epCode = p => (p.season ? `S${p.season}` : '') + (p.ep ? `E${p.ep}` : '');
+// Folgen-Kürzel immer zweistellig in Klammern: „(S01/F07)“, „(S02)“, „(F05)“, „(S01/F01–03)“
+const pad2Nums = s => String(s).replace(/\d+/g, n => n.padStart(2, '0'));
+function epCode(p) {
+  const parts = [p.season && `S${pad2Nums(p.season)}`, p.ep && `F${pad2Nums(p.ep)}`].filter(Boolean);
+  return parts.length ? `(${parts.join('/')})` : '';
+}
 
 // Ankündigung als Embed: farbiger Rand im Anbieter-Look, Titel, Text, Link, Fußzeile,
 // oben rechts das Poster – oder ohne Poster die Kachel des Streaming-Anbieters
@@ -3039,15 +3063,27 @@ const THEMES = [
   { id: 'forest', name: 'Wald', sw: 'linear-gradient(135deg,#2fbf71,#08130e)' },
 ];
 // motion: fall (fällt), rise (steigt), fly (fliegt quer), twinkle (funkelt)
+// Gründung der Community – jedes Jahr 7 Tage vorher bis 7 Tage nachher Geburtstags-Design
+const COMMUNITY_BIRTHDAY = { year: 2017, month: 8, day: 27 };
 const SEASONS = {
   carnival:  { name: 'Karneval',     emoji: '🎭', greet: 'Helau & Alaaf',        deco: ['🎭', '🎉', '🎊', '🤡'],  motion: 'fall',    colors: ['#ff006e', '#ffbe0b', '#3a86ff', '#06d6a0', '#fb5607'] },
   valentine: { name: 'Valentinstag', emoji: '💘', greet: 'Happy Valentine’s',    deco: ['💕', '💖', '💘', '🌹'],  motion: 'rise',    colors: ['#ff4d8d', '#ff8fab', '#c9184a', '#ffffff'] },
   easter:    { name: 'Ostern',       emoji: '🐰', greet: 'Frohe Ostern',         deco: ['🥚', '🐣', '🌷', '🐰'],  motion: 'fall',    colors: ['#f78fb3', '#9b8cf5', '#6fcf97', '#f6c453', '#4fc3c3'] },
+  spring:    { name: 'Frühling',     emoji: '🌸', greet: 'Schönen Frühling',     deco: ['🌸', '🌼', '🦋', '🌷'],  motion: 'fall',    colors: ['#ff8fab', '#52b788', '#f6bd60', '#b388eb', '#ffffff'] },
   summer:    { name: 'Sommer',       emoji: '☀️', greet: 'Schönen Sommer',       deco: ['☀️', '🌴', '🍉', '🍦'],  motion: 'rise',    colors: ['#ffb703', '#fb8500', '#219ebc', '#ff6b6b'] },
+  birthday:  { name: 'Community-Geburtstag', emoji: '🎂', greet: 'Happy Birthday', deco: ['🎈', '🎉', '🎂', '🥳', '🎁'], motion: 'rise', colors: ['#f72585', '#ffd166', '#4cc9f0', '#7209b7', '#ff8c1a'] },
+  autumn:    { name: 'Herbst',       emoji: '🍂', greet: 'Schönen Herbst',       deco: ['🍂', '🍁', '🍄', '🌰'],  motion: 'fall',    colors: ['#e85d04', '#a47148', '#e9a23b', '#9d0208'] },
   halloween: { name: 'Halloween',    emoji: '🎃', greet: 'Happy Halloween',      deco: ['🦇', '🎃', '👻', '🕸️'], motion: 'fly',     colors: ['#ff7a00', '#8a2be2', '#1b1b1b', '#39ff88'] },
+  winter:    { name: 'Winter',       emoji: '❄️', greet: 'Schönen Winter',       deco: ['❄️', '❅', '☃️', '🧣'],  motion: 'fall',    colors: ['#4dabf7', '#ffffff', '#9775fa', '#3bc9db'] },
   christmas: { name: 'Weihnachten',  emoji: '🎄', greet: 'Frohe Weihnachtszeit', deco: ['❄️', '❄️', '❅', '⛄'],   motion: 'fall',    colors: ['#e63946', '#2d6a4f', '#ffd166', '#ffffff'] },
   newyear:   { name: 'Silvester & Neujahr', emoji: '🎆', greet: 'Frohes neues Jahr', deco: ['✨', '🎆', '🎇', '⭐'], motion: 'twinkle', colors: ['#ffd166', '#ffffff', '#b388ff', '#ff4d6d'] },
 };
+// Wie viele Tage bis zum Community-Geburtstag (negativ = schon vorbei) und das wievielte Jubiläum
+function birthdayInfo(now = new Date()) {
+  const y = now.getFullYear(), today = new Date(y, now.getMonth(), now.getDate());
+  const bday = new Date(y, COMMUNITY_BIRTHDAY.month - 1, COMMUNITY_BIRTHDAY.day);
+  return { days: Math.round((bday - today) / 864e5), years: y - COMMUNITY_BIRTHDAY.year };
+}
 // Ostersonntag (Gaußsche Osterformel, gregorianisch)
 function easterSunday(y) {
   const a = y % 19, b = Math.floor(y / 100), c = y % 100, d = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25),
@@ -3059,14 +3095,19 @@ function currentSeason(now = new Date()) {
   const y = now.getFullYear(), day = new Date(y, now.getMonth(), now.getDate());
   const md = (now.getMonth() + 1) * 100 + now.getDate();
   const easter = easterSunday(y), off = Math.round((day - easter) / 864e5);
-  if (off >= -52 && off <= -47) return 'carnival';            // Weiberfastnacht bis Faschingsdienstag
-  if (off >= -7 && off <= 1) return 'easter';                 // Palmsonntag bis Ostermontag
+  // Feste Anlässe haben Vorrang vor den Jahreszeiten
+  if (Math.abs(birthdayInfo(now).days) <= 7) return 'birthday';          // 20.08. bis 03.09.
+  if ((off >= -52 && off <= -47) || md === 1111) return 'carnival';      // Weiberfastnacht bis Faschingsdienstag + 11.11.
+  if (off >= -7 && off <= 1) return 'easter';                            // Palmsonntag bis Ostermontag
   if (md >= 207 && md <= 214) return 'valentine';
-  if (md >= 621 && md <= 831) return 'summer';
   if (md >= 1015 && md <= 1101) return 'halloween';
   if (md >= 1201 && md <= 1226) return 'christmas';
   if (md >= 1227 || md <= 106) return 'newyear';
-  return null;
+  // Jahreszeiten (astronomisch)
+  if (md >= 320 && md <= 620) return 'spring';
+  if (md >= 621 && md <= 922) return 'summer';
+  if (md >= 923 && md <= 1220) return 'autumn';
+  return 'winter';
 }
 const activeSeason = () => { const p = store.get('season', 'auto'); return p === 'auto' ? currentSeason() : p === 'off' ? null : p; };
 
