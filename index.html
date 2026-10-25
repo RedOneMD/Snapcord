@@ -89,16 +89,22 @@
 #cam,#edit{--text:#fff;--muted:#a3a3ad;--soft:rgba(255,255,255,.06);--soft2:rgba(255,255,255,.12);--line:rgba(255,255,255,.14)}
 
 /* Animierte Saison-Deko auf Startseite und Unterseiten */
-#deco{position:fixed;inset:0;z-index:15;overflow:hidden;pointer-events:none}
-#deco{display:none}
-body.home-on #deco{display:block}
-#deco span{position:absolute;top:0;left:0;line-height:1;opacity:var(--o);will-change:transform;
+/* Saison-Deko nur im Kopfbereich der Startseite (oberhalb von „Snap machen“).
+   Bewegungen in px relativ zu diesem Bereich: --W/--H = Breite/Höhe, --x/--y/--dx = Position/Versatz */
+.home-head{position:relative}
+#deco{position:absolute;left:-16px;right:-16px;top:calc(-14px - var(--safe-t));bottom:-6px;z-index:2;overflow:hidden;pointer-events:none}
+#deco span{position:absolute;top:0;left:0;line-height:1;opacity:var(--o);will-change:transform,opacity;
   font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;animation:var(--anim) var(--dur) linear var(--delay) infinite}
-@keyframes deco-fall{from{transform:translate3d(var(--x),-12vh,0) rotate(0)}to{transform:translate3d(calc(var(--x) + var(--dx)),112vh,0) rotate(var(--rot))}}
-@keyframes deco-rise{from{transform:translate3d(var(--x),112vh,0) scale(.8)}to{transform:translate3d(calc(var(--x) + var(--dx)),-12vh,0) scale(1.1)}}
-@keyframes deco-fly{0%{transform:translate3d(-15vw,var(--y),0)}25%{transform:translate3d(20vw,calc(var(--y) - 6vh),0)}50%{transform:translate3d(55vw,var(--y),0)}
-  75%{transform:translate3d(85vw,calc(var(--y) - 5vh),0)}100%{transform:translate3d(115vw,var(--y),0)}}
-@keyframes deco-twinkle{0%,100%{transform:translate3d(var(--x),var(--y),0) scale(.4);opacity:0}50%{transform:translate3d(var(--x),var(--y),0) scale(1.15);opacity:var(--o)}}
+@keyframes deco-fall{from{transform:translate3d(var(--x),-40px,0) rotate(0)}to{transform:translate3d(calc(var(--x) + var(--dx)),var(--H),0) rotate(var(--rot))}}
+@keyframes deco-rise{from{transform:translate3d(var(--x),var(--H),0) scale(.8)}to{transform:translate3d(calc(var(--x) + var(--dx)),-40px,0) scale(1.1)}}
+@keyframes deco-fly{0%{transform:translate3d(-40px,var(--y),0)}25%{transform:translate3d(calc(var(--W) * .25),calc(var(--y) - 18px),0)}
+  50%{transform:translate3d(calc(var(--W) * .5),var(--y),0)}75%{transform:translate3d(calc(var(--W) * .75),calc(var(--y) - 14px),0)}
+  100%{transform:translate3d(calc(var(--W) + 40px),var(--y),0)}}
+/* Silvester: steigt wie eine kleine Rakete auf und funkelt dabei */
+@keyframes deco-sparkle{0%{transform:translate3d(var(--x),var(--H),0) scale(.5);opacity:0}
+  10%{opacity:var(--o)}30%{transform:translate3d(calc(var(--x) + var(--dx) * .3),calc(var(--H) * .62),0) scale(.9);opacity:.15}
+  45%{opacity:var(--o)}60%{transform:translate3d(calc(var(--x) + var(--dx) * .6),calc(var(--H) * .3),0) scale(1.25);opacity:.2}
+  75%{opacity:var(--o)}100%{transform:translate3d(calc(var(--x) + var(--dx)),-40px,0) scale(.7);opacity:0}}
 @media (prefers-reduced-motion:reduce){#deco{display:none}}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 [hidden]{display:none!important}
@@ -209,7 +215,14 @@ button,label{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .theme-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
 .theme-grid button{padding:8px;border-radius:14px;border:2px solid transparent;background:var(--soft);text-align:left;font-size:14px;font-weight:700}
 .theme-grid button[aria-pressed="true"]{border-color:var(--accent)}
-.theme-grid .tsw{height:56px;margin-bottom:8px;border-radius:10px;border:1px solid var(--line)}
+.theme-grid .tsw{height:56px;margin-bottom:8px;border-radius:10px;border:1px solid var(--line);display:grid;place-items:center;font-size:28px}
+.switch-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px;padding:14px;border-radius:14px;
+  background:var(--soft);color:var(--text);font-size:15px;font-weight:700;cursor:pointer}
+.switch-row small{display:block;margin-top:2px;color:var(--muted);font-size:12px;font-weight:500}
+.toggle{flex:none;appearance:none;-webkit-appearance:none;position:relative;width:50px;height:30px;border-radius:999px;background:var(--soft2);cursor:pointer;transition:background .2s}
+.toggle::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:left .2s}
+.toggle:checked{background:var(--accent)}
+.toggle:checked::after{left:23px}
 .chan-row{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
 .chan-row .n{flex:1;font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis}
 .chan-row small{display:block;color:var(--muted);font-weight:400}
@@ -463,6 +476,8 @@ textarea.input{min-height:90px;resize:vertical;font-family:inherit}
 
 <section id="home" class="screen active">
   <div class="home-wrap">
+    <div class="home-head">
+    <div id="deco" aria-hidden="true"></div>
     <div class="home-top">
       <div class="logo"><img src="icon-192.png" alt="">Snapcord</div>
       <button class="icon-btn" id="btnProfile" aria-label="Einstellungen"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></button>
@@ -471,6 +486,7 @@ textarea.input{min-height:90px;resize:vertical;font-family:inherit}
       <h1 id="heroTitle">Hey 👋</h1>
       <p id="heroText">Schön, dass du da bist!</p>
       <div class="chips" id="heroChips"></div>
+    </div>
     </div>
     <div class="tiles">
       <button class="tile snap" id="tileSnap"><span class="ic">📸</span><span><b>Snap machen</b><small id="snapSub">Foto, Fotoautomat oder Boomerang – mit Filtern direkt in den Discord</small></span></button>
@@ -610,7 +626,6 @@ textarea.input{min-height:90px;resize:vertical;font-family:inherit}
   <div class="trash" id="trash"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m3 0V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/></svg></div>
 </section>
 
-<div id="deco" aria-hidden="true"></div>
 <div class="backdrop" id="backdrop"></div>
 
 <div class="sheet" id="sendSheet">
@@ -702,12 +717,16 @@ textarea.input{min-height:90px;resize:vertical;font-family:inherit}
   <div class="grab"></div>
   <button class="sheet-back" data-settings>‹ Einstellungen</button>
   <h2>🎨 Styles</h2>
-  <h3>Grund-Style</h3>
-  <div class="theme-grid" id="themeGrid"></div>
-  <h3>Saison-Design</h3>
+  <span class="lbl">Design-Art</span>
+  <button type="button" class="dd" id="ddDesignMode"></button>
+  <h3 id="designTitle"></h3>
   <p class="send-hint" id="seasonNow"></p>
-  <div class="seg-chips" id="seasonChips"></div>
-  <p class="hint">„Automatisch“ wechselt von selbst: Frühling, Sommer, Herbst und Winter – und zu besonderen Anlässen Karneval (auch am 11.11.), Valentinstag, Ostern, Community-Geburtstag (27.08.), Halloween, Weihnachten und Silvester. Mit passenden Farben, Begrüßung und Deko-Animation auf der Startseite.</p>
+  <div class="theme-grid" id="themeGrid"></div>
+  <label class="switch-row" id="decoRow">
+    <span>✨ Deko-Animation auf der Startseite<small>Kleine animierte Emojis oberhalb von „Snap machen“</small></span>
+    <input type="checkbox" class="toggle" id="decoToggle">
+  </label>
+  <p class="hint" id="designHint"></p>
 </div>
 
 <div class="sheet" id="channelsSheet">
@@ -2754,7 +2773,7 @@ const escHtml = t => String(t ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'
 const WD_SHORT = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
 const MON_SHORT = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
 
-function goHome() { closeSheets(); stopCamera(); show('home'); renderHome(); }
+function goHome() { closeSheets(); stopCamera(); show('home'); renderHome(); buildDeco(); }
 function openCam() { closeSheets(); show('cam'); setFilter(state.f); startCamera(); }
 function openPage(id) { stopCamera(); show(id); $('#' + id).scrollTop = 0; }
 
@@ -3076,7 +3095,7 @@ const SEASONS = {
   halloween: { name: 'Halloween',    emoji: '🎃', greet: 'Happy Halloween',      deco: ['🦇', '🎃', '👻', '🕸️'], motion: 'fly',     colors: ['#ff7a00', '#8a2be2', '#1b1b1b', '#39ff88'] },
   winter:    { name: 'Winter',       emoji: '❄️', greet: 'Schönen Winter',       deco: ['❄️', '❅', '☃️', '🧣'],  motion: 'fall',    colors: ['#4dabf7', '#ffffff', '#9775fa', '#3bc9db'] },
   christmas: { name: 'Weihnachten',  emoji: '🎄', greet: 'Frohe Weihnachtszeit', deco: ['❄️', '❄️', '❅', '⛄'],   motion: 'fall',    colors: ['#e63946', '#2d6a4f', '#ffd166', '#ffffff'] },
-  newyear:   { name: 'Silvester & Neujahr', emoji: '🎆', greet: 'Frohes neues Jahr', deco: ['✨', '🎆', '🎇', '⭐'], motion: 'twinkle', colors: ['#ffd166', '#ffffff', '#b388ff', '#ff4d6d'] },
+  newyear:   { name: 'Silvester & Neujahr', emoji: '🎆', greet: 'Frohes neues Jahr', deco: ['✨', '🎆', '🎇', '⭐'], motion: 'sparkle', colors: ['#ffd166', '#ffffff', '#b388ff', '#ff4d6d'] },
 };
 // Wie viele Tage bis zum Community-Geburtstag (negativ = schon vorbei) und das wievielte Jubiläum
 function birthdayInfo(now = new Date()) {
@@ -3109,58 +3128,85 @@ function currentSeason(now = new Date()) {
   if (md >= 923 && md <= 1220) return 'autumn';
   return 'winter';
 }
-const activeSeason = () => { const p = store.get('season', 'auto'); return p === 'auto' ? currentSeason() : p === 'off' ? null : p; };
+// Vorschau-Kacheln der Saison-Designs (Farben wie die Snap-Kachel der jeweiligen Saison)
+const SEASON_SW = {
+  carnival: 'linear-gradient(135deg,#ff006e,#ffbe0b 55%,#3a86ff)', valentine: 'linear-gradient(135deg,#ff8fab,#c9184a)',
+  easter: 'linear-gradient(135deg,#f78fb3,#9b8cf5 55%,#6fcf97)', spring: 'linear-gradient(135deg,#ff8fab,#52b788)',
+  summer: 'linear-gradient(135deg,#ffb703,#fb8500 55%,#219ebc)', birthday: 'linear-gradient(135deg,#f72585,#ffd166 55%,#4cc9f0)',
+  autumn: 'linear-gradient(135deg,#e85d04,#6f4518)', halloween: 'linear-gradient(135deg,#ff7a00,#6a1b9a 60%,#1b1b1b)',
+  winter: 'linear-gradient(135deg,#a5d8ff,#4dabf7 50%,#5f3dc4)', christmas: 'linear-gradient(135deg,#e63946,#2d6a4f)',
+  newyear: 'linear-gradient(135deg,#ffd166,#151525 60%,#9d7bff)',
+};
+// Entweder Main-Design ODER Saison-Design (automatisch oder fest gewählt)
+const designMode = () => store.get('designMode', store.get('season', 'auto') === 'off' ? 'main' : 'season');
+const activeSeason = () => {
+  if (designMode() !== 'season') return null;
+  const p = store.get('season', 'auto');
+  return p === 'auto' || p === 'off' ? currentSeason() : p;
+};
 
 function applyTheme() {
-  const root = document.documentElement, theme = store.get('theme', 'oldschool'), s = activeSeason();
+  const root = document.documentElement, s = activeSeason();
+  const theme = designMode() === 'main' ? store.get('theme', 'oldschool') : 'oldschool';
   if (theme === 'oldschool') delete root.dataset.theme; else root.dataset.theme = theme;
   if (s) root.dataset.season = s; else delete root.dataset.season;
   document.querySelector('meta[name="theme-color"]').content = getComputedStyle(root).getPropertyValue('--base').trim() || '#000000';
   for (const b of document.querySelectorAll('.brand')) b.textContent = 'Snapcord' + (s ? ' ' + SEASONS[s].emoji : '');
-  buildDeco(s);
   renderHome();
+  buildDeco();
 }
 
-function buildDeco(s) {
+// Deko-Emojis im Kopfbereich der Startseite – Maße in px, damit sie genau diesen Bereich durchqueren
+function buildDeco() {
   const box = $('#deco'); box.replaceChildren();
-  if (!s) return;
-  const conf = SEASONS[s], n = conf.motion === 'twinkle' ? 18 : 14;
+  const s = activeSeason();
+  if (!s || !store.get('decoOn', true) || !$('#home').classList.contains('active')) return;
+  const { width: W, height: H } = box.getBoundingClientRect();
+  if (!W || !H) return;
+  const conf = SEASONS[s], n = Math.max(6, Math.round(W * H / 9000));
   for (let i = 0; i < n; i++) {
     const el = document.createElement('span');
     el.textContent = conf.deco[i % conf.deco.length];
-    const dur = 10 + Math.random() * 12;
-    el.style.cssText = `font-size:${16 + Math.random() * 18}px;--o:${(.35 + Math.random() * .35).toFixed(2)};--dur:${dur.toFixed(1)}s;` +
-      `--delay:${(-Math.random() * dur).toFixed(1)}s;--anim:deco-${conf.motion};--x:${(Math.random() * 100).toFixed(1)}vw;` +
-      `--y:${(Math.random() * 90).toFixed(1)}vh;--dx:${((Math.random() - .5) * 30).toFixed(1)}vw;--rot:${Math.random() < .5 ? '' : '-'}${Math.round(180 + Math.random() * 360)}deg`;
+    const dur = 6 + Math.random() * 6;
+    el.style.cssText = `font-size:${15 + Math.random() * 14}px;--o:${(.4 + Math.random() * .35).toFixed(2)};--dur:${dur.toFixed(1)}s;` +
+      `--delay:${(-Math.random() * dur).toFixed(1)}s;--anim:deco-${conf.motion};--W:${W}px;--H:${H}px;` +
+      `--x:${Math.round(Math.random() * (W - 20))}px;--y:${Math.round(20 + Math.random() * (H - 50))}px;` +
+      `--dx:${Math.round((Math.random() - .5) * 80)}px;--rot:${Math.random() < .5 ? '' : '-'}${Math.round(180 + Math.random() * 360)}deg`;
     box.appendChild(el);
   }
 }
 
 function openStyles() {
-  const theme = store.get('theme', 'oldschool'), pref = store.get('season', 'auto'), now = currentSeason();
-  $('#themeGrid').replaceChildren(...THEMES.map(t => {
+  const mode = designMode(), theme = store.get('theme', 'oldschool'), pref = store.get('season', 'auto'), now = currentSeason();
+  ddText($('#ddDesignMode'), mode === 'main' ? '🎨 Main-Design' : '🗓️ Saison-Design');
+  $('#designTitle').textContent = mode === 'main' ? 'Main-Design' : 'Saison-Design';
+  $('#seasonNow').hidden = mode === 'main';
+  $('#seasonNow').textContent = `Gerade aktiv: ${SEASONS[now].emoji} ${SEASONS[now].name}`;
+  $('#decoRow').hidden = mode === 'main';
+  $('#decoToggle').checked = store.get('decoOn', true);
+  $('#designHint').textContent = mode === 'main'
+    ? 'Ein festes Design – unabhängig von Jahreszeit und Feiertagen.'
+    : '„Automatisch“ wechselt von selbst: Frühling, Sommer, Herbst und Winter – und zu besonderen Anlässen Karneval (auch am 11.11.), Valentinstag, Ostern, Community-Geburtstag (27.08.), Halloween, Weihnachten und Silvester.';
+  const tile = (sw, inner, label, on, fn) => {
     const b = document.createElement('button');
-    b.innerHTML = `<div class="tsw" style="background:${t.sw}"></div>`;
-    b.append(t.name);
-    b.setAttribute('aria-pressed', t.id === theme);
-    b.onclick = () => { store.set('theme', t.id); applyTheme(); openStyles(); };
+    const t = document.createElement('div'); t.className = 'tsw'; t.style.background = sw; t.textContent = inner;
+    b.append(t, label); b.setAttribute('aria-pressed', on); b.onclick = fn;
     return b;
-  }));
-  $('#seasonNow').textContent = now ? `Gerade aktiv: ${SEASONS[now].emoji} ${SEASONS[now].name}` : 'Gerade ist keine besondere Saison – das Grund-Design ist aktiv.';
-  const opts = [['auto', '✨ Automatisch'], ['off', '🚫 Aus'], ...Object.entries(SEASONS).map(([k, v]) => [k, `${v.emoji} ${v.name}`])];
-  $('#seasonChips').replaceChildren(...opts.map(([k, label]) => {
-    const b = document.createElement('button'); b.type = 'button'; b.textContent = label;
-    b.setAttribute('aria-pressed', k === pref);
-    b.onclick = () => { store.set('season', k); applyTheme(); openStyles(); };
-    return b;
-  }));
+  };
+  const pickTheme = id => () => { store.set('theme', id); applyTheme(); openStyles(); };
+  const pickSeason = id => () => { store.set('season', id); applyTheme(); openStyles(); };
+  $('#themeGrid').replaceChildren(...(mode === 'main'
+    ? THEMES.map(t => tile(t.sw, '', t.name, t.id === theme, pickTheme(t.id)))
+    : [tile('linear-gradient(135deg,#ff8fab,#ffb703 25%,#e85d04 50%,#4dabf7 75%,#c13dff)', '✨', 'Automatisch', pref === 'auto' || pref === 'off', pickSeason('auto')),
+       ...Object.entries(SEASONS).map(([k, v]) => tile(SEASON_SW[k], v.emoji, v.name, pref === k, pickSeason(k)))]));
   openSheet('#stylesSheet');
 }
 
 function renderSettingsRows() {
   const av = store.get('avatar', null), th = THEMES.find(t => t.id === store.get('theme', 'oldschool')), s = activeSeason();
   $('#rowAvatarImg').replaceChildren(av ? Object.assign(new Image(), { src: `avatars/${av}.png`, alt: '' }) : '🙂');
-  $('#rowStylesSub').textContent = th.name + (s ? ` · ${SEASONS[s].emoji} ${SEASONS[s].name}` : '');
+  const auto = ['auto', 'off'].includes(store.get('season', 'auto'));
+  $('#rowStylesSub').textContent = s ? `Saison: ${SEASONS[s].emoji} ${SEASONS[s].name}${auto ? ' (automatisch)' : ''}` : `Main-Design: ${th.name}`;
   const n = channels().length, ph = partyHook();
   $('#rowChannelsSub').textContent = `${n} ${n === 1 ? 'Foto-Kanal' : 'Foto-Kanäle'}` + (ph ? ` · Watchparty: #${ph.name}` : ' · kein Watchparty-Kanal');
 }
@@ -3233,6 +3279,14 @@ $('#rowStyles').onclick = openStyles;
 $('#rowChannels').onclick = openChannels;
 for (const b of document.querySelectorAll('[data-settings]')) b.onclick = () => BOT_MODE ? openProfile() : openSettings();
 for (const b of document.querySelectorAll('[data-styles]')) b.onclick = openStyles;
+$('#ddDesignMode').onclick = () => pick({
+  title: 'Design-Art', hint: 'Wähle ein festes Main-Design oder ein Saison-Design.',
+  options: [{ v: 'main', label: '🎨 Main-Design' }, { v: 'season', label: '🗓️ Saison-Design' }],
+  value: designMode(), onChange: v => { store.set('designMode', v); applyTheme(); setTimeout(openStyles, 0); },
+});
+$('#decoToggle').onchange = e => { store.set('decoOn', e.target.checked); buildDeco(); };
+let decoTimer;
+addEventListener('resize', () => { clearTimeout(decoTimer); decoTimer = setTimeout(buildDeco, 300); });
 $('#savePartyHook').onclick = () => { savePartyHook(); if ($('#partyPage').classList.contains('active')) openParty(); };
 $('#eventsList').onclick = e => { const b = e.target.closest('[data-ics]'); if (b) downloadIcs(content.events.find(x => x.id === b.dataset.ics)); };
 $('#styleTabs').onclick = e => {
