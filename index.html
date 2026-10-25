@@ -229,8 +229,17 @@ button,label{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .tag.int{background:var(--danger);color:#fff}
 .tag.pub{background:var(--soft2);color:var(--muted)}
 .chan-row .acts{display:flex;flex-wrap:wrap;gap:6px;flex:1 1 100%}
-#chanList .chan-row,#partyList .chan-row{flex-wrap:wrap;gap:8px}
-#chanList .chan-row .n,#partyList .chan-row .n{flex:1 1 100%;white-space:normal}
+.chan-box .chan-row{flex-wrap:wrap;gap:8px}
+.chan-box .chan-row .n{flex:1 1 100%;white-space:normal}
+.chan-box h3{margin:18px 0 6px;color:var(--muted);font-size:12px;letter-spacing:.07em;text-transform:uppercase}
+.chan-add{margin-top:6px;padding:14px;border-radius:14px;background:var(--soft)}
+.chan-add .field{margin-bottom:8px}
+.chan-add .seg-chips{margin-bottom:8px}
+.chan-add .seg-chips button{padding:8px 12px;font-size:13px}
+.welcome{padding-top:calc(var(--safe-t) + 28px)}
+.welcome h1{text-align:center;font-size:26px}
+.welcome-logo{display:block;width:84px;height:84px;margin:0 auto 14px;border-radius:20px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.welcome-sub{margin:6px 0 20px;color:var(--muted);text-align:center}
 .chan-row .acts button{padding:7px 9px;border-radius:8px;background:var(--soft);color:var(--text);font-size:12px;font-weight:700}
 .chan-row .acts button.del{color:var(--danger)}
 .chan-row{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
@@ -483,6 +492,18 @@ textarea.input{min-height:90px;resize:vertical;font-family:inherit}
 <body class="home-on">
 
 <input type="file" id="galleryInput" class="vh" accept="image/*">
+
+<section id="welcome" class="screen page">
+  <div class="page-body welcome">
+    <img class="welcome-logo" src="icon-192.png" alt="">
+    <h1>Willkommen bei Snapcord 👋</h1>
+    <p class="welcome-sub">Trag deinen Namen ein und füge die Kanal-Codes hinzu, die du bekommen hast.</p>
+    <label class="field">Dein Name<input class="input" id="wName" maxlength="80" placeholder="z. B. Alex"></label>
+    <div class="chan-box" id="chanBoxWelcome"></div>
+    <button class="btn primary" id="welcomeDone" style="margin-top:22px">Los geht’s 🚀</button>
+    <button class="btn" id="welcomeSkip" style="margin-top:8px">Später einrichten</button>
+  </div>
+</section>
 
 <section id="home" class="screen active">
   <div class="home-wrap">
@@ -742,31 +763,8 @@ textarea.input{min-height:90px;resize:vertical;font-family:inherit}
 <div class="sheet" id="channelsSheet">
   <div class="grab"></div>
   <button class="sheet-back" data-settings>‹ Einstellungen</button>
-  <h2>📢 Kanäle &amp; Webhooks</h2>
-  <h3>📸 Foto-Kanäle</h3>
-  <div id="chanList"></div>
-  <h3>🍿 Watchparty-Kanal</h3>
-  <div id="partyList"></div>
-  <h3>➕ Eigenen Kanal hinzufügen</h3>
-  <label class="field">Name<input class="input" id="newName" maxlength="40" placeholder="z. B. snaps"></label>
-  <label class="field">Webhook-URL<input class="input" id="newUrl" inputmode="url" autocomplete="off" placeholder="https://discord.com/api/webhooks/…"></label>
-  <span class="lbl">Art</span>
-  <div class="seg-chips" id="newKind">
-    <button type="button" data-v="photo" aria-pressed="true">📸 Foto-Kanal</button>
-    <button type="button" data-v="party" aria-pressed="false">🍿 Watchparty-Kanal</button>
-  </div>
-  <span class="lbl">Sichtbarkeit</span>
-  <div class="seg-chips" id="newVis">
-    <button type="button" data-v="public" aria-pressed="true">🌍 Öffentlich</button>
-    <button type="button" data-v="internal" aria-pressed="false">🔒 Intern</button>
-  </div>
-  <p class="hint">🔒 Interne Kanäle werden über den Einrichtungslink <b>nicht</b> geteilt – ihren Webhook-Link kannst du aber einzeln kopieren.</p>
-  <button class="btn primary" id="addChan" style="margin-top:12px">Hinzufügen</button>
-  <p class="hint">Webhook-URL bekommen: In Discord den Kanal bearbeiten → Integrationen → Webhooks → Neuer Webhook → „Webhook-URL kopieren“.</p>
-  <h3>Community</h3>
-  <button class="btn" id="shareSetup">Einrichtungslink teilen</button>
-  <p class="hint">Der Link richtet alle <b>öffentlichen</b> Kanäle mit einem Tipp in der App ein.</p>
-  <p class="hint warn">Achtung: Wer eine Webhook-URL kennt, kann in diesen Kanal posten. Teile sie und den Einrichtungslink nur in privaten Kanälen.</p>
+  <h2>📢 Kanäle</h2>
+  <div class="chan-box" id="chanBoxSettings"></div>
 </div>
 
 <div class="sheet" id="tasksSheet">
@@ -2748,99 +2746,86 @@ function openSettings() {
   renderSettingsRows(); openSheet('#settingsSheet');
 }
 function openChannels() {
-  renderChanList(); openSheet('#channelsSheet');
+  renderChanBox($('#chanBoxSettings')); openSheet('#channelsSheet');
 }
 function openAvatars() { renderAvatars(); openSheet('#avatarSheet'); }
 
-// Eine Kanal-Zeile: Name, öffentlich/intern, Link kopieren, umschalten, entfernen
-function chanRow(c, { onToggle, onDelete }) {
+// Eine Kanal-Zeile: Name und öffentlich/intern kommen fest aus dem Kanal-Code – nur Entfernen ist möglich
+function chanRow(c, { onDelete }) {
   const row = document.createElement('div'); row.className = 'chan-row' + (c.internal ? ' internal' : '');
   const n = document.createElement('div'); n.className = 'n'; n.textContent = '#' + c.name;
   const tag = document.createElement('span'); tag.className = 'tag ' + (c.internal ? 'int' : 'pub'); tag.textContent = c.internal ? '🔒 INTERN' : '🌍 öffentlich';
   n.appendChild(tag);
-  const sm = document.createElement('small');
-  sm.textContent = 'Webhook …' + c.url.split('/').slice(-2, -1)[0].slice(-4) + (c.internal ? ' · wird nicht geteilt' : '');
-  n.appendChild(sm);
-  const acts = document.createElement('div'); acts.className = 'acts';
-  const btn = (label, fn, cls) => { const b = document.createElement('button'); b.textContent = label; b.onclick = fn; if (cls) b.className = cls; acts.appendChild(b); };
-  btn('📋 Link', () => copyText(c.url, `Webhook-Link von #${c.name} kopiert ✓`));
-  btn(c.internal ? '🌍 Öffentlich' : '🔒 Intern', onToggle);
-  btn('Entfernen', () => { if (confirm(`#${c.name} entfernen?`)) onDelete(); }, 'del');
+  const del = document.createElement('button'); del.type = 'button'; del.className = 'del'; del.textContent = 'Entfernen';
+  del.onclick = () => { if (confirm(`#${c.name} entfernen?`)) onDelete(); };
+  const acts = document.createElement('div'); acts.className = 'acts'; acts.appendChild(del);
   row.append(n, acts);
   return row;
 }
-async function copyText(text, msg) {
-  try { await navigator.clipboard.writeText(text); toast(msg); }
-  catch { prompt('Zum Kopieren markieren:', text); }
+
+// Kanal-Code aus dem Redaktions-Tool: „SNAPCORD-“ + Base64 von { v:1, n: Name, u: Webhook, k: p/w, i: intern }
+function parseChannelCode(input) {
+  const m = String(input).replace(/\s+/g, '').match(/^SNAPCORD-([A-Za-z0-9_-]+)$/i);
+  if (!m) return null;
+  try {
+    let b = m[1].replace(/-/g, '+').replace(/_/g, '/'); while (b.length % 4) b += '=';
+    const d = JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(b), c => c.charCodeAt(0))));
+    if (d.v !== 1 || !d.n || !WEBHOOK_RE.test(d.u)) return null;
+    return { name: String(d.n).replace(/^#/, '').slice(0, 40), url: d.u, kind: d.k === 'w' ? 'party' : 'photo', internal: !!d.i };
+  } catch { return null; }
 }
 
-function renderChanList() {
-  const chans = channels();
-  $('#chanList').replaceChildren(...(chans.length ? chans.map((c, i) => chanRow(c, {
-    onToggle: () => { const next = channels(); next[i].internal = !next[i].internal; store.set('channels', next); renderChanList(); },
-    onDelete: () => { const next = channels(); next.splice(i, 1); store.set('channels', next); renderChanList(); },
-  })) : [Object.assign(document.createElement('p'), { className: 'empty', textContent: 'Noch keine Foto-Kanäle.' })]));
-  const ph = partyHook();
-  $('#partyList').replaceChildren(ph ? chanRow(ph, {
-    onToggle: () => { store.set('partyHook', { ...ph, internal: !ph.internal }); renderChanList(); },
-    onDelete: () => { store.set('partyHook', null); renderChanList(); },
-  }) : Object.assign(document.createElement('p'), { className: 'empty', textContent: 'Noch kein Watchparty-Kanal – füge unten einen hinzu.' }));
-  renderSettingsRows();
+// Kanal-Bereich (Liste + Hinzufügen) – wird in den Einstellungen und auf der Willkommensseite benutzt
+const CHAN_BOXES = ['#chanBoxSettings', '#chanBoxWelcome'];
+function renderChanBoxes() { for (const sel of CHAN_BOXES) renderChanBox($(sel)); renderSettingsRows(); }
+function renderChanBox(box) {
+  const empty = t => Object.assign(document.createElement('p'), { className: 'empty', textContent: t });
+  const h = t => Object.assign(document.createElement('h3'), { textContent: t });
+  const chans = channels(), ph = partyHook();
+  const photoList = chans.length ? chans.map((c, i) => chanRow(c, {
+    onDelete: () => { const next = channels(); next.splice(i, 1); store.set('channels', next); renderChanBoxes(); },
+  })) : [empty('Noch keine Foto-Kanäle.')];
+  const partyRow = ph ? chanRow(ph, {
+    onDelete: () => { store.set('partyHook', null); renderChanBoxes(); },
+  }) : empty('Noch kein Watchparty-Kanal.');
+
+  const form = document.createElement('form'); form.className = 'chan-add'; form.autocomplete = 'off';
+  form.innerHTML = `
+    <label class="field">Kanal-Code<input class="input" name="code" autocapitalize="off" spellcheck="false" placeholder="SNAPCORD-…"></label>
+    <button class="btn primary" type="submit">Hinzufügen</button>`;
+  form.onsubmit = e => {
+    e.preventDefault();
+    if (addChannel(form.elements.code.value)) form.reset();
+  };
+  box.replaceChildren(h('📸 Foto-Kanäle'), ...photoList, h('🍿 Watchparty-Kanal'), partyRow, h('➕ Kanal hinzufügen'), form);
 }
 
-const segValue = id => [...$(id).children].find(b => b.getAttribute('aria-pressed') === 'true').dataset.v;
-function addChannel() {
-  const name = $('#newName').value.trim().replace(/^#/, ''), url = $('#newUrl').value.trim();
-  const kind = segValue('#newKind'), internal = segValue('#newVis') === 'internal';
-  if (!name) return toast('Gib dem Kanal einen Namen', true);
-  if (!WEBHOOK_RE.test(url)) return toast('Das ist keine gültige Discord-Webhook-URL', true);
+// Fügt den Kanal aus einem Kanal-Code hinzu – Name, Art und Sichtbarkeit sind darin festgelegt
+function addChannel(code) {
+  const c = parseChannelCode(code);
+  if (!c) { toast('Ungültiger Kanal-Code', true); return false; }
+  const { name, url, kind, internal } = c;
   if (kind === 'party') {
     const ph = partyHook();
-    if (ph && ph.url !== url && !confirm(`Es gibt schon den Watchparty-Kanal #${ph.name}. Durch #${name} ersetzen?`)) return;
+    if (ph && ph.url !== url && !confirm(`Es gibt schon den Watchparty-Kanal #${ph.name}. Durch #${name} ersetzen?`)) return false;
     store.set('partyHook', { name, url, internal });
   } else {
     const chans = channels();
-    if (chans.some(c => c.url === url)) return toast('Diesen Webhook gibt es schon', true);
+    if (chans.some(x => x.url === url)) { toast('Diesen Kanal gibt es schon', true); return false; }
     chans.push({ name, url, internal }); store.set('channels', chans);
   }
-  $('#newName').value = ''; $('#newUrl').value = '';
-  renderChanList(); toast(`#${name} ${internal ? '(intern) ' : ''}hinzugefügt ✓`);
+  renderChanBoxes();
+  toast(`${kind === 'party' ? '🍿' : '📸'} #${name} ${internal ? '(intern) ' : ''}hinzugefügt ✓`);
+  return true;
 }
 
-const b64enc = s => btoa(unescape(encodeURIComponent(s))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-const b64dec = s => { s = s.replace(/-/g, '+').replace(/_/g, '/'); while (s.length % 4) s += '='; return decodeURIComponent(escape(atob(s))); };
-
-// Teilt nur öffentliche Kanäle – interne bleiben auf diesem Handy
-async function shareSetup() {
-  const pub = channels().filter(c => !c.internal), ph = partyHook(), phPub = ph && !ph.internal ? ph : null;
-  if (!pub.length && !phPub) return toast('Es gibt keine öffentlichen Kanäle zum Teilen.', true);
-  const skipped = channels().length - pub.length + (ph && ph.internal ? 1 : 0);
-  if (skipped) toast(`🔒 ${skipped} ${skipped === 1 ? 'interner Kanal wird' : 'interne Kanäle werden'} nicht geteilt`);
-  const link = location.href.split('#')[0] + '#setup=' + b64enc(JSON.stringify({c: pub.map(c => [c.name, c.url]), w: phPub ? [phPub.name, phPub.url] : undefined}));
-  if (navigator.share) { try { await navigator.share({title:'Snapcord einrichten', url:link}); } catch {} return; }
-  try { await navigator.clipboard.writeText(link); toast(skipped ? 'Link kopiert ✓ (ohne interne Kanäle)' : 'Link kopiert ✓'); }
-  catch { prompt('Link kopieren:', link); }
-}
-
-function importFromHash() {
-  const m = location.hash.match(/^#setup=([\w-]+)$/);
-  if (!m) return;
-  history.replaceState(null, '', location.pathname + location.search);
-  try {
-    const data = JSON.parse(b64dec(m[1]));
-    const add = (data.c || []).map(([n, u]) => ({name:String(n).slice(0, 40), url:String(u)})).filter(c => c.name && WEBHOOK_RE.test(c.url));
-    const w = Array.isArray(data.w) && WEBHOOK_RE.test(String(data.w[1])) ? { name: String(data.w[0]).slice(0, 40), url: String(data.w[1]) } : null;
-    if (!add.length && !w) throw 0;
-    const chans = channels(), fresh = add.filter(a => !chans.some(c => c.url === a.url));
-    const newParty = w && partyHook()?.url !== w.url ? w : null;
-    if (!fresh.length && !newParty) return toast('Kanäle sind schon eingerichtet');
-    const list = [...fresh.map(c => '#' + c.name), ...(newParty ? [`#${newParty.name} (Watchparty)`] : [])];
-    if (confirm(`Diese Kanäle zu Snapcord hinzufügen?\n\n${list.join('\n')}`)) {
-      store.set('channels', chans.concat(fresh));
-      if (newParty) store.set('partyHook', newParty);
-      toast('Kanäle hinzugefügt ✓');
-    }
-  } catch { toast('Einrichtungslink ist ungültig', true); }
+// Willkommensseite beim ersten Start
+function showWelcome() { $('#wName').value = store.get('name', ''); renderChanBox($('#chanBoxWelcome')); show('welcome'); }
+function finishWelcome() {
+  const n = $('#wName').value.trim();
+  if (n) store.set('name', n);
+  store.set('welcomed', true);
+  renderMe(); goHome();
 }
 
 /* ---------- Startseite, News, Events ---------- */
@@ -3358,20 +3343,15 @@ $('#ddDesignMode').onclick = () => pick({
 $('#decoToggle').onchange = e => { store.set('decoOn', e.target.checked); buildDeco(); };
 let decoTimer;
 addEventListener('resize', () => { clearTimeout(decoTimer); decoTimer = setTimeout(buildDeco, 300); });
-// Auswahl „Art“ und „Sichtbarkeit“ beim Kanal hinzufügen
-for (const id of ['#newKind', '#newVis']) $(id).onclick = e => {
-  const b = e.target.closest('button'); if (!b) return;
-  for (const x of $(id).children) x.setAttribute('aria-pressed', x === b);
-};
+$('#welcomeDone').onclick = finishWelcome;
+$('#welcomeSkip').onclick = finishWelcome;
 $('#eventsList').onclick = e => { const b = e.target.closest('[data-ics]'); if (b) downloadIcs(content.events.find(x => x.id === b.dataset.ics)); };
 $('#styleTabs').onclick = e => {
   const b = e.target.closest('button'); if (!b) return;
   store.set('postStyle', b.dataset.k); renderAvatars();
 };
 $('#setName').oninput = e => store.set('name', e.target.value);
-$('#addChan').onclick = addChannel;
-$('#shareSetup').onclick = shareSetup;
-$('#sendToSettings').onclick = openSettings;
+$('#sendToSettings').onclick = openChannels;
 $('#themePill').onclick = () => BOT_MODE ? toast('🎯 Passt dein Foto zum Thema, gibt es +5 Bonuspunkte') : openTasks();
 for (const b of document.querySelectorAll('.login-btn')) b.onclick = login;
 $('#btnLogout').onclick = async () => {
@@ -3405,12 +3385,14 @@ document.addEventListener('visibilitychange', () => {
 });
 applyTheme();
 
-if (BOT_MODE) handleLoginHash(); else importFromHash();
+if (BOT_MODE) handleLoginHash();
 if (FILTERS[state.f].unlock) state.f = 0;
 setFilter(state.f);
 renderMe();
 refreshMe();
 renderHome();
+// Beim allerersten Start: Willkommensseite (wer schon Kanäle hat, sieht sie nicht)
+if (!BOT_MODE && !store.get('welcomed', false) && !channels().length && !partyHook()) showWelcome();
 loadContent();
 if ('serviceWorker' in navigator && window.isSecureContext) navigator.serviceWorker.register('sw.js').catch(() => {});
 </script>
