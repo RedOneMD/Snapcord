@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-25T12:00:00Z",
+  "updated": "2026-10-25T09:53:59.050Z",
   "news": [
     {
       "id": "n-willkommen",
@@ -9,6 +9,15 @@
       "date": "2026-10-25",
       "image": null,
       "link": null
+    },
+    {
+      "id": "n-mvnnhgu0",
+      "emoji": "",
+      "title": "Das ist ein Test",
+      "text": "Endlich funktionieren jetzt auch die News!\n\nPS: Schaut MANHUNT!",
+      "link": "https://www.youtube.com/watch?v=wiyi063sWaM",
+      "image": "content/news-mvnng75x.jpg",
+      "date": "2026-10-25"
     }
   ],
   "events": []
