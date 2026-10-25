@@ -292,13 +292,138 @@ button,label{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .cal .d.task::after{content:"🎯";position:absolute;right:2px;bottom:1px;font-size:10px}
 .cal .d.empty{background:none}
 .cal-stats{margin:12px 0;color:var(--muted);font-size:14px;font-weight:600;text-align:center}
+
+/* Startseite & Unterseiten (News, Events, Watchparty) */
+#home,.page{overflow-y:auto;-webkit-overflow-scrolling:touch;
+  background:radial-gradient(circle at 15% 0%,rgba(88,101,242,.35),transparent 55%),radial-gradient(circle at 100% 35%,rgba(193,61,255,.22),transparent 50%),#0b0b10}
+.home-wrap{max-width:560px;margin:0 auto;padding:calc(var(--safe-t) + 14px) 16px calc(var(--safe-b) + 24px)}
+.home-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.logo{display:flex;align-items:center;gap:10px;font-size:22px;font-weight:900}
+.logo img{width:40px;height:40px;border-radius:10px}
+.hero{margin-bottom:14px;padding:18px;border-radius:22px;border:1px solid var(--line);background:rgba(255,255,255,.06)}
+.hero h1{font-size:24px;margin-bottom:6px}
+.hero p{color:var(--muted);font-size:14px;line-height:1.45}
+.hero .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.hero .chips button{padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.09);font-size:13px;font-weight:700;text-align:left}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tile{position:relative;display:flex;flex-direction:column;justify-content:space-between;gap:10px;min-height:150px;padding:16px;
+  border-radius:22px;overflow:hidden;text-align:left;color:#fff;transition:transform .1s;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+.tile:active{transform:scale(.97)}
+.tile .ic{font-size:38px;line-height:1}
+.tile b{display:block;font-size:19px}
+.tile small{display:block;margin-top:4px;font-size:13px;line-height:1.35;opacity:.9}
+.tile.snap{grid-column:1/-1;min-height:165px;background:linear-gradient(135deg,#ff8c1a,#c13dff)}
+.tile.news{background:linear-gradient(135deg,#2f6fd6,#00a2ff)}
+.tile.events{background:linear-gradient(135deg,#0f8f80,#2fd06e)}
+.tile.party{grid-column:1/-1;min-height:120px;background:linear-gradient(135deg,#d6261a,#f5a419)}
+.tile .badge-new{position:absolute;top:12px;right:12px;padding:4px 10px;border-radius:999px;background:#fff;color:#000;font-size:12px;font-weight:800}
+.page-head{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;padding:calc(var(--safe-t) + 12px) 16px 12px;
+  background:rgba(11,11,16,.85);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.page-head h2{font-size:22px}
+.page-body{max-width:560px;margin:0 auto;padding:8px 16px calc(var(--safe-b) + 32px)}
+.card{margin-bottom:14px;border-radius:20px;border:1px solid var(--line);background:rgba(255,255,255,.06);overflow:hidden}
+.card > img{display:block;width:100%;max-height:340px;object-fit:cover;background:#222}
+.card .cb{padding:16px}
+.card h3{font-size:18px;line-height:1.3;margin-bottom:4px}
+.card .meta{margin-bottom:8px;color:var(--gold);font-size:13px;font-weight:700}
+.card p{color:#e4e4ea;font-size:15px;line-height:1.5;white-space:pre-line}
+.card .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.card .actions .btn{width:auto;padding:10px 16px;font-size:14px}
+.card.past{opacity:.55}
+.ev{display:flex;gap:14px}
+.ev .dbox{flex:none;width:60px;height:66px;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:14px;background:rgba(255,255,255,.09)}
+.ev .dbox b{font-size:26px;line-height:1}
+.ev .dbox span{margin-top:3px;color:var(--gold);font-size:12px;font-weight:800;text-transform:uppercase}
+.when{display:inline-block;margin-bottom:6px;padding:3px 10px;border-radius:999px;background:var(--accent);font-size:12px;font-weight:800}
+.when.now{background:#ff3b30}
+.sec-title{margin:22px 0 10px;color:var(--muted);font-size:12px;font-weight:800;letter-spacing:.07em;text-transform:uppercase}
+.empty-state{padding:40px 10px;text-align:center;color:var(--muted);line-height:1.5}
+.empty-state b{display:block;font-size:44px;margin-bottom:8px}
+.input{color-scheme:dark}
+textarea.input{min-height:90px;resize:vertical;font-family:inherit}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.lbl{display:block;margin:14px 0 6px;color:var(--muted);font-size:13px;font-weight:600}
+.lbl small{font-weight:500;opacity:.8}
+.seg-chips{display:flex;flex-wrap:wrap;gap:8px}
+.seg-chips button{padding:9px 14px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.06);font-size:14px;font-weight:700}
+.seg-chips button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent)}
+.poster-pick{display:flex;align-items:center;gap:12px;padding:10px;border-radius:14px;border:1px dashed var(--line);cursor:pointer}
+.poster-pick img{width:64px;height:92px;object-fit:cover;border-radius:10px}
+.poster-pick span{color:var(--muted);font-size:14px}
 </style>
 </head>
 <body>
 
 <input type="file" id="galleryInput" class="vh" accept="image/*">
 
-<section id="cam" class="screen active">
+<section id="home" class="screen active">
+  <div class="home-wrap">
+    <div class="home-top">
+      <div class="logo"><img src="icon-192.png" alt="">Snapcord</div>
+      <button class="icon-btn" id="btnProfile" aria-label="Einstellungen"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></button>
+    </div>
+    <div class="hero">
+      <h1 id="heroTitle">Hey 👋</h1>
+      <p id="heroText">Schön, dass du da bist!</p>
+      <div class="chips" id="heroChips"></div>
+    </div>
+    <div class="tiles">
+      <button class="tile snap" id="tileSnap"><span class="ic">📸</span><span><b>Snap machen</b><small id="snapSub">Foto, Fotoautomat oder Boomerang – mit Filtern direkt in den Discord</small></span></button>
+      <button class="tile news" id="tileNews"><span class="ic">📰</span><span><b>News</b><small id="newsSub">Neues aus der Community</small></span><span class="badge-new" id="newsBadge" hidden></span></button>
+      <button class="tile events" id="tileEvents"><span class="ic">📅</span><span><b>Events</b><small id="eventsSub">Was demnächst ansteht</small></span></button>
+      <button class="tile party" id="tileParty"><span class="ic">🍿</span><span><b>Watchparty planen</b><small>Film oder Serie zusammen gucken – lade die Community ein</small></span></button>
+    </div>
+  </div>
+</section>
+
+<section id="newsPage" class="screen page">
+  <header class="page-head"><button class="icon-btn" data-home aria-label="Zurück"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button><h2>📰 News</h2></header>
+  <div class="page-body" id="newsList"></div>
+</section>
+
+<section id="eventsPage" class="screen page">
+  <header class="page-head"><button class="icon-btn" data-home aria-label="Zurück"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button><h2>📅 Events</h2></header>
+  <div class="page-body" id="eventsList"></div>
+</section>
+
+<section id="partyPage" class="screen page">
+  <header class="page-head"><button class="icon-btn" data-home aria-label="Zurück"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button><h2>🍿 Watchparty</h2></header>
+  <div class="page-body">
+    <div id="partyNoHook" hidden>
+      <div class="empty-state"><b>🔗</b>Für Watchpartys braucht Snapcord einen Webhook für euren Watchparty-Kanal.</div>
+      <button class="btn primary" id="partyToSettings">Watchparty-Kanal einrichten</button>
+    </div>
+    <form id="partyForm" autocomplete="off">
+      <label class="lbl" for="pTitle">Was wird geguckt?</label>
+      <input class="input" id="pTitle" maxlength="120" placeholder="z. B. Stranger Things" required>
+      <span class="lbl">Art</span>
+      <div class="seg-chips" id="pType"></div>
+      <div class="form-row" id="pEpisode" hidden>
+        <label><span class="lbl">Staffel</span><input class="input" id="pSeason" inputmode="numeric" maxlength="4" placeholder="z. B. 2"></label>
+        <label><span class="lbl">Folge(n)</span><input class="input" id="pEp" maxlength="20" placeholder="z. B. 1–3"></label>
+      </div>
+      <span class="lbl">Genre <small>(bis zu 3)</small></span>
+      <div class="seg-chips" id="pGenre"></div>
+      <div class="form-row">
+        <label><span class="lbl">Datum</span><input class="input" type="date" id="pDate" required></label>
+        <label><span class="lbl">Uhrzeit</span><input class="input" type="time" id="pTime" required></label>
+      </div>
+      <span class="lbl">Wo wird geguckt?</span>
+      <div class="seg-chips" id="pPlatform"></div>
+      <label class="lbl" for="pWhere">Treffpunkt <small>(optional)</small></label>
+      <input class="input" id="pWhere" maxlength="80" placeholder="z. B. Voice-Kanal #kino">
+      <span class="lbl">Poster <small>(optional)</small></span>
+      <label class="poster-pick" for="pPoster"><img id="pPosterImg" alt="" hidden><span id="pPosterTxt">🖼️ Poster oder Bild auswählen</span></label>
+      <input type="file" id="pPoster" class="vh" accept="image/*">
+      <label class="lbl" for="pNote">Nachricht <small>(optional)</small></label>
+      <textarea class="input" id="pNote" maxlength="600" placeholder="z. B. Bringt Snacks mit! 🍿"></textarea>
+      <button class="btn primary" id="pSend" type="submit" style="margin-top:20px">🍿 Watchparty ankündigen</button>
+      <p class="hint">Die Ankündigung erscheint als Karte in eurem Watchparty-Kanal. Datum und Uhrzeit zeigt Discord jedem in seiner eigenen Zeitzone an.</p>
+    </form>
+  </div>
+</section>
+
+<section id="cam" class="screen">
   <div id="camTouch" class="touch"></div>
   <div class="viewfinder" id="viewfinder">
     <video id="video" playsinline muted autoplay></video>
@@ -314,7 +439,7 @@ button,label{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
     <label for="galleryInput" class="btn inline primary">Bild aus Galerie wählen</label>
   </div>
   <header class="topbar">
-    <button class="icon-btn" id="btnProfile" aria-label="Profil"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></button>
+    <button class="icon-btn" data-home aria-label="Startseite"><svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg></button>
     <div class="brand-wrap"><div class="brand">Snapcord</div><button class="streak-pill" id="streakPill" hidden></button></div>
     <button class="icon-btn" id="btnFlip" aria-label="Kamera wechseln"><svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></button>
   </header>
@@ -458,6 +583,11 @@ button,label{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   <label class="field">Name<input class="input" id="newName" maxlength="40" placeholder="z. B. snaps"></label>
   <label class="field">Webhook-URL<input class="input" id="newUrl" inputmode="url" autocomplete="off" placeholder="https://discord.com/api/webhooks/…"></label>
   <button class="btn primary" id="addChan">Hinzufügen</button>
+  <h3>Watchparty-Kanal</h3>
+  <p class="hint" style="margin:0 0 10px">Eigener Kanal für Watchparty-Ankündigungen – mit eigenem Webhook.</p>
+  <label class="field">Name<input class="input" id="partyName" maxlength="40" placeholder="z. B. watchparty"></label>
+  <label class="field">Webhook-URL<input class="input" id="partyUrl" inputmode="url" autocomplete="off" placeholder="https://discord.com/api/webhooks/…"></label>
+  <button class="btn" id="savePartyHook">Watchparty-Kanal speichern</button>
   <p class="hint">Webhook-URL bekommen: In Discord den Kanal bearbeiten → Integrationen → Webhooks → Neuer Webhook → „Webhook-URL kopieren“.</p>
   <h3>Community</h3>
   <button class="btn" id="shareSetup">Einrichtungslink teilen</button>
@@ -1671,6 +1801,7 @@ function renderMe() {
     if (!BOT_MODE) renderLocal();
   }
   updateLocks();
+  renderHome();
 }
 
 let lbData = null, lbTab = 'week';
@@ -2393,7 +2524,11 @@ async function createRecap() {
   openEditor(c, { recap: true, recapTitle: title });
 }
 
-function openSettings() { $('#setName').value = store.get('name', ''); renderChanList(); renderAvatars(); openSheet('#settingsSheet'); }
+function openSettings() {
+  $('#setName').value = store.get('name', '');
+  const ph = partyHook(); $('#partyName').value = ph?.name || ''; $('#partyUrl').value = ph?.url || '';
+  renderChanList(); renderAvatars(); openSheet('#settingsSheet');
+}
 
 function renderChanList() {
   const L = $('#chanList'), chans = channels();
@@ -2430,7 +2565,8 @@ const b64dec = s => { s = s.replace(/-/g, '+').replace(/_/g, '/'); while (s.leng
 async function shareSetup() {
   const chans = channels();
   if (!chans.length) return toast('Füge zuerst einen Kanal hinzu', true);
-  const link = location.href.split('#')[0] + '#setup=' + b64enc(JSON.stringify({c: chans.map(c => [c.name, c.url])}));
+  const ph = partyHook();
+  const link = location.href.split('#')[0] + '#setup=' + b64enc(JSON.stringify({c: chans.map(c => [c.name, c.url]), w: ph ? [ph.name, ph.url] : undefined}));
   if (navigator.share) { try { await navigator.share({title:'Snapcord einrichten', url:link}); } catch {} return; }
   try { await navigator.clipboard.writeText(link); toast('Link kopiert ✓'); }
   catch { prompt('Link kopieren:', link); }
@@ -2443,13 +2579,273 @@ function importFromHash() {
   try {
     const data = JSON.parse(b64dec(m[1]));
     const add = (data.c || []).map(([n, u]) => ({name:String(n).slice(0, 40), url:String(u)})).filter(c => c.name && WEBHOOK_RE.test(c.url));
-    if (!add.length) throw 0;
+    const w = Array.isArray(data.w) && WEBHOOK_RE.test(String(data.w[1])) ? { name: String(data.w[0]).slice(0, 40), url: String(data.w[1]) } : null;
+    if (!add.length && !w) throw 0;
     const chans = channels(), fresh = add.filter(a => !chans.some(c => c.url === a.url));
-    if (!fresh.length) return toast('Kanäle sind schon eingerichtet');
-    if (confirm(`Diese Kanäle zu Snapcord hinzufügen?\n\n${fresh.map(c => '#' + c.name).join('\n')}`)) {
-      store.set('channels', chans.concat(fresh)); toast('Kanäle hinzugefügt ✓');
+    const newParty = w && partyHook()?.url !== w.url ? w : null;
+    if (!fresh.length && !newParty) return toast('Kanäle sind schon eingerichtet');
+    const list = [...fresh.map(c => '#' + c.name), ...(newParty ? [`#${newParty.name} (Watchparty)`] : [])];
+    if (confirm(`Diese Kanäle zu Snapcord hinzufügen?\n\n${list.join('\n')}`)) {
+      store.set('channels', chans.concat(fresh));
+      if (newParty) store.set('partyHook', newParty);
+      toast('Kanäle hinzugefügt ✓');
     }
   } catch { toast('Einrichtungslink ist ungültig', true); }
+}
+
+/* ---------- Startseite, News, Events ---------- */
+
+const escHtml = t => String(t ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const WD_SHORT = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+const MON_SHORT = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
+
+function goHome() { closeSheets(); stopCamera(); show('home'); renderHome(); }
+function openCam() { closeSheets(); show('cam'); setFilter(state.f); startCamera(); }
+function openPage(id) { stopCamera(); show(id); $('#' + id).scrollTop = 0; }
+
+// News und Events kommen aus content.json (gepflegt mit dem Redaktions-Tool am PC)
+let content = store.get('content', { news: [], events: [] });
+async function loadContent() {
+  try {
+    const r = await fetch(`content.json?t=${Date.now()}`, { cache: 'no-store' });
+    if (r.ok) { content = await r.json(); store.set('content', content); }
+  } catch { /* offline: letzte gespeicherte Version anzeigen */ }
+  renderHome();
+  if ($('#newsPage').classList.contains('active')) renderNews();
+  if ($('#eventsPage').classList.contains('active')) renderEvents();
+}
+const newsSorted = () => [...(content.news || [])].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+const evStart = e => new Date(e.start), evEnd = e => e.end ? new Date(e.end) : new Date(evStart(e).getTime() + 3 * 3600e3);
+const upcomingEvents = () => (content.events || []).filter(e => evEnd(e) >= new Date()).sort((a, b) => evStart(a) - evStart(b));
+function relDay(d) {
+  const a = new Date(); a.setHours(0, 0, 0, 0);
+  const b = new Date(d); b.setHours(0, 0, 0, 0);
+  const n = Math.round((b - a) / 864e5);
+  return n === 0 ? 'Heute' : n === 1 ? 'Morgen' : n > 1 ? `in ${n} Tagen` : null;
+}
+const fmtTime = d => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+const fmtDay = d => `${WD_SHORT[d.getDay()]}, ${pad(d.getDate())}.${pad(d.getMonth() + 1)}.`;
+
+function renderHome() {
+  const name = BOT_MODE ? me?.user.name : store.get('name', '').trim();
+  $('#heroTitle').textContent = `Hey ${name || 'du'} 👋`;
+  const s = BOT_MODE ? me?.stats : streakInfo();
+  $('#heroText').textContent = !s ? 'Schön, dass du da bist!'
+    : s.streak ? `🔥 ${s.streak} ${s.streak === 1 ? 'Tag' : 'Tage'} Streak` + (s.postedToday ? ' – heute schon gepostet ✓' : ' – heute noch posten, sonst ist sie weg!')
+    : 'Starte heute deine Streak – ein Snap pro Tag! 📸';
+  const chips = [];
+  if (!BOT_MODE) {
+    const we = weekendTask(), t = selectedTask() || (we && !isDone(we) ? we : todaysTasks()[0]);
+    if (t) chips.push([`${t.weekend ? '⭐' : '🎯'} ${t.text}`, () => { openCam(); openTasks(); }]);
+  }
+  const next = upcomingEvents()[0];
+  if (next) chips.push([`📅 ${relDay(evStart(next)) || fmtDay(evStart(next))}: ${next.title}`, () => { openPage('eventsPage'); renderEvents(); }]);
+  $('#heroChips').replaceChildren(...chips.map(([t, fn]) => { const b = document.createElement('button'); b.textContent = t; b.onclick = fn; return b; }));
+
+  const news = newsSorted(), seen = store.get('newsSeen', []);
+  const unseen = news.filter(n => !seen.includes(n.id)).length;
+  $('#newsBadge').hidden = !unseen; $('#newsBadge').textContent = `${unseen} neu`;
+  $('#newsSub').textContent = news[0] ? news[0].title : 'Neues aus der Community';
+  $('#eventsSub').textContent = next ? `${relDay(evStart(next)) || fmtDay(evStart(next))} · ${fmtTime(evStart(next))} · ${next.title}` : 'Gerade keine Events geplant';
+}
+
+function renderNews() {
+  const news = newsSorted();
+  store.set('newsSeen', news.map(n => n.id));
+  if (!news.length) { $('#newsList').innerHTML = '<div class="empty-state"><b>📰</b>Noch keine News. Schau bald wieder vorbei!</div>'; return; }
+  $('#newsList').innerHTML = news.map(n => `
+    <article class="card">
+      ${n.image ? `<img src="${escHtml(n.image)}" alt="" loading="lazy">` : ''}
+      <div class="cb">
+        <div class="meta">${n.date ? escHtml(new Date(n.date + 'T12:00').toLocaleDateString('de-DE', { day: 'numeric', month: 'long', year: 'numeric' })) : ''}</div>
+        <h3>${escHtml(n.emoji || '📰')} ${escHtml(n.title)}</h3>
+        ${n.text ? `<p>${escHtml(n.text)}</p>` : ''}
+        ${n.link ? `<div class="actions"><a class="btn primary" href="${escHtml(n.link)}" target="_blank" rel="noopener">Mehr erfahren ↗</a></div>` : ''}
+      </div>
+    </article>`).join('');
+}
+
+function eventCard(e, past) {
+  const s = evStart(e), now = new Date(), running = s <= now && evEnd(e) >= now, rel = relDay(s);
+  const time = fmtTime(s) + (e.end ? `–${fmtTime(new Date(e.end))}` : '') + ' Uhr';
+  return `
+    <article class="card${past ? ' past' : ''}">
+      ${e.image ? `<img src="${escHtml(e.image)}" alt="" loading="lazy">` : ''}
+      <div class="cb ev">
+        <div class="dbox"><b>${s.getDate()}</b><span>${MON_SHORT[s.getMonth()]}</span></div>
+        <div style="min-width:0;flex:1">
+          ${past ? '' : running ? '<span class="when now">● Läuft gerade</span>' : rel ? `<span class="when">${rel}</span>` : ''}
+          <h3>${escHtml(e.emoji || '📅')} ${escHtml(e.title)}</h3>
+          <div class="meta">${escHtml(fmtDay(s))} · ${escHtml(time)}${e.where ? ` · 📍 ${escHtml(e.where)}` : ''}</div>
+          ${e.text ? `<p>${escHtml(e.text)}</p>` : ''}
+          ${past ? '' : `<div class="actions"><button class="btn" data-ics="${escHtml(e.id)}">📅 In meinen Kalender</button>${e.link ? `<a class="btn primary" href="${escHtml(e.link)}" target="_blank" rel="noopener">Link ↗</a>` : ''}</div>`}
+        </div>
+      </div>
+    </article>`;
+}
+function renderEvents() {
+  const up = upcomingEvents();
+  const past = (content.events || []).filter(e => evEnd(e) < new Date()).sort((a, b) => evStart(b) - evStart(a)).slice(0, 5);
+  let html = up.length ? up.map(e => eventCard(e, false)).join('') : '<div class="empty-state"><b>📅</b>Gerade sind keine Events geplant.</div>';
+  if (past.length) html += '<div class="sec-title">Vergangen</div>' + past.map(e => eventCard(e, true)).join('');
+  $('#eventsList').innerHTML = html;
+}
+
+// Termin als .ics-Datei – öffnet sich auf dem Handy direkt im Kalender
+function downloadIcs(e) {
+  const f = d => d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+  const ie = t => String(t).replace(/\\/g, '\\\\').replace(/\n/g, '\\n').replace(/[,;]/g, m => '\\' + m);
+  const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Snapcord//DE', 'BEGIN:VEVENT',
+    `UID:${e.id}@snapcord`, `DTSTAMP:${f(new Date())}`, `DTSTART:${f(evStart(e))}`, `DTEND:${f(evEnd(e))}`,
+    `SUMMARY:${ie(e.title)}`, e.where && `LOCATION:${ie(e.where)}`, e.text && `DESCRIPTION:${ie(e.text)}`,
+    'END:VEVENT', 'END:VCALENDAR'].filter(Boolean);
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([lines.join('\r\n')], { type: 'text/calendar' }));
+  a.download = `${e.title.replace(/[^\wäöüÄÖÜß -]/g, '').trim() || 'event'}.ics`; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+}
+
+/* ---------- Watchparty ---------- */
+
+const P_TYPES = [['film', '🎬', 'Film', 0xe50914], ['serie', '📺', 'Serie', 0x5865f2], ['anime', '🍥', 'Anime', 0xff6fae], ['doku', '🌍', 'Doku', 0x2a9d8f], ['sonst', '🎉', 'Sonstiges', 0xffc83d]];
+const P_GENRES = ['Action', 'Comedy', 'Drama', 'Horror', 'Thriller', 'Sci-Fi', 'Fantasy', 'Krimi', 'Romanze', 'Animation', 'Abenteuer', 'Mystery', 'Musik', 'True Crime'];
+const P_PLATFORMS = ['Netflix', 'Prime Video', 'Disney+', 'Crunchyroll', 'Apple TV+', 'Paramount+', 'YouTube', 'Discord-Stream', 'Kino', 'Sonstiges'];
+let party = { type: 'film', genres: [], platform: null, poster: null };
+const partyHook = () => store.get('partyHook', null);
+
+function chipRow(el, items, isOn, onClick) {
+  el.replaceChildren(...items.map(it => {
+    const b = document.createElement('button'); b.type = 'button';
+    b.textContent = Array.isArray(it) ? `${it[1]} ${it[2]}` : it;
+    b.setAttribute('aria-pressed', isOn(it));
+    b.onclick = () => onClick(it);
+    return b;
+  }));
+}
+function renderPartyChips() {
+  chipRow($('#pType'), P_TYPES, t => t[0] === party.type, t => { party.type = t[0]; renderPartyChips(); });
+  chipRow($('#pGenre'), P_GENRES, g => party.genres.includes(g), g => {
+    party.genres = party.genres.includes(g) ? party.genres.filter(x => x !== g) : [...party.genres, g].slice(-3);
+    renderPartyChips();
+  });
+  chipRow($('#pPlatform'), P_PLATFORMS, p => p === party.platform, p => { party.platform = party.platform === p ? null : p; renderPartyChips(); });
+  $('#pEpisode').hidden = !['serie', 'anime'].includes(party.type);
+}
+function openParty() {
+  openPage('partyPage');
+  $('#partyNoHook').hidden = !!partyHook();
+  $('#partyForm').hidden = !partyHook();
+  if (!$('#pDate').value) {
+    const d = new Date(); if (d.getHours() >= 20) d.setDate(d.getDate() + 1);
+    $('#pDate').value = localDay(d); $('#pTime').value = '20:00';
+  }
+  renderPartyChips();
+}
+function resetParty() {
+  $('#partyForm').reset();
+  party = { type: 'film', genres: [], platform: null, poster: null };
+  $('#pPosterImg').hidden = true; $('#pPosterTxt').textContent = '🖼️ Poster oder Bild auswählen';
+}
+
+$('#pPoster').addEventListener('change', e => {
+  const file = e.target.files[0]; e.target.value = '';
+  if (!file) return;
+  const url = URL.createObjectURL(file), img = new Image();
+  img.onload = () => {
+    const s = Math.min(1, 1000 / Math.max(img.naturalWidth, img.naturalHeight));
+    const c = document.createElement('canvas'); c.width = Math.round(img.naturalWidth * s); c.height = Math.round(img.naturalHeight * s);
+    c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+    URL.revokeObjectURL(url);
+    c.toBlob(b => { party.poster = b; $('#pPosterImg').src = c.toDataURL('image/jpeg', .7); $('#pPosterImg').hidden = false; $('#pPosterTxt').textContent = 'Anderes Bild wählen'; }, 'image/jpeg', .88);
+  };
+  img.onerror = () => { URL.revokeObjectURL(url); toast('Bild konnte nicht geladen werden', true); };
+  img.src = url;
+});
+
+function partyPayload(style, p) {
+  const t = P_TYPES.find(x => x[0] === p.type);
+  let typeLine = `${t[1]} **${t[2]}**`;
+  if (p.season) typeLine += ` · Staffel ${p.season}`;
+  if (p.ep) typeLine += ` · Folge ${p.ep}`;
+  const lines = [typeLine];
+  if (p.genres.length) lines.push(`🎭 ${p.genres.join(' · ')}`);
+  lines.push(`📅 <t:${p.unix}:F>  ·  <t:${p.unix}:R>`);
+  const where = [p.platform, p.where].filter(Boolean).join(' · ');
+  if (where) lines.push(`📍 ${where}`);
+  lines.push(`👤 Gastgeber: **${p.host}**`);
+  const note = p.note ? p.note.split('\n').map(l => '> ' + l).join('\n') : '';
+  const payload = { allowed_mentions: { parse: [] } };
+  if (p.name) payload.username = p.name;
+  if (p.avatar) payload.avatar_url = avatarUrl(p.avatar);
+  if (p.poster) payload.attachments = [{ id: 0, filename: 'poster.jpg' }];
+  if (style === 'card') {
+    const parts = [{ type: 10, content: `-# 🍿 WATCHPARTY\n# ${p.title}` }];
+    if (p.poster) parts.push({ type: 12, items: [{ media: { url: 'attachment://poster.jpg' } }] });
+    parts.push({ type: 10, content: lines.join('\n') });
+    if (note) parts.push({ type: 10, content: note });
+    parts.push({ type: 14, divider: true, spacing: 1 });
+    parts.push({ type: 10, content: '-# ✅ Reagiere, wenn du dabei bist  ·  🍿 Snapcord Watchparty' });
+    payload.flags = 1 << 15;
+    payload.components = [{ type: 17, accent_color: t[3], components: parts }];
+  } else {
+    payload.embeds = [{
+      color: t[3], title: `🍿 Watchparty: ${p.title}`,
+      description: [lines.join('\n'), note].filter(Boolean).join('\n\n'),
+      image: p.poster ? { url: 'attachment://poster.jpg' } : undefined,
+      footer: { text: '✅ Reagiere, wenn du dabei bist · Snapcord' },
+    }];
+  }
+  return payload;
+}
+async function postParty(url, payload, poster, components) {
+  const fd = new FormData();
+  fd.append('payload_json', JSON.stringify(payload));
+  if (poster) fd.append('files[0]', poster, 'poster.jpg');
+  try { return await fetch(url.replace(/\/$/, '') + '?wait=true' + (components ? '&with_components=true' : ''), { method: 'POST', body: fd }); }
+  catch { throw new Error('Keine Verbindung zu Discord. Bist du online?'); }
+}
+
+$('#partyForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const hook = partyHook(); if (!hook || sending) return;
+  const title = $('#pTitle').value.trim(), when = new Date(`${$('#pDate').value}T${$('#pTime').value}`);
+  if (!title) return toast('Was wird geguckt? Gib einen Titel ein.', true);
+  if (isNaN(when)) return toast('Bitte Datum und Uhrzeit angeben.', true);
+  if (when < new Date(Date.now() - 5 * 60e3)) return toast('Der Termin liegt in der Vergangenheit.', true);
+  const name = BOT_MODE ? (me?.user.name || '') : store.get('name', '').trim();
+  const p = {
+    title, type: party.type, genres: party.genres, platform: party.platform, poster: party.poster,
+    season: $('#pEpisode').hidden ? '' : $('#pSeason').value.trim(), ep: $('#pEpisode').hidden ? '' : $('#pEp').value.trim(),
+    where: $('#pWhere').value.trim(), note: $('#pNote').value.trim(), unix: Math.floor(when / 1000),
+    host: name || 'Jemand aus der Community', name, avatar: BOT_MODE ? null : store.get('avatar', null),
+  };
+  const btn = $('#pSend'); sending = true; btn.disabled = true; btn.textContent = 'Wird angekündigt …';
+  try {
+    let res = await postParty(hook.url, partyPayload('card', p), p.poster, true);
+    if (res.status === 400) res = await postParty(hook.url, partyPayload('classic', p), p.poster, false);
+    if (!res.ok) {
+      if (res.status === 401 || res.status === 404) throw new Error('Watchparty-Webhook ungültig – bitte in den Einstellungen prüfen.');
+      throw new Error(`Discord-Fehler ${res.status}`);
+    }
+    const msg = await res.json().catch(() => ({}));
+    resetParty(); goHome();
+    celebrate({ icon: '🍿', title: 'Watchparty angekündigt!', sub: title,
+      lines: [`📅 ${when.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' })} · ${fmtTime(when)} Uhr`, `📣 Gepostet in #${hook.name}`] });
+    if (msg.id) toast(`Angekündigt in #${hook.name} ✓`, false, { label: 'Rückgängig', fn: async () => {
+      try {
+        const r = await fetch(`${hook.url.replace(/\/$/, '')}/messages/${msg.id}`, { method: 'DELETE' });
+        toast(r.ok || r.status === 404 ? 'Ankündigung gelöscht 🗑️' : `Discord-Fehler ${r.status}`, !(r.ok || r.status === 404));
+      } catch { toast('Keine Verbindung zu Discord.', true); }
+    } });
+  } catch (err) { toast(err.message, true); }
+  finally { sending = false; btn.disabled = false; btn.textContent = '🍿 Watchparty ankündigen'; }
+});
+
+function savePartyHook() {
+  const name = $('#partyName').value.trim().replace(/^#/, '') || 'watchparty', url = $('#partyUrl').value.trim();
+  if (!url) { store.set('partyHook', null); return toast('Watchparty-Kanal entfernt'); }
+  if (!WEBHOOK_RE.test(url)) return toast('Das ist keine gültige Discord-Webhook-URL', true);
+  store.set('partyHook', { name, url }); toast(`#${name} als Watchparty-Kanal gespeichert ✓`);
 }
 
 /* ---------- UI-Helfer ---------- */
@@ -2509,6 +2905,14 @@ for (const [id, k] of [['#memeTop', 'top'], ['#memeBottom', 'bottom']]) {
 }
 $('#btnFrame').onclick = openFrames;
 $('#btnWeather').onclick = addWeather;
+for (const b of document.querySelectorAll('[data-home]')) b.onclick = goHome;
+$('#tileSnap').onclick = openCam;
+$('#tileNews').onclick = () => { openPage('newsPage'); renderNews(); renderHome(); };
+$('#tileEvents').onclick = () => { openPage('eventsPage'); renderEvents(); };
+$('#tileParty').onclick = openParty;
+$('#partyToSettings').onclick = openSettings;
+$('#savePartyHook').onclick = () => { savePartyHook(); if ($('#partyPage').classList.contains('active')) openParty(); };
+$('#eventsList').onclick = e => { const b = e.target.closest('[data-ics]'); if (b) downloadIcs(content.events.find(x => x.id === b.dataset.ics)); };
 $('#styleTabs').onclick = e => {
   const b = e.target.closest('button'); if (!b) return;
   store.set('postStyle', b.dataset.k); renderAvatars();
@@ -2538,14 +2942,15 @@ $('#sendGo').onclick = send;
 $('#backdrop').onclick = closeSheets;
 
 addEventListener('resize', () => { if (state.base) layoutEdit(); else applyLiveFilter(); });
-addEventListener('keydown', e => { if (e.code === 'Space' && !state.base && document.activeElement === document.body) { e.preventDefault(); capture(); } });
+const camActive = () => $('#cam').classList.contains('active');
+addEventListener('keydown', e => { if (e.code === 'Space' && camActive() && document.activeElement === document.body) { e.preventDefault(); capture(); } });
 // Uhrzeit-Filter in der Kameravorschau aktuell halten
 setInterval(() => {
   if (!state.base && !document.hidden && (FILTERS[state.f].fx || []).some(f => TIME_FX.includes(f))) applyLiveFilter();
 }, 15000);
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) stopCamera();
-  else { if (!state.base) startCamera(); refreshMe(); }
+  else { if (camActive()) startCamera(); refreshMe(); loadContent(); }
 });
 
 if (BOT_MODE) handleLoginHash(); else importFromHash();
@@ -2553,7 +2958,8 @@ if (FILTERS[state.f].unlock) state.f = 0;
 setFilter(state.f);
 renderMe();
 refreshMe();
-startCamera();
+renderHome();
+loadContent();
 if ('serviceWorker' in navigator && window.isSecureContext) navigator.serviceWorker.register('sw.js').catch(() => {});
 </script>
 </body>

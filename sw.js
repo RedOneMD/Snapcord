@@ -1,6 +1,6 @@
 // Netzwerk zuerst (damit Updates sofort ankommen), Cache als Offline-Fallback.
 // Nur eigene GET-Anfragen – Posts an Discord laufen nie durch den Cache.
-const CACHE = 'snapcord-v6';
+const CACHE = 'snapcord-v7';
 const ASSETS = ['./', './index.html', './manifest.webmanifest', './favicon.png', './apple-touch-icon.png', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
