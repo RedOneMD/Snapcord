@@ -223,6 +223,16 @@ button,label{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .toggle::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:left .2s}
 .toggle:checked{background:var(--accent)}
 .toggle:checked::after{left:23px}
+.chan-row.internal{margin:4px 0;padding:10px 10px 10px 12px;border:1px solid rgba(255,77,94,.45);border-left:4px solid var(--danger);
+  border-radius:12px;background:rgba(255,77,94,.08)}
+.tag{display:inline-block;margin-left:6px;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:800;vertical-align:2px}
+.tag.int{background:var(--danger);color:#fff}
+.tag.pub{background:var(--soft2);color:var(--muted)}
+.chan-row .acts{display:flex;flex-wrap:wrap;gap:6px;flex:1 1 100%}
+#chanList .chan-row,#partyList .chan-row{flex-wrap:wrap;gap:8px}
+#chanList .chan-row .n,#partyList .chan-row .n{flex:1 1 100%;white-space:normal}
+.chan-row .acts button{padding:7px 9px;border-radius:8px;background:var(--soft);color:var(--text);font-size:12px;font-weight:700}
+.chan-row .acts button.del{color:var(--danger)}
 .chan-row{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
 .chan-row .n{flex:1;font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis}
 .chan-row small{display:block;color:var(--muted);font-weight:400}
@@ -490,7 +500,7 @@ textarea.input{min-height:90px;resize:vertical;font-family:inherit}
     </div>
     <div class="tiles">
       <button class="tile snap" id="tileSnap"><span class="ic">📸</span><span><b>Snap machen</b><small id="snapSub">Foto, Fotoautomat oder Boomerang – mit Filtern direkt in den Discord</small></span></button>
-      <button class="tile news" id="tileNews"><span class="ic">📰</span><span><b>News</b><small id="newsSub">Neues aus der Community</small></span><span class="badge-new" id="newsBadge" hidden></span></button>
+      <button class="tile news" id="tileNews"><span class="ic">📰</span><span><b>News</b><small id="newsSub">Frische News aus der Community</small></span><span class="badge-new" id="newsBadge" hidden></span></button>
       <button class="tile events" id="tileEvents"><span class="ic">📅</span><span><b>Events</b><small id="eventsSub">Was demnächst ansteht</small></span></button>
       <button class="tile party" id="tileParty"><span class="ic">🍿</span><span><b>Watchparty planen</b><small>Film oder Serie zusammen gucken – lade die Community ein</small></span></button>
     </div>
@@ -733,21 +743,29 @@ textarea.input{min-height:90px;resize:vertical;font-family:inherit}
   <div class="grab"></div>
   <button class="sheet-back" data-settings>‹ Einstellungen</button>
   <h2>📢 Kanäle &amp; Webhooks</h2>
-  <h3>Foto-Kanäle</h3>
+  <h3>📸 Foto-Kanäle</h3>
   <div id="chanList"></div>
-  <h3>Kanal hinzufügen</h3>
+  <h3>🍿 Watchparty-Kanal</h3>
+  <div id="partyList"></div>
+  <h3>➕ Eigenen Kanal hinzufügen</h3>
   <label class="field">Name<input class="input" id="newName" maxlength="40" placeholder="z. B. snaps"></label>
   <label class="field">Webhook-URL<input class="input" id="newUrl" inputmode="url" autocomplete="off" placeholder="https://discord.com/api/webhooks/…"></label>
-  <button class="btn primary" id="addChan">Hinzufügen</button>
-  <h3>Watchparty-Kanal</h3>
-  <p class="hint" style="margin:0 0 10px">Eigener Kanal für Watchparty-Ankündigungen – mit eigenem Webhook.</p>
-  <label class="field">Name<input class="input" id="partyName" maxlength="40" placeholder="z. B. watchparty"></label>
-  <label class="field">Webhook-URL<input class="input" id="partyUrl" inputmode="url" autocomplete="off" placeholder="https://discord.com/api/webhooks/…"></label>
-  <button class="btn" id="savePartyHook">Watchparty-Kanal speichern</button>
+  <span class="lbl">Art</span>
+  <div class="seg-chips" id="newKind">
+    <button type="button" data-v="photo" aria-pressed="true">📸 Foto-Kanal</button>
+    <button type="button" data-v="party" aria-pressed="false">🍿 Watchparty-Kanal</button>
+  </div>
+  <span class="lbl">Sichtbarkeit</span>
+  <div class="seg-chips" id="newVis">
+    <button type="button" data-v="public" aria-pressed="true">🌍 Öffentlich</button>
+    <button type="button" data-v="internal" aria-pressed="false">🔒 Intern</button>
+  </div>
+  <p class="hint">🔒 Interne Kanäle werden über den Einrichtungslink <b>nicht</b> geteilt – ihren Webhook-Link kannst du aber einzeln kopieren.</p>
+  <button class="btn primary" id="addChan" style="margin-top:12px">Hinzufügen</button>
   <p class="hint">Webhook-URL bekommen: In Discord den Kanal bearbeiten → Integrationen → Webhooks → Neuer Webhook → „Webhook-URL kopieren“.</p>
   <h3>Community</h3>
   <button class="btn" id="shareSetup">Einrichtungslink teilen</button>
-  <p class="hint">Der Link richtet alle deine Kanäle mit einem Tipp in der App ein.</p>
+  <p class="hint">Der Link richtet alle <b>öffentlichen</b> Kanäle mit einem Tipp in der App ein.</p>
   <p class="hint warn">Achtung: Wer eine Webhook-URL kennt, kann in diesen Kanal posten. Teile sie und den Einrichtungslink nur in privaten Kanälen.</p>
 </div>
 
@@ -2283,27 +2301,31 @@ function renderLocal() {
     : we && !isDone(we) ? '⭐ Wochenend-Aufgabe & Tagesaufgaben – tippe!' : '🎯 Aufgabe des Tages – tippe zum Auswählen';
 }
 
-function openTasks() {
+// verify: prüft im Hintergrund, ob die Posts erfüllter Aufgaben noch in Discord existieren
+function openTasks(verify = true) {
   const sel = selectedTask();
   $('#taskList').replaceChildren(...allTasks().map(t => {
     const b = document.createElement('button');
     const done = isDone(t);
     b.className = 'task-opt' + (done ? ' done' : '') + (t.weekend ? ' weekend' : '');
-    b.setAttribute('aria-pressed', sel?.id === t.id);
+    b.setAttribute('aria-pressed', !done && sel?.id === t.id);
     b.innerHTML = '<span class="em"></span><span><span class="tx"></span><small></small></span>';
     b.querySelector('.em').textContent = done ? '✅' : t.emoji;
     b.querySelector('.tx').textContent = t.text;
-    b.querySelector('small').textContent = done ? 'Schon erfüllt'
+    b.querySelector('small').textContent = done ? 'Erfüllt ✓ – heute nicht noch einmal möglich'
       : sel?.id === t.id ? 'Ausgewählt – mach dein Foto!'
       : t.weekend ? '⭐ Wochenend-Aufgabe · nur Samstag & Sonntag' : 'Tippen zum Auswählen';
     b.onclick = () => {
+      // Erfüllt heißt: wirklich gepostet. Löschst du den Post, wird die Aufgabe wieder frei.
+      if (done) return toast('✅ Schon erfüllt. Lösch den Post (Meine Posts), um sie neu einzureichen.');
       store.set('task', sel?.id === t.id ? null : { day: localDay(), id: t.id });
       renderLocal(); closeSheets();
       if (sel?.id !== t.id) toast(`🎯 Los geht’s: ${t.text}`);
     };
     return b;
   }));
-  openSheet('#tasksSheet');
+  if (!$('#tasksSheet').classList.contains('open')) openSheet('#tasksSheet');
+  if (verify) verifyTaskPosts().then(ch => { if (ch && $('#tasksSheet').classList.contains('open')) openTasks(false); });
 }
 
 function renderAvatars() {
@@ -2323,24 +2345,30 @@ function renderAvatars() {
   for (const x of $('#styleTabs').children) x.setAttribute('aria-pressed', x.dataset.k === style);
 }
 
-function openSendWebhook() {
-  const chans = channels(), box = $('#sendChans');
-  $('#sendLogin').hidden = true;
-  $('#sendHint').hidden = true;
+function updateTaskRow() {
   const task = selectedTask();
   $('#themeRow').hidden = !task || isDone(task);
   if (task) {
     $('#themeLabel').textContent = `Für Aufgabe einreichen: ${task.emoji} ${task.text}`;
-    $('#themeRow').querySelector('small').textContent = 'Zählt für deine erfüllten Aufgaben';
+    $('#themeRow').querySelector('small').textContent = 'Zählt erst, wenn der Post wirklich in Discord ist';
   }
-  $('#sendTheme').checked = !!task;
+  $('#sendTheme').checked = !!task && !isDone(task);
+}
+
+function openSendWebhook() {
+  const chans = channels(), box = $('#sendChans');
+  $('#sendLogin').hidden = true;
+  $('#sendHint').hidden = true;
+  updateTaskRow();
+  // Wurde der Aufgaben-Post inzwischen in Discord gelöscht? Dann kann die Aufgabe jetzt erneut eingereicht werden.
+  verifyTaskPosts().then(ch => { if (ch && $('#sendSheet').classList.contains('open')) updateTaskRow(); });
   $('#sendEmpty').hidden = chans.length > 0;
   $('#sendForm').hidden = chans.length === 0;
   if (hookSel >= chans.length) hookSel = 0;
   box.innerHTML = '';
   chans.forEach((c, i) => {
     const b = document.createElement('button');
-    b.textContent = '#' + c.name;
+    b.textContent = '#' + c.name + (c.internal ? ' 🔒' : '');
     b.setAttribute('aria-pressed', i === hookSel);
     b.onclick = () => { hookSel = i; for (const x of box.children) x.setAttribute('aria-pressed', x === b); };
     box.appendChild(b);
@@ -2497,6 +2525,14 @@ async function deletePost(post) {
     const res = await fetch(`${post.hook.replace(/\/$/, '')}/messages/${post.id}`, { method: 'DELETE' });
     if (!res.ok && res.status !== 404) throw new Error(res.status === 401 ? 'Webhook ungültig.' : `Discord-Fehler ${res.status}`);
   } catch (e) { toast(e instanceof TypeError ? 'Keine Verbindung zu Discord.' : e.message, true); return; }
+  forgetPost(post);
+  renderMe();
+  if ($('#postsSheet').classList.contains('open')) renderPosts();
+  toast('Post gelöscht 🗑️');
+}
+
+// Post lokal vergessen: Streak-Tag, Aufgabe und Abzeichen dieses Posts zurücknehmen
+function forgetPost(post) {
   const rest = store.get('posts', []).filter(p => p.id !== post.id);
   store.set('posts', rest);
   // Nur zurücknehmen, wenn es an dem Tag keinen anderen Post (mit dieser Aufgabe) gibt
@@ -2508,9 +2544,22 @@ async function deletePost(post) {
   if (key && !rest.some(p => (p.taskKey || `${p.day}:${p.task}`) === key)) store.set('done', doneTasks().filter(x => x !== key));
   // Abzeichen, die genau dieser Post gebracht hat, wieder abgeben
   if (post.badges?.length) { const owned = store.get('badges', {}); for (const b of post.badges) delete owned[b]; store.set('badges', owned); }
-  renderMe();
-  if ($('#postsSheet').classList.contains('open')) renderPosts();
-  toast('Post gelöscht 🗑️');
+}
+
+// Eine Aufgabe gilt nur als erfüllt, solange ihr Post in Discord noch existiert.
+// Wurde er direkt in Discord gelöscht (z. B. um das Foto neu zu machen), ist die Aufgabe wieder offen.
+async function verifyTaskPosts() {
+  const keys = new Set(allTasks().map(t => t.key));
+  const posts = store.get('posts', []).filter(p => p.id && p.taskKey && keys.has(p.taskKey));
+  let changed = false;
+  await Promise.all(posts.map(async p => {
+    try {
+      const r = await fetch(`${p.hook.replace(/\/$/, '')}/messages/${p.id}`, { cache: 'no-store' });
+      if (r.status === 404) { forgetPost(p); changed = true; }
+    } catch { /* offline: Stand behalten */ }
+  }));
+  if (changed) renderMe();
+  return changed;
 }
 
 function renderPosts() {
@@ -2699,50 +2748,77 @@ function openSettings() {
   renderSettingsRows(); openSheet('#settingsSheet');
 }
 function openChannels() {
-  const ph = partyHook(); $('#partyName').value = ph?.name || ''; $('#partyUrl').value = ph?.url || '';
   renderChanList(); openSheet('#channelsSheet');
 }
 function openAvatars() { renderAvatars(); openSheet('#avatarSheet'); }
 
-function renderChanList() {
-  const L = $('#chanList'), chans = channels();
-  L.innerHTML = '';
-  if (!chans.length) { L.innerHTML = '<p class="empty">Noch keine Kanäle.</p>'; return; }
-  chans.forEach((c, i) => {
-    const row = document.createElement('div'); row.className = 'chan-row';
-    const n = document.createElement('div'); n.className = 'n'; n.textContent = '#' + c.name;
-    const sm = document.createElement('small'); sm.textContent = 'Webhook …' + c.url.split('/').slice(-2, -1)[0].slice(-4);
-    n.appendChild(sm);
-    const del = document.createElement('button'); del.textContent = 'Entfernen';
-    del.onclick = () => {
-      if (!confirm(`#${c.name} entfernen?`)) return;
-      const next = channels(); next.splice(i, 1); store.set('channels', next); renderChanList();
-    };
-    row.append(n, del); L.appendChild(row);
-  });
+// Eine Kanal-Zeile: Name, öffentlich/intern, Link kopieren, umschalten, entfernen
+function chanRow(c, { onToggle, onDelete }) {
+  const row = document.createElement('div'); row.className = 'chan-row' + (c.internal ? ' internal' : '');
+  const n = document.createElement('div'); n.className = 'n'; n.textContent = '#' + c.name;
+  const tag = document.createElement('span'); tag.className = 'tag ' + (c.internal ? 'int' : 'pub'); tag.textContent = c.internal ? '🔒 INTERN' : '🌍 öffentlich';
+  n.appendChild(tag);
+  const sm = document.createElement('small');
+  sm.textContent = 'Webhook …' + c.url.split('/').slice(-2, -1)[0].slice(-4) + (c.internal ? ' · wird nicht geteilt' : '');
+  n.appendChild(sm);
+  const acts = document.createElement('div'); acts.className = 'acts';
+  const btn = (label, fn, cls) => { const b = document.createElement('button'); b.textContent = label; b.onclick = fn; if (cls) b.className = cls; acts.appendChild(b); };
+  btn('📋 Link', () => copyText(c.url, `Webhook-Link von #${c.name} kopiert ✓`));
+  btn(c.internal ? '🌍 Öffentlich' : '🔒 Intern', onToggle);
+  btn('Entfernen', () => { if (confirm(`#${c.name} entfernen?`)) onDelete(); }, 'del');
+  row.append(n, acts);
+  return row;
+}
+async function copyText(text, msg) {
+  try { await navigator.clipboard.writeText(text); toast(msg); }
+  catch { prompt('Zum Kopieren markieren:', text); }
 }
 
+function renderChanList() {
+  const chans = channels();
+  $('#chanList').replaceChildren(...(chans.length ? chans.map((c, i) => chanRow(c, {
+    onToggle: () => { const next = channels(); next[i].internal = !next[i].internal; store.set('channels', next); renderChanList(); },
+    onDelete: () => { const next = channels(); next.splice(i, 1); store.set('channels', next); renderChanList(); },
+  })) : [Object.assign(document.createElement('p'), { className: 'empty', textContent: 'Noch keine Foto-Kanäle.' })]));
+  const ph = partyHook();
+  $('#partyList').replaceChildren(ph ? chanRow(ph, {
+    onToggle: () => { store.set('partyHook', { ...ph, internal: !ph.internal }); renderChanList(); },
+    onDelete: () => { store.set('partyHook', null); renderChanList(); },
+  }) : Object.assign(document.createElement('p'), { className: 'empty', textContent: 'Noch kein Watchparty-Kanal – füge unten einen hinzu.' }));
+  renderSettingsRows();
+}
+
+const segValue = id => [...$(id).children].find(b => b.getAttribute('aria-pressed') === 'true').dataset.v;
 function addChannel() {
   const name = $('#newName').value.trim().replace(/^#/, ''), url = $('#newUrl').value.trim();
+  const kind = segValue('#newKind'), internal = segValue('#newVis') === 'internal';
   if (!name) return toast('Gib dem Kanal einen Namen', true);
   if (!WEBHOOK_RE.test(url)) return toast('Das ist keine gültige Discord-Webhook-URL', true);
-  const chans = channels();
-  if (chans.some(c => c.url === url)) return toast('Diesen Webhook gibt es schon', true);
-  chans.push({name, url}); store.set('channels', chans);
+  if (kind === 'party') {
+    const ph = partyHook();
+    if (ph && ph.url !== url && !confirm(`Es gibt schon den Watchparty-Kanal #${ph.name}. Durch #${name} ersetzen?`)) return;
+    store.set('partyHook', { name, url, internal });
+  } else {
+    const chans = channels();
+    if (chans.some(c => c.url === url)) return toast('Diesen Webhook gibt es schon', true);
+    chans.push({ name, url, internal }); store.set('channels', chans);
+  }
   $('#newName').value = ''; $('#newUrl').value = '';
-  renderChanList(); toast(`#${name} hinzugefügt ✓`);
+  renderChanList(); toast(`#${name} ${internal ? '(intern) ' : ''}hinzugefügt ✓`);
 }
 
 const b64enc = s => btoa(unescape(encodeURIComponent(s))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 const b64dec = s => { s = s.replace(/-/g, '+').replace(/_/g, '/'); while (s.length % 4) s += '='; return decodeURIComponent(escape(atob(s))); };
 
+// Teilt nur öffentliche Kanäle – interne bleiben auf diesem Handy
 async function shareSetup() {
-  const chans = channels();
-  if (!chans.length) return toast('Füge zuerst einen Kanal hinzu', true);
-  const ph = partyHook();
-  const link = location.href.split('#')[0] + '#setup=' + b64enc(JSON.stringify({c: chans.map(c => [c.name, c.url]), w: ph ? [ph.name, ph.url] : undefined}));
+  const pub = channels().filter(c => !c.internal), ph = partyHook(), phPub = ph && !ph.internal ? ph : null;
+  if (!pub.length && !phPub) return toast('Es gibt keine öffentlichen Kanäle zum Teilen.', true);
+  const skipped = channels().length - pub.length + (ph && ph.internal ? 1 : 0);
+  if (skipped) toast(`🔒 ${skipped} ${skipped === 1 ? 'interner Kanal wird' : 'interne Kanäle werden'} nicht geteilt`);
+  const link = location.href.split('#')[0] + '#setup=' + b64enc(JSON.stringify({c: pub.map(c => [c.name, c.url]), w: phPub ? [phPub.name, phPub.url] : undefined}));
   if (navigator.share) { try { await navigator.share({title:'Snapcord einrichten', url:link}); } catch {} return; }
-  try { await navigator.clipboard.writeText(link); toast('Link kopiert ✓'); }
+  try { await navigator.clipboard.writeText(link); toast(skipped ? 'Link kopiert ✓ (ohne interne Kanäle)' : 'Link kopiert ✓'); }
   catch { prompt('Link kopieren:', link); }
 }
 
@@ -2827,7 +2903,7 @@ function renderHome() {
   const news = newsSorted(), seen = store.get('newsSeen', []);
   const unseen = news.filter(n => !seen.includes(n.id)).length;
   $('#newsBadge').hidden = !unseen; $('#newsBadge').textContent = `${unseen} neu`;
-  $('#newsSub').textContent = news[0] ? news[0].title : 'Neues aus der Community';
+  $('#newsSub').textContent = 'Frische News aus der Community';
   $('#eventsSub').textContent = next ? `${relDay(evStart(next)) || fmtDay(evStart(next))} · ${fmtTime(evStart(next))} · ${next.title}` : 'Gerade keine Events geplant';
 }
 
@@ -3062,12 +3138,6 @@ $('#partyForm').addEventListener('submit', async e => {
   finally { sending = false; btn.disabled = false; btn.textContent = '🍿 Watchparty ankündigen'; }
 });
 
-function savePartyHook() {
-  const name = $('#partyName').value.trim().replace(/^#/, '') || 'watchparty', url = $('#partyUrl').value.trim();
-  if (!url) { store.set('partyHook', null); return toast('Watchparty-Kanal entfernt'); }
-  if (!WEBHOOK_RE.test(url)) return toast('Das ist keine gültige Discord-Webhook-URL', true);
-  store.set('partyHook', { name, url }); toast(`#${name} als Watchparty-Kanal gespeichert ✓`);
-}
 
 /* ---------- Styles & Saison-Designs ---------- */
 
@@ -3288,7 +3358,11 @@ $('#ddDesignMode').onclick = () => pick({
 $('#decoToggle').onchange = e => { store.set('decoOn', e.target.checked); buildDeco(); };
 let decoTimer;
 addEventListener('resize', () => { clearTimeout(decoTimer); decoTimer = setTimeout(buildDeco, 300); });
-$('#savePartyHook').onclick = () => { savePartyHook(); if ($('#partyPage').classList.contains('active')) openParty(); };
+// Auswahl „Art“ und „Sichtbarkeit“ beim Kanal hinzufügen
+for (const id of ['#newKind', '#newVis']) $(id).onclick = e => {
+  const b = e.target.closest('button'); if (!b) return;
+  for (const x of $(id).children) x.setAttribute('aria-pressed', x === b);
+};
 $('#eventsList').onclick = e => { const b = e.target.closest('[data-ics]'); if (b) downloadIcs(content.events.find(x => x.id === b.dataset.ics)); };
 $('#styleTabs').onclick = e => {
   const b = e.target.closest('button'); if (!b) return;
