@@ -521,6 +521,8 @@ button,label{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .game-end .rec{color:var(--gold);font-size:18px;font-weight:900}
 .game-end .btns{display:flex;gap:10px;margin-top:14px}
 .game-end .btn{width:auto;padding:14px 22px}
+.game-end .btn.share{margin-top:14px;min-width:260px}
+.game-end .task-hint{color:var(--accent);font-size:13px}
 /* Sammlungsseite */
 .coll-list{display:flex;flex-direction:column;gap:8px;margin-top:14px}
 .coll-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
@@ -2345,8 +2347,15 @@ function weekendTask(day = localDay()) {
   const i = Math.round(Date.parse(sat + 'T00:00:00Z') / 864e5 / 7) % WEEKEND_TASKS.length;
   return { id: 1000 + i, emoji: WEEKEND_TASKS[i][0], text: WEEKEND_TASKS[i][1], key: `${sat}:w${i}`, weekend: true };
 }
-const allTasks = () => [weekendTask(), ...todaysTasks()].filter(Boolean);
-const taskById = id => id >= 1000 ? WEEKEND_TASKS[id - 1000] : TASKS[id];
+// Spiel-Aufgabe: das Spiel des Tages spielen und den Score teilen (am Wochenende ein Spiel nach Wahl)
+const gameTaskText = g => g ? [g.e, `Spiel „${g.name}“ und teile deinen Score`] : ['🎮', 'Spiel ein Spiel deiner Wahl und teile deinen Score'];
+function gameTask(day = localDay()) {
+  const g = GAMES.find(x => x.day === new Date(day + 'T12:00:00').getDay()) || null;
+  const [emoji, text] = gameTaskText(g);
+  return { id: g ? 2000 + GAMES.indexOf(g) : 2099, emoji, text, key: `${day}:g${g ? '-' + g.id : ''}`, game: g, isGame: true };
+}
+const allTasks = () => [weekendTask(), ...todaysTasks(), gameTask()].filter(Boolean);
+const taskById = id => id >= 2000 ? gameTaskText(GAMES[id - 2000]) : id >= 1000 ? WEEKEND_TASKS[id - 1000] : TASKS[id];
 const doneTasks = () => store.get('done', []);              // ["2026-10-24:12", "2026-10-24:w3", …]
 const isDone = t => doneTasks().includes(t.key);
 function selectedTask() {
@@ -2455,8 +2464,20 @@ function openTasks(verify = true) {
   $('#taskList').replaceChildren(...allTasks().map(t => {
     const b = document.createElement('button');
     const done = isDone(t);
-    b.className = 'task-opt' + (done ? ' done' : '') + (t.weekend ? ' weekend' : '');
+    b.className = 'task-opt' + (done ? ' done' : '') + (t.weekend ? ' weekend' : '') + (t.isGame ? ' game' : '');
     b.setAttribute('aria-pressed', !done && sel?.id === t.id);
+    if (t.isGame) {
+      b.innerHTML = '<span class="em"></span><span><span class="tx"></span><small></small></span>';
+      b.querySelector('.em').textContent = done ? '✅' : t.emoji;
+      b.querySelector('.tx').textContent = t.text;
+      b.querySelector('small').textContent = done ? 'Erfüllt ✓ – Score ist in Discord' : '🎮 Spiel-Aufgabe · tippen zum Spielen';
+      b.onclick = () => {
+        if (done) return toast('✅ Schon erfüllt. Lösch den Post (Meine Posts), um sie neu einzureichen.');
+        closeSheets(); stopCamera();
+        t.game ? playGame(t.game) : openGames();
+      };
+      return b;
+    }
     b.innerHTML = '<span class="em"></span><span><span class="tx"></span><small></small></span>';
     b.querySelector('.em').textContent = done ? '✅' : t.emoji;
     b.querySelector('.tx').textContent = t.text;
@@ -2721,7 +2742,7 @@ function renderPosts() {
     info.textContent = '#' + p.ch;
     const sm = document.createElement('small');
     const t = p.task != null && taskById(p.task);
-    sm.textContent = fmt.format(p.ts) + (t ? ` · ${p.task >= 1000 ? '⭐' : '🎯'} ${t[0]} Aufgabe` : '');
+    sm.textContent = fmt.format(p.ts) + (t ? ` · ${p.task >= 2000 ? '🎮' : p.task >= 1000 ? '⭐' : '🎯'} ${t[0]} Aufgabe` : p.game ? ' · 🎮 Score' : '');
     info.appendChild(sm);
     const del = document.createElement('button'); del.textContent = 'Löschen';
     del.onclick = () => { if (confirm('Diesen Post wirklich aus Discord löschen?')) deletePost(p); };
@@ -3114,12 +3135,116 @@ function endGame(g, score) {
   const record = valid && (prev == null || (g.lowerBetter ? score < prev : score > prev));
   if (record) { best[g.id] = score; store.set('gameBest', best); }
   $('#gameScore').textContent = '';
+  const task = gameTask(), forTask = !BOT_MODE && !isDone(task) && (!task.game || task.game === g);
   $('#gameArea').innerHTML = `<div class="game-end"><div class="e">${record ? '🏆' : g.e}</div><h3>${fmtScore(g, score)}</h3>
     ${record ? '<div class="rec">Neuer Rekord!</div>' : prev != null ? `<p>Dein Rekord: ${fmtScore(g, prev)}</p>` : ''}
-    <div class="btns"><button class="btn primary" id="gameAgain">↻ Nochmal</button><button class="btn" id="gameDone">Fertig</button></div></div>`;
+    <button class="btn primary share" id="gameShare">📤 Score in Discord teilen</button>
+    ${forTask ? '<p class="task-hint">🎯 Teilen erfüllt deine Spiel-Aufgabe von heute</p>' : ''}
+    <div class="btns"><button class="btn" id="gameAgain">↻ Nochmal</button><button class="btn" id="gameDone">Fertig</button></div></div>`;
+  $('#gameShare').onclick = () => shareScore(g, score, record);
   $('#gameAgain').onclick = () => playGame(g);
   $('#gameDone').onclick = openGames;
   if (record) confetti();
+}
+
+// Score als Bild-Karte in einen Discord-Kanal posten – erfüllt die Spiel-Aufgabe des Tages
+function shareScore(g, score, record) {
+  const chans = channels();
+  if (!chans.length) return toast('Noch kein Kanal eingerichtet – füge einen in den Einstellungen hinzu.', true);
+  if (chans.length === 1) return postScore(g, score, record, 0);
+  pick({ title: 'Wohin teilen?', options: chans.map((c, i) => ({ v: i, label: '#' + c.name + (c.internal ? ' 🔒' : '') })),
+    value: Math.min(store.get('last', 0), chans.length - 1), onChange: i => postScore(g, score, record, i) });
+}
+
+// Bild für den Post: 1200×630 mit Spiel, Score und Name
+async function scoreCard(g, score, record, name) {
+  const c = document.createElement('canvas'); c.width = 1200; c.height = 630;
+  const x = c.getContext('2d'), EMO = '"Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif', SANS = 'system-ui,-apple-system,"Segoe UI",Roboto,sans-serif';
+  const bg = x.createLinearGradient(0, 0, 1200, 630);
+  bg.addColorStop(0, '#24104a'); bg.addColorStop(.55, '#5b2a9e'); bg.addColorStop(1, record ? '#ff8c1a' : '#5865f2');
+  x.fillStyle = bg; x.fillRect(0, 0, 1200, 630);
+  x.fillStyle = 'rgba(255,255,255,.07)';
+  for (const [cx, cy, r] of [[120, 90, 160], [1080, 540, 220], [1050, 80, 90]]) { x.beginPath(); x.arc(cx, cy, r, 0, 7); x.fill(); }
+  const fit = (t, font, size, max) => { do x.font = `${font.replace('$', size)}`; while (x.measureText(t).width > max && (size -= 4) > 20); };
+  x.textAlign = 'center'; x.textBaseline = 'alphabetic'; x.fillStyle = '#fff';
+  x.font = `120px ${EMO}`; x.fillText(record ? '🏆' : g.e, 600, 165);
+  fit(g.name, `700 $px ${SANS}`, 52, 1000); x.fillText(g.name, 600, 240);
+  const num = String(score), unit = g.lowerBetter ? 'ms Reaktionszeit' : g.unit;
+  fit(num, `900 $px ${SANS}`, 170, 1000); x.fillText(num, 600, 410);
+  x.font = `600 40px ${SANS}`; x.fillStyle = 'rgba(255,255,255,.85)'; x.fillText(unit, 600, 465);
+  if (record) { x.font = `800 34px ${SANS}`; x.fillStyle = '#ffc83d'; x.fillText('NEUER REKORD!', 600, 520); }
+  // Fußzeile: Logo + Snapcord links, Name + Datum rechts
+  const logo = await new Promise(res => { const i = new Image(); i.onload = () => res(i); i.onerror = () => res(null); i.src = 'icon-192.png'; setTimeout(() => res(null), 1500); });
+  x.fillStyle = 'rgba(0,0,0,.25)'; x.fillRect(0, 560, 1200, 70);
+  x.fillStyle = '#fff'; x.textBaseline = 'middle';
+  if (logo) x.drawImage(logo, 36, 573, 44, 44);
+  x.textAlign = 'left'; x.font = `700 30px ${SANS}`; x.fillText('Snapcord', logo ? 92 : 36, 596);
+  x.textAlign = 'right'; x.font = `500 28px ${SANS}`;
+  x.fillText(`${name ? name + ' · ' : ''}${new Date().toLocaleDateString('de-DE')}`, 1164, 596);
+  return c;
+}
+
+function scorePayload(style, { g, score, record, best, task, file }, name, av) {
+  const p = { attachments: [{ id: 0, filename: file }], allowed_mentions: { parse: [] } };
+  if (name) p.username = name;
+  if (av) p.avatar_url = avatarUrl(av);
+  const head = task ? '🎯 AUFGABE DES TAGES' : g === gameOfDay() ? '🎮 SPIEL DES TAGES' : '🎮 SNAPCORD-SPIELE';
+  const line = [`**${fmtScore(g, score)}**`, record ? '🏆 **Neuer Rekord!**' : best != null ? `🏆 Rekord: ${fmtScore(g, best)}` : null].filter(Boolean).join('  ·  ');
+  const color = record ? 0xffc83d : task ? 0xff8c1a : 0x5865f2;
+  if (style === 'card') {
+    p.flags = 1 << 15; // IS_COMPONENTS_V2
+    p.components = [{ type: 17, accent_color: color, components: [
+      { type: 10, content: `-# ${head}\n## ${g.e} ${g.name}` },
+      { type: 12, items: [{ media: { url: `attachment://${file}` } }] },
+      { type: 10, content: `${line}\n-# 🎮 Snapcord · <t:${Math.floor(Date.now() / 1000)}:R>` },
+    ] }];
+  } else {
+    p.embeds = [{ color, title: `${g.e} ${g.name}`, description: (task ? `🎯 **Aufgabe des Tages:** ${task.text}\n` : '') + line,
+      image: { url: `attachment://${file}` }, timestamp: new Date().toISOString(),
+      footer: { text: '🎮 Snapcord-Spiele', icon_url: new URL('icon-192.png', location.href).href } }];
+  }
+  return p;
+}
+
+let sharingScore = false;
+async function postScore(g, score, record, idx) {
+  const ch = channels()[idx];
+  if (sharingScore || !ch) return;
+  sharingScore = true;
+  const btn = $('#gameShare');
+  if (btn) { btn.disabled = true; btn.textContent = 'Wird geteilt …'; }
+  try {
+    const task = gameTask(), forTask = !isDone(task) && (!task.game || task.game === g);
+    const name = store.get('name', '').trim(), av = store.get('avatar', null);
+    const canvas = await scoreCard(g, score, record, name);
+    const blob = await new Promise((res, rej) => canvas.toBlob(b => b ? res(b) : rej(new Error('Export fehlgeschlagen')), 'image/jpeg', .92));
+    const info = { g, score, record, best: store.get('gameBest', {})[g.id], task: forTask ? task : null, file: 'snapcord-score.jpg' };
+    let res = await postWebhook(ch.url, scorePayload('card', info, name, av), blob, true);
+    if (res.status === 400) res = await postWebhook(ch.url, scorePayload('classic', info, name, av), blob, false);
+    if (!res.ok) {
+      if (res.status === 401 || res.status === 404) throw new Error('Webhook ungültig oder gelöscht – bitte in den Einstellungen prüfen.');
+      if (res.status === 429) throw new Error('Zu viele Posts – warte kurz.');
+      throw new Error(`Discord-Fehler ${res.status}`);
+    }
+    const message = await res.json().catch(() => ({}));
+    store.set('last', idx); hookSel = idx;
+    if (forTask) store.set('done', [...new Set([...doneTasks(), task.key])]);
+    const thumb = document.createElement('canvas'); thumb.width = 96; thumb.height = 50;
+    thumb.getContext('2d').drawImage(canvas, 0, 0, 96, 50);
+    // hadDayBefore: Score-Posts zählen nicht zur Foto-Streak und nehmen beim Löschen keinen Tag weg
+    const post = { id: message.id, hook: ch.url, ch: ch.name, ts: Date.now(), day: localDay(), task: forTask ? task.id : null, taskKey: forTask ? task.key : null,
+      badges: [], hadDayBefore: true, game: g.id, thumb: thumb.toDataURL('image/jpeg', .6) };
+    if (message.id) store.set('posts', [post, ...store.get('posts', [])].slice(0, 40));
+    renderMe();
+    if (btn) btn.textContent = '✓ Geteilt';
+    $('#gameArea .task-hint')?.remove();
+    if (forTask) { const n = doneTasks().length;
+      celebrate({ icon: '🎮', title: 'Aufgabe erfüllt!', sub: task.text, lines: [`${g.e} ${fmtScore(g, score)}`, `🏅 ${n} ${n === 1 ? 'Aufgabe' : 'Aufgaben'} erfüllt`] }); }
+    toast(`Score geteilt in #${ch.name} ✓`, false, message.id ? { label: 'Rückgängig', fn: () => deletePost(post) } : null);
+  } catch (e) {
+    toast(e.message, true);
+    if (btn) { btn.disabled = false; btn.textContent = '📤 Score in Discord teilen'; }
+  } finally { sharingScore = false; }
 }
 
 // Quiz: 10 Fragen, 12 Sekunden pro Frage, schnelle Antworten bringen Bonuspunkte
