@@ -432,18 +432,50 @@ button,label{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .hero p{color:var(--muted);font-size:14px;line-height:1.45}
 .hero .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
 .hero .chips button{padding:7px 12px;border-radius:999px;background:var(--soft);font-size:13px;font-weight:700;text-align:left}
-.tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
 .tile{position:relative;display:flex;flex-direction:column;justify-content:space-between;gap:10px;min-height:150px;padding:16px;
   border-radius:22px;overflow:hidden;text-align:left;color:#fff;transition:transform .1s;box-shadow:0 8px 24px rgba(0,0,0,.25)}
 .tile:active{transform:scale(.97)}
 .tile .ic{font-size:38px;line-height:1}
 .tile b{display:block;font-size:19px}
 .tile small{display:block;margin-top:4px;font-size:13px;line-height:1.35;opacity:.9}
-.tile.snap{grid-column:1/-1;min-height:165px;background:var(--tile-snap)}
+/* Großer Button oben: links „Meine Sammlung“ (¾), Trennstrich, rechts „Snap!“ (¼) */
+.tile.main{grid-column:1/-1;min-height:165px;flex-direction:row;gap:0;padding:0;background:var(--tile-snap)}
+.tile.main:active{transform:none}
+.tile.main > button{position:relative;display:flex;flex-direction:column;color:#fff;text-align:left;transition:transform .1s}
+.tile.main > button:active{transform:scale(.97)}
+.main-coll{flex:3;justify-content:flex-end;padding:16px;overflow:hidden}
+.main-snap{flex:1;align-items:center;justify-content:center;gap:8px;text-align:center}
+.main-snap .ic{font-size:36px}
+.main-snap b{font-size:18px}
+.main-div{width:1px;margin:18px 0;background:rgba(255,255,255,.45)}
+/* Aufgefächerte letzte Fotos mit leichtem Schweben */
+.fan{position:absolute;top:12px;right:14px;width:150px;height:100px;pointer-events:none}
+.fan .fp{position:absolute;top:6px;left:50%;width:58px;height:78px;margin-left:-29px;padding:3px 3px 10px;border-radius:6px;
+  background:#fff;box-shadow:0 6px 16px rgba(0,0,0,.35);animation:fan-float 4.5s ease-in-out infinite}
+.fan .fp img,.fan .fp i{display:block;width:100%;height:100%;border-radius:3px;object-fit:cover;background:linear-gradient(135deg,#ddd,#bbb)}
+.fan .fp i{display:grid;place-items:center;font-style:normal;font-size:24px;background:linear-gradient(135deg,#f1f1f4,#d9d9e3)}
+.fan .fp:nth-child(1){--r:-14deg;--x:-42px;animation-delay:-1.4s}
+.fan .fp:nth-child(2){--r:12deg;--x:42px;animation-delay:-2.8s}
+.fan .fp:nth-child(3){--r:-1deg;--x:0px;z-index:2}
+@keyframes fan-float{0%,100%{transform:translateX(var(--x)) rotate(var(--r)) translateY(0)}50%{transform:translateX(var(--x)) rotate(calc(var(--r) + 2deg)) translateY(-5px)}}
+@media (prefers-reduced-motion:reduce){.fan .fp{animation:none;transform:translateX(var(--x)) rotate(var(--r))}}
+/* Sammlungsseite */
+.coll-list{display:flex;flex-direction:column;gap:8px;margin-top:14px}
+.coll-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.coll-grid div{position:relative;aspect-ratio:3/4;border-radius:10px;overflow:hidden;background:var(--soft)}
+.coll-grid img{width:100%;height:100%;object-fit:cover}
+.coll-grid span{position:absolute;left:6px;bottom:5px;font-size:11px;font-weight:800;color:#fff;text-shadow:0 1px 4px #000}
+/* News und Events: lange, flache Buttons untereinander */
+.tile.news,.tile.events{grid-column:1/-1;min-height:75px;flex-direction:row;align-items:center;justify-content:flex-start;gap:14px;padding:12px 16px}
 .tile.news{background:var(--tile-news)}
 .tile.events{background:var(--tile-events)}
+.tile.news .ic,.tile.events .ic{font-size:30px}
+.tile.news b,.tile.events b{font-size:17px}
+.tile.news small,.tile.events small{margin-top:2px}
 .tile.party{grid-column:1/-1;min-height:120px;background:var(--tile-party)}
 .tile .badge-new{position:absolute;top:12px;right:12px;padding:4px 10px;border-radius:999px;background:#fff;color:#000;font-size:12px;font-weight:800}
+.tile.news .badge-new{top:50%;transform:translateY(-50%)}
 .page-head{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;padding:calc(var(--safe-t) + 12px) 16px 12px;
   background:var(--head-bg);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
 .page-head h2{font-size:22px}
@@ -520,11 +552,32 @@ textarea.input{min-height:90px;resize:vertical;font-family:inherit}
     </div>
     </div>
     <div class="tiles">
-      <button class="tile snap" id="tileSnap"><span class="ic">📸</span><span><b>Snap machen</b><small id="snapSub">Foto, Fotoautomat oder Boomerang – mit Filtern direkt in den Discord</small></span></button>
+      <div class="tile main">
+        <button class="main-coll" id="tileColl">
+          <div class="fan" id="fan"></div>
+          <span><b>Meine Sammlung</b><small>Abzeichen · Kalender · Posts</small></span>
+        </button>
+        <div class="main-div"></div>
+        <button class="main-snap" id="tileSnap"><span class="ic">📸</span><b>Snap!</b></button>
+      </div>
       <button class="tile news" id="tileNews"><span class="ic">📰</span><span><b>News</b><small id="newsSub">Frische News aus der Community</small></span><span class="badge-new" id="newsBadge" hidden></span></button>
       <button class="tile events" id="tileEvents"><span class="ic">📅</span><span><b>Events</b><small id="eventsSub">Was demnächst ansteht</small></span></button>
       <button class="tile party" id="tileParty"><span class="ic">🍿</span><span><b>Watchparty planen</b><small>Film oder Serie zusammen gucken – lade die Community ein</small></span></button>
     </div>
+  </div>
+</section>
+
+<section id="collPage" class="screen page">
+  <header class="page-head"><button class="icon-btn" data-home aria-label="Zurück"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button><h2>🗂️ Meine Sammlung</h2></header>
+  <div class="page-body">
+    <div class="stats" id="collStats"></div>
+    <div class="coll-list">
+      <button class="set-row" id="collBadges"><span class="ic">🏅</span><span><b>Abzeichen</b><small id="collBadgesSub"></small></span></button>
+      <button class="set-row" id="collCalendar"><span class="ic">📅</span><span><b>Kalender</b><small id="collCalendarSub"></small></span></button>
+      <button class="set-row" id="collPosts"><span class="ic">🗂️</span><span><b>Meine Posts</b><small id="collPostsSub"></small></span></button>
+    </div>
+    <div class="sec-title">Letzte Fotos</div>
+    <div class="coll-grid" id="collPhotos"></div>
   </div>
 </section>
 
@@ -2829,13 +2882,54 @@ function finishWelcome() {
   renderMe(); goHome();
 }
 
+/* ---------- Meine Sammlung ---------- */
+
+// Die letzten n Tagesfotos aus dem Kalender-Speicher (neuestes zuerst)
+async function latestPhotos(n) {
+  try {
+    const keys = (await photoDb.keys()).sort().reverse().slice(0, n), out = [];
+    for (const k of keys) { const r = await photoDb.get(k); if (r?.blob) out.push({ day: k, url: URL.createObjectURL(r.blob) }); }
+    return out;
+  } catch { return []; }
+}
+
+// Startseite: drei letzte Fotos aufgefächert (ältestes links, neuestes vorne in der Mitte)
+let fanUrls = [];
+async function renderFan() {
+  const photos = await latestPhotos(3);
+  for (const u of fanUrls) URL.revokeObjectURL(u);
+  fanUrls = photos.map(p => p.url);
+  const order = [photos[2], photos[1], photos[0]], empty = ['🎬', '✨', '📸'];
+  $('#fan').innerHTML = order.map((p, i) => `<div class="fp">${p ? `<img src="${p.url}" alt="">` : `<i>${empty[i]}</i>`}</div>`).join('');
+}
+
+let collUrls = [];
+async function openColl() {
+  openPage('collPage');
+  const s = streakInfo(), days = store.get('days', []), posts = store.get('posts', []).length;
+  const owned = Object.keys(store.get('badges', {})).length, month = localDay().slice(0, 7);
+  const inMonth = days.filter(d => d.startsWith(month)).length;
+  const stat = (v, l) => `<div class="stat"><b>${v}</b><span>${l}</span></div>`;
+  $('#collStats').innerHTML = stat(`🔥 ${s.streak}`, 'Streak') + stat(`🏆 ${s.best}`, 'Rekord') +
+    stat(`🎯 ${s.tasks}`, 'Aufgaben erfüllt') + stat(`📸 ${days.length}`, 'Tage gepostet');
+  $('#collBadgesSub').textContent = `${owned} von ${BADGES.length} gesammelt`;
+  $('#collCalendarSub').textContent = `${inMonth} ${inMonth === 1 ? 'Tag' : 'Tage'} in diesem Monat`;
+  $('#collPostsSub').textContent = posts ? `${posts} ${posts === 1 ? 'Post' : 'Posts'} von diesem Handy` : 'Noch keine Posts';
+  const photos = await latestPhotos(9);
+  for (const u of collUrls) URL.revokeObjectURL(u);
+  collUrls = photos.map(p => p.url);
+  $('#collPhotos').innerHTML = photos.length
+    ? photos.map(p => `<div><img src="${p.url}" alt=""><span>${new Date(p.day + 'T12:00').toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })}</span></div>`).join('')
+    : '<p class="empty" style="grid-column:1/-1">Noch keine Fotos – mach deinen ersten Snap! 📸</p>';
+}
+
 /* ---------- Startseite, News, Events ---------- */
 
 const escHtml = t => String(t ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const WD_SHORT = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
 const MON_SHORT = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
 
-function goHome() { closeSheets(); stopCamera(); show('home'); renderHome(); buildDeco(); }
+function goHome() { closeSheets(); stopCamera(); show('home'); renderHome(); buildDeco(); renderFan(); }
 function openCam() { closeSheets(); show('cam'); setFilter(state.f); startCamera(); }
 function openPage(id) { stopCamera(); show(id); $('#' + id).scrollTop = 0; }
 
@@ -3327,6 +3421,10 @@ $('#btnFrame').onclick = openFrames;
 $('#btnWeather').onclick = addWeather;
 for (const b of document.querySelectorAll('[data-home]')) b.onclick = goHome;
 $('#tileSnap').onclick = openCam;
+$('#tileColl').onclick = openColl;
+$('#collBadges').onclick = openBadges;
+$('#collCalendar').onclick = openCalendar;
+$('#collPosts').onclick = () => { renderPosts(); openSheet('#postsSheet'); };
 $('#tileNews').onclick = () => { openPage('newsPage'); renderNews(); renderHome(); };
 $('#tileEvents').onclick = () => { openPage('eventsPage'); renderEvents(); };
 $('#tileParty').onclick = openParty;
@@ -3392,6 +3490,7 @@ setFilter(state.f);
 renderMe();
 refreshMe();
 renderHome();
+renderFan();
 // Beim allerersten Start: Willkommensseite (wer schon Kanäle hat, sieht sie nicht)
 if (!BOT_MODE && !store.get('welcomed', false) && !channels().length && !partyHook()) showWelcome();
 loadContent();
