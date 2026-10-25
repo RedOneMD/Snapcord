@@ -2282,7 +2282,8 @@ function streakInfo() {
 }
 
 const avatarUrl = name => name ? new URL(`avatars/${name}.png`, location.href).href : null;
-const AVATARS = ['kino','popcorn','tv','musik','gitarre','gamer','alien','roboter','rakete','fuchs','katze','hund','panda','einhorn','geist','cool'];
+const AVATARS = ['kino','popcorn','tv','musik','gitarre','gamer','alien','roboter','rakete','fuchs','katze','hund','panda','einhorn','geist','cool',
+  'otter','waschbaer','eule','pinguin','frosch','koala','loewe','krake','dino','baer','faultier','biene'];
 
 function renderLocal() {
   const s = streakInfo(), pill = $('#streakPill'), tp = $('#themePill'), task = selectedTask(), btn = $('#btnProfile');
