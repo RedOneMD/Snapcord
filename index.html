@@ -959,6 +959,7 @@ textarea.input{min-height:90px;resize:vertical;font-family:inherit}
 
 <script>
 'use strict';
+let updateReady = false;   // neue App-Version ist da und wartet auf einen ruhigen Moment
 const $ = s => document.querySelector(s);
 const EMOJI_FONT = '"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';
 const CAP_FS = .048, CAP_H = 1.9, MAX_SIDE = 1600;
@@ -1512,6 +1513,15 @@ $('#galleryInput').addEventListener('change', e => {
 function show(id) {
   for (const s of document.querySelectorAll('.screen')) s.classList.toggle('active', s.id === id);
   document.body.classList.toggle('home-on', id === 'home');   // Saison-Deko nur auf der Startseite
+  reloadIfSafe();
+}
+
+// Neue Version sofort laden – aber nie mitten in einem Foto, einer Watchparty-Planung oder einem Spiel
+const SAFE_RELOAD = ['home', 'welcome', 'collPage', 'gamesPage', 'newsPage', 'eventsPage'];
+function reloadIfSafe() {
+  if (!updateReady) return;
+  const cur = document.querySelector('.screen.active')?.id;
+  if (SAFE_RELOAD.includes(cur) && !document.querySelector('.sheet.open')) location.reload();
 }
 
 // opts: { booth, recap } – merkt sich, woher das Bild kommt (für Abzeichen)
@@ -3859,7 +3869,7 @@ setInterval(() => {
 }, 15000);
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) stopCamera();
-  else { if (camActive()) startCamera(); refreshMe(); loadContent(); applyTheme(); }
+  else { if (camActive()) startCamera(); refreshMe(); loadContent(); applyTheme(); checkForUpdate(); }
 });
 applyTheme();
 
@@ -3873,7 +3883,19 @@ renderFan();
 // Beim allerersten Start: Willkommensseite (wer schon Kanäle hat, sieht sie nicht)
 if (!BOT_MODE && !store.get('welcomed', false) && !channels().length && !partyHook()) showWelcome();
 loadContent();
-if ('serviceWorker' in navigator && window.isSecureContext) navigator.serviceWorker.register('sw.js').catch(() => {});
+// Updates: Beim Öffnen und bei jeder Rückkehr in die App bei GitHub nach einer neuen Version fragen.
+// Übernimmt ein neuer Service Worker, lädt die App neu (sofort oder beim nächsten Zurück zur Startseite).
+let swReg = null;
+function checkForUpdate() { swReg?.update().catch(() => {}); }
+if ('serviceWorker' in navigator && window.isSecureContext) {
+  const hadController = !!navigator.serviceWorker.controller;   // beim allerersten Start nicht neu laden
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!hadController || updateReady) return;
+    updateReady = true;
+    reloadIfSafe();
+  });
+  navigator.serviceWorker.register('sw.js', {updateViaCache: 'none'}).then(r => { swReg = r; checkForUpdate(); }).catch(() => {});
+}
 </script>
 </body>
 </html>

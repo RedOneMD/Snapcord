@@ -1,6 +1,6 @@
 // Netzwerk zuerst (damit Updates sofort ankommen), Cache als Offline-Fallback.
 // Nur eigene GET-Anfragen – Posts an Discord laufen nie durch den Cache.
-const CACHE = 'snapcord-v19';
+const CACHE = 'snapcord-v20';
 const ASSETS = ['./', './index.html', './manifest.webmanifest', './favicon.png', './apple-touch-icon.png', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
@@ -16,8 +16,10 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
   if (e.request.method !== 'GET' || url.origin !== location.origin) return;
+  // Seite und Daten am Browser-Cache vorbei bei GitHub prüfen, sonst kommt eine neue Version erst nach ~10 Minuten an
+  const fresh = e.request.mode === 'navigate' || /\.(html|json)$/.test(url.pathname) || url.pathname.endsWith('/');
   e.respondWith(
-    fetch(e.request)
+    fetch(fresh ? new Request(url.href, {cache: 'no-cache', credentials: 'same-origin'}) : e.request)
       .then(res => { const copy = res.clone(); caches.open(CACHE).then(c => c.put(e.request, copy)); return res; })
       .catch(() => caches.match(e.request, {ignoreSearch: true}).then(r => r || caches.match('./index.html')))
   );
