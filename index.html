@@ -233,6 +233,8 @@ button,label{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .chan-box .chan-row .n{flex:1 1 100%;white-space:normal}
 .chan-box h3{margin:18px 0 6px;color:var(--muted);font-size:12px;letter-spacing:.07em;text-transform:uppercase}
 .chan-add{margin-top:6px;padding:14px;border-radius:14px;background:var(--soft)}
+.chan-box .access-line{margin:4px 0 0;padding:10px 14px;border-radius:14px;background:color-mix(in srgb,var(--accent) 22%,transparent);font-weight:800}
+.chan-box .access-line.blocked{background:color-mix(in srgb,var(--danger) 25%,transparent)}
 .chan-add .field{margin-bottom:8px}
 .chan-add .seg-chips{margin-bottom:8px}
 .chan-add .seg-chips button{padding:8px 12px;font-size:13px}
@@ -323,6 +325,7 @@ button,label{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .post-row .i{flex:1;min-width:0;font-size:14px;font-weight:600}
 .post-row .i small{display:block;color:var(--muted);font-weight:500;margin-top:2px}
 .post-row button{color:var(--danger);font-weight:700;padding:8px}
+.post-row.gone img{filter:grayscale(1);opacity:.5}
 .toast{width:max-content}
 .toast.action{pointer-events:auto;display:flex;align-items:center;gap:12px;padding:8px 8px 8px 18px}
 .toast button{padding:7px 14px;border-radius:999px;background:#fff;color:#000;font-weight:800;font-size:13px}
@@ -514,6 +517,25 @@ button,label{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .react.idle{background:var(--soft)}
 .react.wait{background:#c0392b;color:#fff}
 .react.go{background:#2fbf71;color:#fff}
+.board{margin-top:14px;padding:14px;border-radius:20px;background:var(--soft)}
+.board-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.board-head b{font-size:16px}
+.seg{display:flex;padding:3px;border-radius:12px;background:var(--soft2)}
+.seg button{padding:6px 12px;border-radius:9px;background:none;color:var(--muted);font-size:13px;font-weight:800}
+.seg button[aria-pressed="true"]{background:var(--accent);color:#fff}
+.board-games{display:flex;gap:6px;margin:12px -14px 4px;padding:0 14px;overflow-x:auto;scrollbar-width:none}
+.board-games button{flex:none;padding:6px 11px;border-radius:99px;background:var(--soft2);color:var(--text);font-size:13px;font-weight:700;white-space:nowrap}
+.board-games button[aria-pressed="true"]{background:var(--text);color:#111}
+.board-list{display:flex;flex-direction:column;gap:2px;margin-top:6px}
+.board-row{display:flex;align-items:center;gap:10px;padding:7px 8px;border-radius:12px}
+.board-row.me{background:color-mix(in srgb,var(--accent) 22%,transparent)}
+.board-row .r{width:28px;font-weight:900;text-align:center}
+.board-row img,.board-row .na{flex:none;width:30px;height:30px;border-radius:50%;background:var(--soft2)}
+.board-row .n{flex:1;min-width:0;overflow:hidden;font-weight:700;white-space:nowrap;text-overflow:ellipsis}
+.board-row .s{font-weight:900}
+.board-gap{color:var(--muted);text-align:center;line-height:1}
+.board-empty{padding:14px 4px;color:var(--muted);font-size:14px;text-align:center}
+.game-end .rank{color:var(--text);font-size:15px;font-weight:800}
 .game-end{display:flex;flex:1;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center}
 .game-end .e{font-size:72px;animation:pop .7s cubic-bezier(.2,1.6,.4,1) both}
 .game-end h3{font-size:30px}
@@ -529,6 +551,50 @@ button,label{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .coll-grid div{position:relative;aspect-ratio:3/4;border-radius:10px;overflow:hidden;background:var(--soft)}
 .coll-grid img{width:100%;height:100%;object-fit:cover}
 .coll-grid span{position:absolute;left:6px;bottom:5px;font-size:11px;font-weight:800;color:#fff;text-shadow:0 1px 4px #000}
+.coll-grid div{cursor:pointer}
+.coll-hint{margin-top:12px;color:var(--muted);font-size:13px;line-height:1.45}
+.tile.coll{background:linear-gradient(135deg,#1fa37a,#147a8f)}
+.tile.news.half .badge-new{top:8px;right:8px;transform:none;padding:2px 7px;font-size:10px}
+/* Feed */
+.feed-post{width:auto;margin-left:auto;padding:9px 14px;font-size:14px}
+.feed-soon{display:flex;flex-direction:column;gap:4px;margin:4px 0 12px;padding:14px 16px;border-radius:18px;background:var(--tile-snap);color:#fff;font-size:14px;line-height:1.4}
+.feed-soon b{font-size:17px}
+.feed-tabs{display:flex;gap:6px;margin:0 -16px 8px;padding:2px 16px;overflow-x:auto;scrollbar-width:none}
+.feed-tabs:empty{display:none}
+.feed-tabs button{flex:none;padding:7px 13px;border-radius:99px;background:var(--soft);color:var(--text);font-size:13px;font-weight:700;white-space:nowrap}
+.feed-tabs button[aria-pressed="true"]{background:var(--text);color:#111}
+.feed-rule{margin:2px 0 12px;color:var(--muted);font-size:12px;font-weight:700;text-align:center}
+.fcard{margin-bottom:16px;border-radius:22px;background:var(--soft);overflow:hidden;border:1px solid var(--line)}
+.fcard header{display:flex;align-items:center;gap:10px;padding:12px 14px}
+.fcard .fav{flex:none;width:38px;height:38px;border-radius:50%;overflow:hidden;background:var(--soft2);display:grid;place-items:center;font-size:18px}
+.fcard .fav img{width:100%;height:100%}
+.fcard .fwho{flex:1;min-width:0}
+.fcard .fwho b{display:block;font-size:15px}
+.fcard .fwho small{display:block;color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fcard .fdel{flex:none;padding:6px 10px;border-radius:10px;background:var(--soft2);color:var(--muted);font-size:13px}
+.fmedia{position:relative;aspect-ratio:3/4;background:#111;user-select:none;-webkit-user-select:none}
+.fmedia img,.fmedia video{display:block;width:100%;height:100%;object-fit:cover}
+.fmedia .burst{position:absolute;left:50%;top:50%;font-size:96px;pointer-events:none;animation:burst .8s ease-out forwards}
+@keyframes burst{0%{transform:translate(-50%,-50%) scale(.3);opacity:0}25%{transform:translate(-50%,-50%) scale(1.15);opacity:1}100%{transform:translate(-50%,-80%) scale(1);opacity:0}}
+.fbody{padding:10px 14px 0}
+.fbody p{margin:0 0 4px;line-height:1.4}
+.fbody .ftask{color:var(--accent);font-size:13px;font-weight:800}
+.fbody p:empty{display:none}
+.fcard footer{display:flex;align-items:center;gap:8px;padding:8px 10px 12px}
+.fcard footer button{display:flex;align-items:center;gap:6px;padding:8px 12px;border-radius:14px;background:var(--soft2);color:var(--text);font-size:15px;font-weight:800}
+.fflame{filter:grayscale(1);opacity:.85}
+.fflame.on{filter:none;opacity:1;background:color-mix(in srgb,#ff8c1a 28%,transparent) !important;animation:pop .45s cubic-bezier(.2,1.6,.4,1)}
+.fcard .fleft{margin-left:auto;color:var(--muted);font-size:12px;font-weight:700}
+.reply-list{display:flex;flex-direction:column;gap:12px;max-height:50dvh;overflow:auto;margin-bottom:12px}
+.reply{display:flex;gap:10px}
+.reply .fav{flex:none;width:32px;height:32px;border-radius:50%;overflow:hidden;background:var(--soft2);display:grid;place-items:center}
+.reply .fav img{width:100%;height:100%}
+.reply b{font-size:14px}
+.reply small{margin-left:6px;color:var(--muted);font-size:12px}
+.reply p{margin:2px 0 0;line-height:1.4;word-break:break-word}
+.reply-form{display:flex;gap:8px}
+.reply-form .input{flex:1;margin:0}
+.reply-form .btn{width:auto;padding:0 16px}
 /* News und Events: lange, flache Buttons untereinander */
 .tile.news{grid-column:1/-1;min-height:75px;flex-direction:row;align-items:center;justify-content:flex-start;gap:14px;padding:12px 16px}
 .tile.news{background:var(--tile-news)}
@@ -599,7 +665,7 @@ textarea.input{min-height:90px;resize:vertical;font-family:inherit}
   <div class="page-body welcome">
     <img class="welcome-logo" src="icon-192.png" alt="">
     <h1>Willkommen bei Snapcord 👋</h1>
-    <p class="welcome-sub">Trag deinen Namen ein und füge die Kanal-Codes hinzu, die du bekommen hast.</p>
+    <p class="welcome-sub">Trag deinen Namen ein und löse deinen persönlichen Benutzercode ein.</p>
     <label class="field">Dein Name<input class="input" id="wName" maxlength="80" placeholder="z. B. Alex"></label>
     <div class="chan-box" id="chanBoxWelcome"></div>
     <button class="btn primary" id="welcomeDone" style="margin-top:22px">Los geht’s 🚀</button>
@@ -623,14 +689,15 @@ textarea.input{min-height:90px;resize:vertical;font-family:inherit}
     </div>
     <div class="tiles">
       <div class="tile main">
-        <button class="main-coll" id="tileColl">
+        <button class="main-coll" id="tileFeed">
           <div class="fan" id="fan"></div>
-          <span><b>Meine Sammlung</b><small>Abzeichen · Kalender · Posts</small></span>
+          <span><b>🔥 Feed</b><small id="feedSub">Was die Community gerade postet</small></span>
         </button>
         <div class="main-div"></div>
         <button class="main-snap" id="tileSnap"><span class="ic">📸</span><b>Snap!</b></button>
       </div>
-      <button class="tile news" id="tileNews"><span class="ic">📰</span><span><b>News</b><small id="newsSub">Frische News aus der Community</small></span><span class="badge-new" id="newsBadge" hidden></span></button>
+      <button class="tile news half" id="tileNews"><span class="ic">📰</span><span><b>News</b><small id="newsSub">Frische News aus der Community</small></span><span class="badge-new" id="newsBadge" hidden></span></button>
+      <button class="tile coll half" id="tileColl"><span class="ic">🗂️</span><span><b>Sammlung</b><small>Kalender · Abzeichen</small></span></button>
       <button class="tile events half" id="tileEvents"><span class="ic">📅</span><span><b>Events</b><small id="eventsSub">Was demnächst ansteht</small></span></button>
       <button class="tile games half" id="tileGames"><span class="ic">🎮</span><span><b>Spiele</b><small id="gamesSub">Spiel des Tages</small></span></button>
       <button class="tile party" id="tileParty"><span class="ic">🍿</span><span><b>Watchparty planen</b><small>Film oder Serie zusammen gucken – lade die Community ein</small></span></button>
@@ -649,6 +716,18 @@ textarea.input{min-height:90px;resize:vertical;font-family:inherit}
     </div>
     <div class="sec-title">Letzte Fotos</div>
     <div class="coll-grid" id="collPhotos"></div>
+    <p class="coll-hint">📌 Deine Fotos bleiben hier gespeichert, auch wenn sie nach 24 Stunden aus Feed und Discord verschwinden. Tippe auf ein Foto, um es zu löschen.</p>
+  </div>
+</section>
+
+<section id="feedPage" class="screen page">
+  <header class="page-head"><button class="icon-btn" data-home aria-label="Zurück"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button><h2>🔥 Feed</h2>
+    <button class="btn primary feed-post" id="feedSnap">📸 Posten</button></header>
+  <div class="page-body">
+    <div class="feed-soon" id="feedSoon" hidden><b>🚧 Der Feed kommt bald!</b><span>So wird er aussehen: Fotos aus euren Kanälen, 🔥 statt Likes und Antworten direkt in der App. Das hier sind Demo-Posts.</span></div>
+    <div class="feed-tabs" id="feedTabs"></div>
+    <div class="feed-rule">⏳ Jedes Foto ist nur 24 Stunden sichtbar</div>
+    <div id="feedList"></div>
   </div>
 </section>
 
@@ -656,6 +735,11 @@ textarea.input{min-height:90px;resize:vertical;font-family:inherit}
   <header class="page-head"><button class="icon-btn" data-home aria-label="Zurück"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button><h2>🎮 Spiele</h2></header>
   <div class="page-body">
     <div class="game-today" id="gameToday"></div>
+    <div class="board" id="gameBoard" hidden>
+      <div class="board-head"><b>🏆 Bestenliste</b><div class="seg" id="boardPeriod"><button data-p="day" aria-pressed="true">Heute</button><button data-p="week" aria-pressed="false">Woche</button></div></div>
+      <div class="board-games" id="boardGames"></div>
+      <div class="board-list" id="boardList"></div>
+    </div>
     <div class="sec-title">Alle Spiele</div>
     <div class="game-list" id="gameList"></div>
   </div>
@@ -913,6 +997,16 @@ textarea.input{min-height:90px;resize:vertical;font-family:inherit}
   <h2>🎯 Aufgaben des Tages</h2>
   <div id="taskList"></div>
   <p class="hint">Jeden Tag gibt es drei neue Aufgaben – für alle in der Community dieselben. Wähle eine aus, mach das Foto und reiche es beim Senden ein.</p>
+</div>
+
+<div class="sheet" id="replySheet">
+  <div class="grab"></div>
+  <h2>💬 Antworten</h2>
+  <div class="reply-list" id="replyList"></div>
+  <form class="reply-form" id="replyForm" autocomplete="off">
+    <input class="input" id="replyText" maxlength="300" placeholder="Antworten …" enterkeyhint="send">
+    <button class="btn primary" type="submit">Senden</button>
+  </form>
 </div>
 
 <div class="sheet" id="postsSheet">
@@ -1519,7 +1613,7 @@ function show(id) {
 }
 
 // Neue Version sofort laden – aber nie mitten in einem Foto, einer Watchparty-Planung oder einem Spiel
-const SAFE_RELOAD = ['home', 'welcome', 'collPage', 'gamesPage', 'newsPage', 'eventsPage'];
+const SAFE_RELOAD = ['home', 'welcome', 'collPage', 'gamesPage', 'newsPage', 'eventsPage', 'feedPage'];
 function reloadIfSafe() {
   if (!updateReady) return;
   const cur = document.querySelector('.screen.active')?.id;
@@ -2602,12 +2696,45 @@ function buildPayload(style, { task, msg, filterName, streakAfter, tasksAfter, n
   return p;
 }
 
-async function postWebhook(url, payload, blob, components) {
+// Kanäle gibt es zweierlei: über den Snapcord-Server (Kanal-Code v2: { code, server }) –
+// dann kennt nur der Server den Webhook – oder direkt per Webhook-Adresse (alte Codes: { url }).
+function playerId() {
+  let id = store.get('pid', null);
+  if (!/^[a-f0-9]{32}$/.test(id || '')) { id = [...crypto.getRandomValues(new Uint8Array(16))].map(b => b.toString(16).padStart(2, '0')).join(''); store.set('pid', id); }
+  return id;
+}
+const chanRef = ch => ch.code ? { code: ch.code, server: ch.server } : { hook: ch.url };   // wird bei Posts gespeichert
+const serverBase = () => [...channels(), partyHook()].find(c => c?.server)?.server || null;
+// feed = { feed: 'photo'|'video'|'score', feed_caption, feed_task } – nur der Server legt das Foto dann auch in den Feed
+async function postWebhook(ch, payload, blob, components, feed = null) {
   const fd = new FormData();
   fd.append('payload_json', JSON.stringify(payload));
-  fd.append('files[0]', blob, payload.attachments[0].filename);
-  try { return await fetch(url.replace(/\/$/, '') + '?wait=true' + (components ? '&with_components=true' : ''), { method: 'POST', body: fd }); }
-  catch { throw new Error('Keine Verbindung zu Discord. Bist du online?'); }
+  if (blob) fd.append('files[0]', blob, payload.attachments[0].filename);
+  let url = (ch.url || '').replace(/\/$/, '') + '?wait=true' + (components ? '&with_components=true' : '');
+  if (ch.code) {
+    fd.append('code', ch.code); fd.append('pid', playerId());
+    if (components) fd.append('components', '1');
+    for (const [k, v] of Object.entries(feed || {})) fd.append(k, v || '');
+    url = `${ch.server}/api.php?a=post`;
+  }
+  try { return await fetch(url, { method: 'POST', body: fd, headers: ch.code ? userHeader() : {} }); }
+  catch { throw new Error(ch.code ? 'Keine Verbindung zum Snapcord-Server. Bist du online?' : 'Keine Verbindung zu Discord. Bist du online?'); }
+}
+// Eigenen Post prüfen (GET) oder löschen (DELETE); ref = chanRef() des Kanals
+function postMessage(ref, id, method = 'GET') {
+  if (ref.code) return fetch(`${ref.server}/api.php?a=msg&code=${ref.code}&id=${id}`, { method, cache: 'no-store', headers: { 'X-Snapcord-Player': playerId(), ...userHeader() } });
+  return fetch(`${ref.hook.replace(/\/$/, '')}/messages/${id}`, { method, cache: 'no-store' });
+}
+// Verständliche Fehlermeldung für einen fehlgeschlagenen Post
+async function postError(res) {
+  let d = {}; try { d = await res.json(); } catch {}
+  if (res.status === 401 || res.status === 410) return 'Webhook ungültig oder gelöscht – bitte Kanal-Code neu holen.';
+  if (res.status === 404) return d.error && !d.message ? d.error : 'Webhook ungültig oder gelöscht – bitte in den Einstellungen prüfen.';
+  if (res.status === 403 && d.error) { refreshAccess(true); return d.error; }   // z. B. Zugang gesperrt
+  if (res.status === 413) return 'Die Datei ist zu groß für Discord.';
+  if (res.status === 429) return 'Zu viele Posts – warte kurz.';
+  const detail = d.error || d.message || '';
+  return `Fehler ${res.status}${detail ? ': ' + detail : ''}`;
 }
 
 async function sendWebhook() {
@@ -2634,16 +2761,11 @@ async function sendWebhook() {
       newRecord: streakAfter > 1 && streakAfter > before.best, firstToday: !before.postedToday,
       file, video: !!vid, badges: fresh, mode };
     const style = store.get('postStyle', 'card');
-    let res = await postWebhook(ch.url, buildPayload(style, info, name, av), blob, style === 'card');
+    const feedInfo = { feed: vid ? 'video' : 'photo', feed_caption: msg, feed_task: task ? `${task.weekend ? '⭐' : '🎯'} ${task.text}` : '' };
+    let res = await postWebhook(ch, buildPayload(style, info, name, av), blob, style === 'card', feedInfo);
     // Falls Discord das neue Karten-Layout ablehnt: einmal als klassische Karte senden
-    if (res.status === 400 && style === 'card') res = await postWebhook(ch.url, buildPayload('classic', info, name, av), blob, false);
-    if (!res.ok) {
-      let detail = ''; try { detail = (await res.json()).message || ''; } catch {}
-      if (res.status === 401 || res.status === 404) throw new Error('Webhook ungültig oder gelöscht – bitte in den Einstellungen prüfen.');
-      if (res.status === 413) throw new Error('Die Datei ist zu groß für Discord.');
-      if (res.status === 429) throw new Error('Zu viele Posts – warte kurz.');
-      throw new Error(`Discord-Fehler ${res.status}${detail ? ': ' + detail : ''}`);
-    }
+    if (res.status === 400 && style === 'card') res = await postWebhook(ch, buildPayload('classic', info, name, av), blob, false, feedInfo);
+    if (!res.ok) throw new Error(await postError(res));
     const message = await res.json().catch(() => ({}));
     store.set('last', hookSel);
     $('#sendMsg').value = '';
@@ -2663,7 +2785,7 @@ async function sendWebhook() {
     const thumb = document.createElement('canvas');
     thumb.width = 96; thumb.height = Math.round(96 * canvas.height / canvas.width);
     thumb.getContext('2d').drawImage(canvas, 0, 0, thumb.width, thumb.height);
-    const post = { id: message.id, hook: ch.url, ch: ch.name, ts: Date.now(), day, task: task ? task.id : null, taskKey: task?.key || null,
+    const post = { id: message.id, ...chanRef(ch), ch: ch.name, ts: Date.now(), day, task: task ? task.id : null, taskKey: task?.key || null,
       badges: fresh.map(b => b.id), hadDayBefore, thumb: thumb.toDataURL('image/jpeg', .6) };
     if (message.id) store.set('posts', [post, ...store.get('posts', [])].slice(0, 40));
 
@@ -2691,7 +2813,7 @@ async function sendWebhook() {
 // Post aus Discord löschen und Streak/Aufgabe wieder zurücknehmen
 async function deletePost(post) {
   try {
-    const res = await fetch(`${post.hook.replace(/\/$/, '')}/messages/${post.id}`, { method: 'DELETE' });
+    const res = await postMessage(post, post.id, 'DELETE');
     if (!res.ok && res.status !== 404) throw new Error(res.status === 401 ? 'Webhook ungültig.' : `Discord-Fehler ${res.status}`);
   } catch (e) { toast(e instanceof TypeError ? 'Keine Verbindung zu Discord.' : e.message, true); return; }
   forgetPost(post);
@@ -2719,11 +2841,11 @@ function forgetPost(post) {
 // Wurde er direkt in Discord gelöscht (z. B. um das Foto neu zu machen), ist die Aufgabe wieder offen.
 async function verifyTaskPosts() {
   const keys = new Set(allTasks().map(t => t.key));
-  const posts = store.get('posts', []).filter(p => p.id && p.taskKey && keys.has(p.taskKey));
+  const posts = store.get('posts', []).filter(p => p.id && p.taskKey && !p.expired && keys.has(p.taskKey));
   let changed = false;
   await Promise.all(posts.map(async p => {
     try {
-      const r = await fetch(`${p.hook.replace(/\/$/, '')}/messages/${p.id}`, { cache: 'no-store' });
+      const r = await postMessage(p, p.id);
       if (r.status === 404) { forgetPost(p); changed = true; }
     } catch { /* offline: Stand behalten */ }
   }));
@@ -2742,13 +2864,39 @@ function renderPosts() {
     info.textContent = '#' + p.ch;
     const sm = document.createElement('small');
     const t = p.task != null && taskById(p.task);
-    sm.textContent = fmt.format(p.ts) + (t ? ` · ${p.task >= 2000 ? '🎮' : p.task >= 1000 ? '⭐' : '🎯'} ${t[0]} Aufgabe` : p.game ? ' · 🎮 Score' : '');
+    const gone = postExpired(p);
+    sm.textContent = fmt.format(p.ts) + (t ? ` · ${p.task >= 2000 ? '🎮' : p.task >= 1000 ? '⭐' : '🎯'} ${t[0]} Aufgabe` : p.game ? ' · 🎮 Score' : '')
+      + (gone ? ' · ⏳ nach 24 Std. gelöscht' : '');
     info.appendChild(sm);
-    const del = document.createElement('button'); del.textContent = 'Löschen';
-    del.onclick = () => { if (confirm('Diesen Post wirklich aus Discord löschen?')) deletePost(p); };
-    row.append(img, info, del);
+    row.append(img, info);
+    if (!gone) {
+      const del = document.createElement('button'); del.textContent = 'Löschen';
+      del.onclick = () => { if (confirm('Diesen Post wirklich aus Discord löschen?')) deletePost(p); };
+      row.appendChild(del);
+    } else row.classList.add('gone');
     return row;
   }));
+}
+
+// 24-Stunden-Regel: Posts verschwinden nach einem Tag aus Discord.
+// Über den Server erledigt das der Server; bei Kanälen mit direktem Webhook löscht die App ihre eigenen Posts selbst.
+const postExpired = p => p.expired || Date.now() - p.ts > 864e5;
+let expiring = false;
+async function expireOldPosts() {
+  if (expiring) return;
+  expiring = true;
+  const done = [];
+  try {
+    for (const p of store.get('posts', [])) {
+      if (p.expired || Date.now() - p.ts <= 864e5 || !p.id) continue;
+      if (p.code) { done.push(p.id); continue; }
+      try {
+        const r = await postMessage(p, p.id, 'DELETE');
+        if (r.ok || [401, 403, 404].includes(r.status)) done.push(p.id);
+      } catch { /* offline – beim nächsten Öffnen nochmal */ }
+    }
+    if (done.length) store.set('posts', store.get('posts', []).map(p => done.includes(p.id) ? { ...p, expired: true } : p));
+  } finally { expiring = false; }
 }
 
 // Feier-Animation mit Konfetti
@@ -2846,6 +2994,7 @@ async function renderCalendar() {
     if (photos[key]?.blob) {
       const url = URL.createObjectURL(photos[key].blob); calUrls.push(url);
       const img = new Image(); img.src = url; img.alt = ''; d.appendChild(img);
+      d.onclick = () => deleteDayPhoto(key, renderCalendar);
     } else if (days.has(key)) d.style.background = 'rgba(255,140,26,.35)';
     const num = document.createElement('span'); num.className = 'n'; num.textContent = n; d.appendChild(num);
     cells.push(d);
@@ -2934,15 +3083,33 @@ function chanRow(c, { onDelete }) {
   return row;
 }
 
-// Kanal-Code aus dem Redaktions-Tool: „SNAPCORD-“ + Base64 von { v:1, n: Name, u: Webhook, k: p/w, i: intern }
+// Kanal-Code: „SNAPCORD-“ + Base64 von
+//   v1 (Redaktions-Tool): { v:1, n: Name, u: Webhook, k: p/w, i: intern }
+//   v2 (Snapcord-Server):  { v:2, n: Name, c: Kanal-Token, s: Server-Adresse, k: p/w, i: intern }
+// Benutzercode (Redaktions-Tool, Tab „Benutzer“): { v:3, u: Name der Person, c: [{ n, u: Webhook, k, i }, …] } – alle Kanäle auf einmal
 function parseChannelCode(input) {
   const m = String(input).replace(/\s+/g, '').match(/^SNAPCORD-([A-Za-z0-9_-]+)$/i);
   if (!m) return null;
   try {
     let b = m[1].replace(/-/g, '+').replace(/_/g, '/'); while (b.length % 4) b += '=';
     const d = JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(b), c => c.charCodeAt(0))));
-    if (d.v !== 1 || !d.n || !WEBHOOK_RE.test(d.u)) return null;
-    return { name: String(d.n).replace(/^#/, '').slice(0, 40), url: d.u, kind: d.k === 'w' ? 'party' : 'photo', internal: !!d.i };
+    // Server-Benutzercode: { v:4, u: Name, t: Benutzer-Token, s: Server } – die Kanäle fragt die App beim Server ab
+    if (d.v === 4) {
+      const user = String(d.u || '').trim().slice(0, 40);
+      return /^[a-f0-9]{24}$/.test(d.t) && user && /^(https:\/\/[^\s/]+|http:\/\/localhost(:\d+)?)(\/[^\s]*)?$/.test(d.s || '')
+        ? { kind: 'srvuser', user, token: d.t, server: d.s.replace(/\/$/, '') } : null;
+    }
+    if (d.v === 3) {
+      const entries = (Array.isArray(d.c) ? d.c : []).map(x => parseChannelCode('SNAPCORD-' + btoa(String.fromCharCode(...new TextEncoder().encode(JSON.stringify({ ...x, v: 1 })))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''))).filter(Boolean);
+      const user = String(d.u || '').trim().slice(0, 40);
+      return entries.length && user ? { kind: 'user', user, entries } : null;
+    }
+    const base = { name: String(d.n || '').replace(/^#/, '').slice(0, 40), kind: d.k === 'w' ? 'party' : 'photo', internal: !!d.i };
+    if (!base.name) return null;
+    if (d.v === 1 && WEBHOOK_RE.test(d.u)) return { ...base, url: d.u };
+    if (d.v === 2 && /^[a-f0-9]{24}$/.test(d.c) && /^(https:\/\/[^\s/]+|http:\/\/localhost(:\d+)?)(\/[^\s]*)?$/.test(d.s || ''))
+      return { ...base, code: d.c, server: d.s.replace(/\/$/, '') };
+    return null;
   } catch { return null; }
 }
 
@@ -2962,28 +3129,104 @@ function renderChanBox(box) {
 
   const form = document.createElement('form'); form.className = 'chan-add'; form.autocomplete = 'off';
   form.innerHTML = `
-    <label class="field">Kanal-Code<input class="input" name="code" autocapitalize="off" spellcheck="false" placeholder="SNAPCORD-…"></label>
-    <button class="btn primary" type="submit">Hinzufügen</button>`;
+    <label class="field">Benutzercode<input class="input" name="code" autocapitalize="off" spellcheck="false" placeholder="SNAPCORD-…"></label>
+    <button class="btn primary" type="submit">Einlösen</button>`;
   form.onsubmit = e => {
     e.preventDefault();
     if (addChannel(form.elements.code.value)) form.reset();
   };
-  box.replaceChildren(h('📸 Foto-Kanäle'), ...photoList, h('🍿 Watchparty-Kanal'), partyRow, h('➕ Kanal hinzufügen'), form);
+  const access = store.get('access', null);
+  const head = access ? [Object.assign(document.createElement('p'), { className: 'access-line' + (access.blocked ? ' blocked' : ''),
+    textContent: access.blocked ? `⛔ Zugang von ${access.user} gesperrt – frag nach einem neuen Benutzercode`
+      : `👤 Zugang von ${access.user} · ${chans.length + (ph ? 1 : 0)} ${chans.length + (ph ? 1 : 0) === 1 ? 'Kanal' : 'Kanäle'}${access.token ? ' · 🔄 automatisch aktuell' : ''}` })] : [];
+  box.replaceChildren(...head, h('📸 Foto-Kanäle'), ...photoList, h('🍿 Watchparty-Kanal'), partyRow, h(access ? '🔄 Neuen Benutzercode einlösen' : '🔑 Benutzercode einlösen'), form);
+}
+
+// Benutzercode: ersetzt den ganzen Zugang (alle Foto-Kanäle + Watchparty) durch die Kanäle aus dem Code
+function applyUserCode(c) {
+  const had = channels().length || partyHook();
+  if (had && !confirm(`Benutzercode von ${c.user}: Deine bisherigen Kanäle werden durch ${c.entries.length === 1 ? 'diesen Kanal' : `diese ${c.entries.length} Kanäle`} ersetzt. Weiter?`)) return false;
+  const strip = ({ kind, ...e }) => e;
+  const party = c.entries.find(e => e.kind === 'party');
+  store.set('channels', c.entries.filter(e => e.kind === 'photo').map(strip));
+  store.set('partyHook', party ? strip(party) : null);
+  store.set('access', { user: c.user, at: Date.now() });
+  hookSel = 0; store.set('last', 0);
+  if (!store.get('name', '').trim()) { store.set('name', c.user); if (!$('#wName').value.trim()) $('#wName').value = c.user; }
+  feed = { items: [], at: 0, demo: true };   // Feed mit den neuen Kanälen neu laden
+  renderChanBoxes(); renderMe();
+  toast(`👤 Zugang für ${c.user} eingerichtet: ${c.entries.length} ${c.entries.length === 1 ? 'Kanal' : 'Kanäle'} ✓`);
+  return true;
+}
+
+// Server-Benutzercode: Der Code enthält keine Webhooks. Welche Kanäle die Person hat, sagt der Server –
+// bei jedem Öffnen neu, so wirken Änderungen und Sperren im Admin-Bereich sofort.
+const userHeader = () => { const a = store.get('access', null); return a?.token && !a.blocked ? { 'X-Snapcord-User': a.token } : {}; };
+async function fetchAccess(server, token) {
+  const r = await fetch(`${server}/api.php?a=access`, { cache: 'no-store', headers: { 'X-Snapcord-User': token } });
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) { const e = new Error(d.error || `Server-Fehler ${r.status}`); e.status = r.status; throw e; }
+  return d;
+}
+function setServerChannels(server, d) {
+  const toEntry = c => ({ name: c.name, code: c.key, server, internal: !!c.internal });
+  const party = d.channels.find(c => c.kind === 'party');
+  store.set('channels', d.channels.filter(c => c.kind === 'photo').map(toEntry));
+  store.set('partyHook', party ? toEntry(party) : null);
+  if (hookSel >= channels().length) { hookSel = 0; store.set('last', 0); }
+  feed = { items: [], at: 0, demo: true };
+}
+async function redeemServerUser(c) {
+  let d;
+  try { d = await fetchAccess(c.server, c.token); }
+  catch (e) { return toast(e.status ? e.message : 'Keine Verbindung zum Snapcord-Server. Bist du online?', true); }
+  const had = channels().length || partyHook(), old = store.get('access', null);
+  if (had && old?.token !== c.token && !confirm(`Benutzercode von ${d.user}: Deine bisherigen Kanäle werden durch ${d.channels.length === 1 ? 'diesen Kanal' : `diese ${d.channels.length} Kanäle`} ersetzt. Weiter?`)) return;
+  store.set('access', { user: d.user, token: c.token, server: c.server, at: Date.now(), checked: Date.now() });
+  setServerChannels(c.server, d);
+  if (!store.get('name', '').trim()) { store.set('name', d.user); if (!$('#wName').value.trim()) $('#wName').value = d.user; }
+  renderChanBoxes(); renderMe(); renderFan();
+  toast(`👤 Zugang für ${d.user} eingerichtet: ${d.channels.length} ${d.channels.length === 1 ? 'Kanal' : 'Kanäle'} ✓`);
+}
+// Beim Öffnen (höchstens alle 5 Minuten): Kanäle abgleichen, Sperre erkennen
+async function refreshAccess(force = false) {
+  const a = store.get('access', null);
+  if (!a?.token || a.blocked || (!force && Date.now() - (a.checked || 0) < 5 * 60e3)) return;
+  try {
+    const d = await fetchAccess(a.server, a.token);
+    const before = JSON.stringify([channels(), partyHook()]);
+    setServerChannels(a.server, d);
+    store.set('access', { ...a, user: d.user, checked: Date.now() });
+    if (before !== JSON.stringify([channels(), partyHook()])) { renderChanBoxes(); renderFan(); toast('🔄 Deine Kanäle wurden aktualisiert'); }
+  } catch (e) {
+    if (e.status !== 403) return;   // offline o. ä. – Zugang behalten
+    store.set('channels', []); store.set('partyHook', null);
+    store.set('access', { ...a, blocked: true, reason: e.message });
+    feed = { items: [], at: 0, demo: true };
+    renderChanBoxes(); renderFan();
+    toast(`⛔ ${e.message}`, true);
+  }
 }
 
 // Fügt den Kanal aus einem Kanal-Code hinzu – Name, Art und Sichtbarkeit sind darin festgelegt
 function addChannel(code) {
   const c = parseChannelCode(code);
-  if (!c) { toast('Ungültiger Kanal-Code', true); return false; }
-  const { name, url, kind, internal } = c;
+  if (!c) { toast('Ungültiger Code – bitte komplett kopieren', true); return false; }
+  if (c.kind === 'user') return applyUserCode(c);
+  if (c.kind === 'srvuser') { redeemServerUser(c); return true; }
+  const { kind, ...entry } = c, { name, internal } = c;
+  const same = x => x && (entry.code ? x.code === entry.code : x.url === entry.url);
   if (kind === 'party') {
     const ph = partyHook();
-    if (ph && ph.url !== url && !confirm(`Es gibt schon den Watchparty-Kanal #${ph.name}. Durch #${name} ersetzen?`)) return false;
-    store.set('partyHook', { name, url, internal });
+    if (ph && !same(ph) && !confirm(`Es gibt schon den Watchparty-Kanal #${ph.name}. Durch #${name} ersetzen?`)) return false;
+    store.set('partyHook', entry);
   } else {
     const chans = channels();
-    if (chans.some(x => x.url === url)) { toast('Diesen Kanal gibt es schon', true); return false; }
-    chans.push({ name, url, internal }); store.set('channels', chans);
+    if (chans.some(same)) { toast('Diesen Kanal gibt es schon', true); return false; }
+    // Gleicher Kanal neu über den Server? Dann den alten Webhook-Eintrag ersetzen
+    const old = chans.findIndex(x => !x.code && entry.code && x.name === name);
+    if (old >= 0) chans.splice(old, 1, entry); else chans.push(entry);
+    store.set('channels', chans);
   }
   renderChanBoxes();
   toast(`${kind === 'party' ? '🍿' : '📸'} #${name} ${internal ? '(intern) ' : ''}hinzugefügt ✓`);
@@ -3116,6 +3359,7 @@ function openGames() {
     return d;
   });
   $('#gameList').replaceChildren(...cards, ...soon);
+  renderBoard();
 }
 
 let gameCleanup = null;
@@ -3138,6 +3382,7 @@ function endGame(g, score) {
   const task = gameTask(), forTask = !BOT_MODE && !isDone(task) && (!task.game || task.game === g);
   $('#gameArea').innerHTML = `<div class="game-end"><div class="e">${record ? '🏆' : g.e}</div><h3>${fmtScore(g, score)}</h3>
     ${record ? '<div class="rec">Neuer Rekord!</div>' : prev != null ? `<p>Dein Rekord: ${fmtScore(g, prev)}</p>` : ''}
+    <p class="rank" id="gameRank" hidden></p>
     <button class="btn primary share" id="gameShare">📤 Score in Discord teilen</button>
     ${forTask ? '<p class="task-hint">🎯 Teilen erfüllt deine Spiel-Aufgabe von heute</p>' : ''}
     <div class="btns"><button class="btn" id="gameAgain">↻ Nochmal</button><button class="btn" id="gameDone">Fertig</button></div></div>`;
@@ -3145,7 +3390,70 @@ function endGame(g, score) {
   $('#gameAgain').onclick = () => playGame(g);
   $('#gameDone').onclick = openGames;
   if (record) confetti();
+  if (valid) submitScore(g, score);
 }
+
+/* ---------- Bestenlisten (nur mit Snapcord-Server) ---------- */
+
+async function serverApi(path, opts = {}) {
+  const base = serverBase();
+  if (!base) return null;
+  const r = await fetch(`${base}/api.php?${path}`, { cache: 'no-store', ...opts, headers: { 'X-Snapcord-Player': playerId(), ...userHeader(), ...(opts.headers || {}) } });
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(d.error || `Server-Fehler ${r.status}`);
+  return d;
+}
+// Jeder Score geht an die Bestenliste – der Server behält pro Tag nur deinen besten
+async function submitScore(g, score) {
+  try {
+    const d = await serverApi('a=score', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pid: playerId(), game: g.id, score, name: store.get('name', '').trim(), avatar: store.get('avatar', null) }) });
+    const el = $('#gameRank');
+    if (!d?.me || !el) return;
+    el.textContent = `📊 Heute Platz ${d.me.rank} von ${d.players}` + (d.me.score !== score ? ` · dein Bestwert: ${fmtScore(g, d.me.score)}` : '');
+    el.hidden = false;
+    boardSel.game = g.id;
+  } catch { /* offline oder kein Server – Spiel funktioniert trotzdem */ }
+}
+
+const boardSel = { game: null, period: 'day' };
+async function renderBoard() {
+  const box = $('#gameBoard');
+  box.hidden = !serverBase();
+  if (box.hidden) return;
+  const open = GAMES.filter(gameUnlocked);
+  if (!GAMES.some(g => g.id === boardSel.game)) boardSel.game = (gameOfDay() || open[0]).id;
+  for (const b of $('#boardPeriod').children) b.setAttribute('aria-pressed', b.dataset.p === boardSel.period);
+  $('#boardGames').replaceChildren(...GAMES.map(g => {
+    const b = document.createElement('button');
+    b.textContent = `${g.e} ${g.name}`;
+    b.setAttribute('aria-pressed', g.id === boardSel.game);
+    b.onclick = () => { boardSel.game = g.id; renderBoard(); };
+    return b;
+  }));
+  const list = $('#boardList'), g = GAMES.find(x => x.id === boardSel.game), want = `${boardSel.game}:${boardSel.period}`;
+  list.dataset.want = want;
+  if (!list.children.length) list.innerHTML = '<div class="board-empty">Lädt …</div>';
+  let d;
+  try { d = await serverApi(`a=board&game=${g.id}&period=${boardSel.period}`); }
+  catch { if (list.dataset.want === want) list.innerHTML = '<div class="board-empty">Bestenliste gerade nicht erreichbar.</div>'; return; }
+  if (list.dataset.want !== want) return;   // inzwischen etwas anderes ausgewählt
+  const row = e => {
+    const r = document.createElement('div'); r.className = 'board-row' + (e.me ? ' me' : '');
+    const rank = Object.assign(document.createElement('span'), { className: 'r', textContent: ['🥇', '🥈', '🥉'][e.rank - 1] || e.rank });
+    const av = e.avatar && AVATARS.includes(e.avatar) ? Object.assign(new Image(), { src: `avatars/${e.avatar}.png`, alt: '' }) : Object.assign(document.createElement('span'), { className: 'na' });
+    const n = Object.assign(document.createElement('span'), { className: 'n', textContent: e.name + (e.me ? ' (du)' : '') });
+    const s = Object.assign(document.createElement('span'), { className: 's', textContent: fmtScore(g, e.score) });
+    r.append(rank, av, n, s);
+    return r;
+  };
+  const rows = d.top.map(row);
+  if (d.me && !d.top.some(e => e.me)) rows.push(Object.assign(document.createElement('div'), { className: 'board-gap', textContent: '⋮' }), row(d.me));
+  if (!rows.length) rows.push(Object.assign(document.createElement('div'), { className: 'board-empty',
+    textContent: boardSel.period === 'day' ? `Heute hat noch niemand ${g.name} gespielt.${gameUnlocked(g) ? ' Sei die erste Person!' : ''}` : 'Diese Woche noch keine Ergebnisse.' }));
+  list.replaceChildren(...rows);
+}
+for (const b of $('#boardPeriod').children) b.onclick = () => { boardSel.period = b.dataset.p; renderBoard(); };
 
 // Score als Bild-Karte in einen Discord-Kanal posten – erfüllt die Spiel-Aufgabe des Tages
 function shareScore(g, score, record) {
@@ -3219,20 +3527,17 @@ async function postScore(g, score, record, idx) {
     const canvas = await scoreCard(g, score, record, name);
     const blob = await new Promise((res, rej) => canvas.toBlob(b => b ? res(b) : rej(new Error('Export fehlgeschlagen')), 'image/jpeg', .92));
     const info = { g, score, record, best: store.get('gameBest', {})[g.id], task: forTask ? task : null, file: 'snapcord-score.jpg' };
-    let res = await postWebhook(ch.url, scorePayload('card', info, name, av), blob, true);
-    if (res.status === 400) res = await postWebhook(ch.url, scorePayload('classic', info, name, av), blob, false);
-    if (!res.ok) {
-      if (res.status === 401 || res.status === 404) throw new Error('Webhook ungültig oder gelöscht – bitte in den Einstellungen prüfen.');
-      if (res.status === 429) throw new Error('Zu viele Posts – warte kurz.');
-      throw new Error(`Discord-Fehler ${res.status}`);
-    }
+    const feedInfo = { feed: 'score', feed_caption: `${g.e} ${g.name}: ${fmtScore(g, score)}${record ? ' – neuer Rekord! 🏆' : ''}`, feed_task: forTask ? `🎮 ${task.text}` : '' };
+    let res = await postWebhook(ch, scorePayload('card', info, name, av), blob, true, feedInfo);
+    if (res.status === 400) res = await postWebhook(ch, scorePayload('classic', info, name, av), blob, false, feedInfo);
+    if (!res.ok) throw new Error(await postError(res));
     const message = await res.json().catch(() => ({}));
     store.set('last', idx); hookSel = idx;
     if (forTask) store.set('done', [...new Set([...doneTasks(), task.key])]);
     const thumb = document.createElement('canvas'); thumb.width = 96; thumb.height = 50;
     thumb.getContext('2d').drawImage(canvas, 0, 0, 96, 50);
     // hadDayBefore: Score-Posts zählen nicht zur Foto-Streak und nehmen beim Löschen keinen Tag weg
-    const post = { id: message.id, hook: ch.url, ch: ch.name, ts: Date.now(), day: localDay(), task: forTask ? task.id : null, taskKey: forTask ? task.key : null,
+    const post = { id: message.id, ...chanRef(ch), ch: ch.name, ts: Date.now(), day: localDay(), task: forTask ? task.id : null, taskKey: forTask ? task.key : null,
       badges: [], hadDayBefore: true, game: g.id, thumb: thumb.toDataURL('image/jpeg', .6) };
     if (message.id) store.set('posts', [post, ...store.get('posts', [])].slice(0, 40));
     renderMe();
@@ -3394,20 +3699,224 @@ async function latestPhotos(n) {
   catch { return []; }
 }
 
-// Startseite: drei letzte Fotos aufgefächert (ältestes links, neuestes vorne in der Mitte)
-let fanUrls = [];
+// Startseite: die drei neuesten Fotos aus dem Feed aufgefächert (ältestes links, neuestes vorne in der Mitte)
 async function renderFan() {
   const empty = ['🎬', '✨', '📸'];
   const draw = photos => {
     const order = [photos[2], photos[1], photos[0]];
-    $('#fan').innerHTML = order.map((p, i) => `<div class="fp">${p ? `<img src="${p.url}" alt="">` : `<i>${empty[i]}</i>`}</div>`).join('');
+    $('#fan').innerHTML = order.map((p, i) => `<div class="fp">${p ? `<img src="${escHtml(p.url)}" alt="">` : `<i>${empty[i]}</i>`}</div>`).join('');
   };
   if (!$('#fan').children.length) draw([]);     // Platzhalter sofort zeigen
-  const photos = await latestPhotos(3);
-  for (const u of fanUrls) URL.revokeObjectURL(u);
-  fanUrls = photos.map(p => p.url);
-  draw(photos);
+  const f = await loadFeed();
+  draw(f.items.filter(i => i.mime.startsWith('image/')).slice(0, 3));
+  const n = f.items.length;
+  $('#feedSub').textContent = f.demo ? 'Bald verfügbar ✨ · Vorschau ansehen'
+    : n ? `${n} ${n === 1 ? 'Post' : 'Posts'} in den letzten 24 Std.` : 'Noch leer – poste den ersten Snap!';
 }
+
+/* ---------- Feed ---------- */
+// Fotos aus den abonnierten Foto-Kanälen, je 24 Stunden sichtbar, mit 🔥 und Antworten.
+// Ohne Snapcord-Server (noch keine Server-Kanal-Codes) zeigt die App eine Vorschau mit Demo-Posts.
+
+const serverChans = () => channels().filter(c => c.code && c.server === serverBase());
+const feedHeaders = (json = false) => ({ 'X-Snapcord-Channels': serverChans().map(c => c.code).join(','), ...(json ? { 'Content-Type': 'application/json' } : {}) });
+let feed = { items: [], at: 0, demo: true }, feedTab = 'all';
+
+async function loadFeed(force = false) {
+  if (!serverChans().length) { if (!feed.demo || !feed.items.length) feed = { items: demoFeed(), at: Date.now(), demo: true }; return feed; }
+  if (!force && !feed.demo && Date.now() - feed.at < 30e3) return feed;
+  try {
+    const d = await serverApi('a=feed', { headers: feedHeaders() });
+    feed = { items: d.items, at: Date.now(), demo: false };
+  } catch { if (feed.demo) feed = { items: [], at: 0, demo: false, error: true }; }
+  return feed;
+}
+
+// Demo-Bilder werden im Handy gezeichnet: Farbverlauf, Lichtpunkte und große Emojis
+const DEMO_SCENES = [
+  { bg: ['#2b1055', '#d53a9d'], e: '🍿', more: ['🎬', '✨', '🎞️'] },
+  { bg: ['#ff9a44', '#fc6076'], e: '🌅', more: ['☁️', '🕊️'] },
+  { bg: ['#9be15d', '#00b09b'], e: '🐌', more: ['🌿', '🍃', '🌼'] },
+  { bg: ['#141e30', '#3a7bd5'], e: '💻', more: ['🎮', '🎧', '⌨️'] },
+  { bg: ['#3a0ca3', '#f72585'], e: '🎸', more: ['🎵', '🎶', '🎤'] },
+  { bg: ['#f7971e', '#ffd200'], e: '🍕', more: ['🧀', '🍅'] },
+];
+const demoPhotoCache = {};
+function demoPhoto(i) {
+  if (demoPhotoCache[i]) return demoPhotoCache[i];
+  const s = DEMO_SCENES[i], c = document.createElement('canvas'); c.width = 600; c.height = 800;
+  const x = c.getContext('2d'), r = rng(i * 977 + 13);
+  const g = x.createLinearGradient(0, 0, 600, 800); g.addColorStop(0, s.bg[0]); g.addColorStop(1, s.bg[1]);
+  x.fillStyle = g; x.fillRect(0, 0, 600, 800);
+  for (let k = 0; k < 14; k++) {   // weiche Lichtpunkte
+    const cx = r() * 600, cy = r() * 800, rad = 30 + r() * 90, b = x.createRadialGradient(cx, cy, 0, cx, cy, rad);
+    b.addColorStop(0, 'rgba(255,255,255,.28)'); b.addColorStop(1, 'rgba(255,255,255,0)');
+    x.fillStyle = b; x.beginPath(); x.arc(cx, cy, rad, 0, 7); x.fill();
+  }
+  x.textAlign = 'center'; x.textBaseline = 'middle';
+  s.more.forEach((e, k) => { x.font = `${70 + r() * 40}px ${EMOJI_FONT}`; x.globalAlpha = .85; x.fillText(e, 90 + r() * 420, k % 2 ? 130 + r() * 120 : 600 + r() * 120); });
+  x.globalAlpha = 1; x.shadowColor = 'rgba(0,0,0,.35)'; x.shadowBlur = 30; x.shadowOffsetY = 12;
+  x.font = `260px ${EMOJI_FONT}`; x.fillText(s.e, 300, 420);
+  x.shadowColor = 'transparent';
+  const v = x.createRadialGradient(300, 400, 260, 300, 400, 560); v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(0,0,0,.35)');
+  x.fillStyle = v; x.fillRect(0, 0, 600, 800);
+  return demoPhotoCache[i] = c.toDataURL('image/jpeg', .85);
+}
+const DEMO_CHANS = [{ code: 'demo-snaps', name: 'snaps', internal: false }, { code: 'demo-crew', name: 'crew', internal: true }];
+const DEMO_POSTS = [
+  ['Mia', 'katze', 0, 'demo-snaps', 'Filmabend steht! Wer ist heute dabei? 🍿', '', 14, 25, [['Jonas', 'fuchs', 'Bin dabei! Welcher Film?'], ['Lea', 'einhorn', 'Bitte was Lustiges 😂']]],
+  ['Lea', 'einhorn', 1, 'demo-snaps', 'Sonnenuntergang vom Balkon – kein Filter nötig', '🎯 So viele Farben wie möglich in einem Foto', 21, 70, [['Mia', 'katze', 'Wow 😍']]],
+  ['Ben', 'gamer', 3, 'demo-crew', 'Neues Setup ist endlich fertig 💻', '', 9, 160, []],
+  ['Jonas', 'fuchs', 2, 'demo-snaps', 'Unser neuer Mitbewohner im Garten', '🎯 Etwas Langsames', 17, 300, [['Ben', 'gamer', 'Der ist schneller als mein WLAN 🐌'], ['Sara', 'musik', 'Wie heißt er?'], ['Jonas', 'fuchs', 'Turbo natürlich']]],
+  ['Sara', 'musik', 4, 'demo-crew', 'Konzert gestern war der Wahnsinn 🎸', '', 26, 600, [['Mia', 'katze', 'Neidisch!!']]],
+  ['Tom', 'baer', 5, 'demo-snaps', 'Selbstgemacht! 🍕', '', 6, 900, []],
+];
+function demoFeed() {
+  const now = Math.floor(Date.now() / 1000);
+  return DEMO_POSTS.map(([name, avatar, scene, ch, caption, task, flames, ago, replies], i) => ({
+    id: -1 - i, demo: true, ch, name, avatar: AVATARS.includes(avatar) ? avatar : null, kind: 'photo', caption, task, mime: 'image/jpeg',
+    url: demoPhoto(scene), created: now - ago * 60, expires: now - ago * 60 + 86400, flames, flamed: false, replies: replies.length, mine: false,
+    demoReplies: replies.map(([n, a, t], k) => ({ name: n, avatar: AVATARS.includes(a) ? a : null, text: t, created: now - ago * 60 + (k + 1) * 240 })),
+  }));
+}
+
+const agoText = sec => { const m = Math.max(0, Math.round((Date.now() / 1000 - sec) / 60)); return m < 1 ? 'gerade eben' : m < 60 ? `vor ${m} Min.` : `vor ${Math.round(m / 60)} Std.`; };
+const leftText = exp => { const h = Math.max(0, (exp - Date.now() / 1000) / 3600); return h < 1 ? '⏳ < 1 Std.' : `⏳ noch ${Math.floor(h)} Std.`; };
+function avatarEl(av) {
+  const s = document.createElement('span'); s.className = 'fav';
+  if (av && AVATARS.includes(av)) s.appendChild(Object.assign(new Image(), { src: `avatars/${av}.png`, alt: '' })); else s.textContent = '🙂';
+  return s;
+}
+
+async function openFeed() {
+  closeSheets();
+  openPage('feedPage');
+  renderFeed();
+  await loadFeed(true);
+  renderFeed(); renderFan();
+}
+function renderFeed() {
+  const chans = feed.demo ? DEMO_CHANS : serverChans().map(c => ({ code: c.code, name: c.name, internal: c.internal }));
+  $('#feedSoon').hidden = !feed.demo;
+  if (feedTab !== 'all' && !chans.some(c => c.code === feedTab)) feedTab = 'all';
+  $('#feedTabs').replaceChildren(...(chans.length > 1 ? [{ code: 'all', name: 'Alle' }, ...chans] : []).map(c => {
+    const b = document.createElement('button');
+    b.textContent = c.code === 'all' ? '🔥 Alle' : `#${c.name}${c.internal ? ' 🔒' : ''}`;
+    b.setAttribute('aria-pressed', feedTab === c.code);
+    b.onclick = () => { feedTab = c.code; renderFeed(); };
+    return b;
+  }));
+  const items = feed.items.filter(i => feedTab === 'all' || i.ch === feedTab);
+  const chanOf = code => chans.find(c => c.code === code);
+  if (!items.length) {
+    $('#feedList').innerHTML = feed.error ? '<div class="empty-state"><b>📡</b>Feed gerade nicht erreichbar. Bist du online?</div>'
+      : '<div class="empty-state"><b>📸</b>In den letzten 24 Stunden wurde hier noch nichts gepostet.<br>Mach den Anfang!</div>';
+    return;
+  }
+  $('#feedList').replaceChildren(...items.map(it => feedCard(it, chanOf(it.ch))));
+}
+function feedCard(it, ch) {
+  const el = document.createElement('article'); el.className = 'fcard';
+  el.innerHTML = `<header><span class="fwho"><b></b><small></small></span></header><div class="fmedia"></div>
+    <div class="fbody"><p class="ftask"></p><p class="fcap"></p></div>
+    <footer><button class="fflame" type="button"></button><button class="freply" type="button"></button><span class="fleft"></span></footer>`;
+  el.querySelector('header').prepend(avatarEl(it.avatar));
+  el.querySelector('.fwho b').textContent = it.name + (it.mine ? ' (du)' : '');
+  el.querySelector('.fwho small').textContent = `${ch ? `#${ch.name}${ch.internal ? ' 🔒' : ''} · ` : ''}${agoText(it.created)}`;
+  if (it.mine && it.msg) {
+    const del = Object.assign(document.createElement('button'), { className: 'fdel', type: 'button', textContent: '🗑️' });
+    del.setAttribute('aria-label', 'Post löschen');
+    del.onclick = () => deleteFeedPost(it);
+    el.querySelector('header').appendChild(del);
+  }
+  const media = el.querySelector('.fmedia');
+  media.appendChild(it.mime.startsWith('video/')
+    ? Object.assign(document.createElement('video'), { src: it.url, autoplay: true, muted: true, loop: true, playsInline: true })
+    : Object.assign(new Image(), { src: it.url, alt: it.caption || 'Foto', loading: 'lazy' }));
+  el.querySelector('.ftask').textContent = it.task || '';
+  el.querySelector('.fcap').textContent = it.caption || '';
+  el.querySelector('.fleft').textContent = leftText(it.expires);
+  const flame = el.querySelector('.fflame'), reply = el.querySelector('.freply');
+  const paint = () => { flame.textContent = `🔥 ${it.flames}`; flame.classList.toggle('on', it.flamed); reply.textContent = `💬 ${it.replies}`; };
+  paint();
+  flame.onclick = () => toggleFlame(it, paint);
+  reply.onclick = () => openReplies(it, paint);
+  // Doppeltippen aufs Foto = 🔥
+  let lastTap = 0;
+  media.onclick = () => {
+    if (Date.now() - lastTap < 350) {
+      media.appendChild(Object.assign(document.createElement('span'), { className: 'burst', textContent: '🔥' }));
+      setTimeout(() => media.querySelector('.burst')?.remove(), 800);
+      if (!it.flamed) toggleFlame(it, paint);
+      lastTap = 0;
+    } else lastTap = Date.now();
+  };
+  return el;
+}
+
+async function toggleFlame(it, paint) {
+  it.flamed = !it.flamed; it.flames += it.flamed ? 1 : -1; paint();   // sofort zeigen, Server bestätigt
+  if (it.demo) return;
+  try {
+    const d = await serverApi('a=flame', { method: 'POST', headers: feedHeaders(true), body: JSON.stringify({ id: it.id, pid: playerId() }) });
+    it.flames = d.flames; it.flamed = d.flamed;
+  } catch (e) { it.flamed = !it.flamed; it.flames += it.flamed ? 1 : -1; toast(e.message, true); }
+  paint();
+}
+
+let replyCtx = null;
+async function openReplies(it, paint) {
+  replyCtx = { it, paint };
+  $('#replyText').value = '';
+  $('#replyList').innerHTML = '<p class="empty">Lädt …</p>';
+  openSheet('#replySheet');
+  if (it.demo) return renderReplies(it.demoReplies);
+  try { renderReplies((await serverApi(`a=replies&id=${it.id}`, { headers: feedHeaders() })).replies); }
+  catch (e) { $('#replyList').innerHTML = `<p class="empty">${escHtml(e.message)}</p>`; }
+}
+function renderReplies(list) {
+  if (!list.length) { $('#replyList').innerHTML = '<p class="empty">Noch keine Antworten – schreib die erste! 💬</p>'; return; }
+  $('#replyList').replaceChildren(...list.map(r => {
+    const row = document.createElement('div'); row.className = 'reply';
+    const body = document.createElement('div');
+    body.append(Object.assign(document.createElement('b'), { textContent: r.name + (r.mine ? ' (du)' : '') }),
+      Object.assign(document.createElement('small'), { textContent: agoText(r.created) }), Object.assign(document.createElement('p'), { textContent: r.text }));
+    row.append(avatarEl(r.avatar), body);
+    return row;
+  }));
+  $('#replyList').scrollTop = 1e6;
+}
+$('#replyForm').onsubmit = async e => {
+  e.preventDefault();
+  const text = $('#replyText').value.trim(), ctx = replyCtx;
+  if (!text || !ctx) return;
+  const me = { name: store.get('name', '').trim() || 'Du', avatar: store.get('avatar', null) };
+  if (ctx.it.demo) {
+    ctx.it.demoReplies.push({ ...me, text, created: Date.now() / 1000, mine: true });
+    ctx.it.replies++; ctx.paint(); renderReplies(ctx.it.demoReplies); $('#replyText').value = '';
+    return toast('Vorschau – echte Antworten gibt es, sobald der Feed online ist');
+  }
+  const btn = $('#replyForm button'); btn.disabled = true;
+  try {
+    const d = await serverApi('a=reply', { method: 'POST', headers: feedHeaders(true), body: JSON.stringify({ id: ctx.it.id, text, pid: playerId(), ...me }) });
+    ctx.it.replies = d.replies.length; ctx.paint(); renderReplies(d.replies); $('#replyText').value = '';
+  } catch (err) { toast(err.message, true); }
+  finally { btn.disabled = false; }
+};
+
+// Eigenen Post aus dem Feed löschen = aus Discord löschen (wie unter „Meine Posts“)
+async function deleteFeedPost(it) {
+  if (!confirm('Diesen Post aus Feed und Discord löschen?')) return;
+  const local = store.get('posts', []).find(p => p.id === it.msg);
+  if (local) await deletePost(local);
+  else {
+    const ch = serverChans().find(c => c.code === it.ch);
+    try { const r = ch && await postMessage(chanRef(ch), it.msg, 'DELETE'); if (!r?.ok && r?.status !== 404) throw new Error(); toast('Post gelöscht 🗑️'); }
+    catch { toast('Löschen hat nicht geklappt', true); }
+  }
+  await loadFeed(true); renderFeed(); renderFan();
+}
+$('#feedSnap').onclick = openCam;
 
 let collUrls = [];
 async function openColl() {
@@ -3425,8 +3934,17 @@ async function openColl() {
   for (const u of collUrls) URL.revokeObjectURL(u);
   collUrls = photos.map(p => p.url);
   $('#collPhotos').innerHTML = photos.length
-    ? photos.map(p => `<div><img src="${p.url}" alt=""><span>${new Date(p.day + 'T12:00').toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })}</span></div>`).join('')
+    ? photos.map(p => `<div data-day="${p.day}"><img src="${p.url}" alt=""><span>${new Date(p.day + 'T12:00').toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })}</span></div>`).join('')
     : '<p class="empty" style="grid-column:1/-1">Noch keine Fotos – mach deinen ersten Snap! 📸</p>';
+  for (const d of $('#collPhotos').querySelectorAll('[data-day]')) d.onclick = () => deleteDayPhoto(d.dataset.day, openColl);
+}
+
+// Fotos der Sammlung bleiben, bis man sie selbst löscht (für Kalender und Monatsrückblick)
+async function deleteDayPhoto(day, after) {
+  const label = new Date(day + 'T12:00').toLocaleDateString('de-DE', { day: 'numeric', month: 'long' });
+  if (!confirm(`Foto vom ${label} aus deiner Sammlung löschen?\nEs fehlt dann auch im Kalender und im Monatsrückblick.`)) return;
+  try { await photoDb.del(day); toast('Foto gelöscht 🗑️'); } catch { toast('Löschen hat nicht geklappt', true); }
+  after?.();
 }
 
 /* ---------- Startseite, News, Events ---------- */
@@ -3685,13 +4203,6 @@ function partyPayload(p) {
   if (p.poster) payload.attachments = [{ id: 0, filename: 'poster.jpg' }];
   return payload;
 }
-async function postParty(url, payload, poster) {
-  const fd = new FormData();
-  fd.append('payload_json', JSON.stringify(payload));
-  if (poster) fd.append('files[0]', poster, 'poster.jpg');
-  try { return await fetch(url.replace(/\/$/, '') + '?wait=true', { method: 'POST', body: fd }); }
-  catch { throw new Error('Keine Verbindung zu Discord. Bist du online?'); }
-}
 
 $('#partyForm').addEventListener('submit', async e => {
   e.preventDefault();
@@ -3711,18 +4222,15 @@ $('#partyForm').addEventListener('submit', async e => {
   };
   const btn = $('#pSend'); sending = true; btn.disabled = true; btn.textContent = 'Wird angekündigt …';
   try {
-    const res = await postParty(hook.url, partyPayload(p), p.poster);
-    if (!res.ok) {
-      if (res.status === 401 || res.status === 404) throw new Error('Watchparty-Webhook ungültig – bitte in den Einstellungen prüfen.');
-      throw new Error(`Discord-Fehler ${res.status}`);
-    }
+    const res = await postWebhook(hook, partyPayload(p), p.poster, false);
+    if (!res.ok) throw new Error(await postError(res));
     const msg = await res.json().catch(() => ({}));
     resetParty(); goHome();
     celebrate({ icon: '🍿', title: 'Watchparty angekündigt!', sub: title,
       lines: [`📅 ${when.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' })} · ${fmtTime(when)} Uhr`, `📣 Gepostet in #${hook.name}`] });
     if (msg.id) toast(`Angekündigt in #${hook.name} ✓`, false, { label: 'Rückgängig', fn: async () => {
       try {
-        const r = await fetch(`${hook.url.replace(/\/$/, '')}/messages/${msg.id}`, { method: 'DELETE' });
+        const r = await postMessage(chanRef(hook), msg.id, 'DELETE');
         toast(r.ok || r.status === 404 ? 'Ankündigung gelöscht 🗑️' : `Discord-Fehler ${r.status}`, !(r.ok || r.status === 404));
       } catch { toast('Keine Verbindung zu Discord.', true); }
     } });
@@ -3934,6 +4442,7 @@ $('#btnWeather').onclick = addWeather;
 for (const b of document.querySelectorAll('[data-home]')) b.onclick = goHome;
 $('#tileSnap').onclick = openCam;
 $('#tileColl').onclick = openColl;
+$('#tileFeed').onclick = openFeed;
 $('#tileGames').onclick = openGames;
 $('#gameClose').onclick = () => { stopGame(); openGames(); };
 $('#collBadges').onclick = openBadges;
@@ -3994,7 +4503,7 @@ setInterval(() => {
 }, 15000);
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) stopCamera();
-  else { if (camActive()) startCamera(); refreshMe(); loadContent(); applyTheme(); checkForUpdate(); }
+  else { if (camActive()) startCamera(); refreshMe(); loadContent(); applyTheme(); checkForUpdate(); expireOldPosts(); refreshAccess(); }
 });
 applyTheme();
 
@@ -4005,6 +4514,8 @@ renderMe();
 refreshMe();
 renderHome();
 renderFan();
+expireOldPosts();
+refreshAccess(true);
 // Beim allerersten Start: Willkommensseite (wer schon Kanäle hat, sieht sie nicht)
 if (!BOT_MODE && !store.get('welcomed', false) && !channels().length && !partyHook()) showWelcome();
 loadContent();
